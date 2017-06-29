@@ -28,6 +28,10 @@ The following arguments are supported:
 
 * `comment` - (Optional) Free form text description.
 
+* `parent` - (Optional) The parent this profile inherits settings from.
+
+* `server` - (Optional) The server-override for the profile.
+
 * `distro` - (Optional) Parent distribution.
 
 * `enable_gpxe` - (Optional) Use gPXE instead of PXELINUX for
@@ -86,6 +90,8 @@ The following arguments are supported:
 
 * `virt_type` - (Optional) The type of virtual machine. Valid options
   are: xenpv, xenfv, qemu, kvm, vmware, openvz.
+
+* `virt_disk_driver` - (Optional) The virtual machine disk driver.
 
 ## Attributes Reference
 
