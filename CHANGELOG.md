@@ -1,4 +1,9 @@
 ## 0.1.1 (Unreleased)
+
+FEATURES:
+
+__New Resource:__ `cobbler_repo` [GH-3]
+
 ## 0.1.0 (June 20, 2017)
 
 NOTES:
