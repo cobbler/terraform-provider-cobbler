@@ -140,8 +140,6 @@ func resourceRepoRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Set all fields
-	d.Set("apt_components", repo.AptComponents)
-	d.Set("apt_dists", repo.AptDists)
 	d.Set("arch", repo.Arch)
 	d.Set("breed", repo.Breed)
 	d.Set("comment", repo.Comment)
@@ -151,10 +149,28 @@ func resourceRepoRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("mirror", repo.Mirror)
 	d.Set("mirror_locally", repo.MirrorLocally)
 	d.Set("name", repo.Name)
-	d.Set("owners", repo.Owners)
 	d.Set("proxy", repo.Proxy)
-	d.Set("rpm_list", repo.RpmList)
 	//d.Set("yumopts", repo.YumOpts)
+
+	err = d.Set("apt_components", repo.AptComponents)
+	if err != nil {
+		log.Printf("[DEBUG] Unable to set apt_components: %s", err)
+	}
+
+	err = d.Set("apt_dists", repo.AptDists)
+	if err != nil {
+		log.Printf("[DEBUG] Unable to set apt_dists: %s", err)
+	}
+
+	err = d.Set("owners", repo.Owners)
+	if err != nil {
+		log.Printf("[DEBUG] Unable to set owners: %s", err)
+	}
+
+	err = d.Set("rpm_list", repo.RpmList)
+	if err != nil {
+		log.Printf("[DEBUG] Unable to set rpm_list: %s", err)
+	}
 
 	return nil
 }
