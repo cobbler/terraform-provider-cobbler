@@ -521,11 +521,11 @@
 			"revisionTime": "2016-08-03T19:07:31Z"
 		},
 		{
-			"checksumSHA1": "YhQcOsGx8r2S/jkJ0Qt4cZ5BLCU=",
+			"checksumSHA1": "tYchtKVbGi7Hcnxwy+25QX6etwg=",
 			"comment": "v0.3.0-33-g53d1c0a",
 			"path": "github.com/jtopjian/cobblerclient",
-			"revision": "3b306e0a196ac0dc04751ad27130601a4533cce9",
-			"revisionTime": "2017-03-05T20:21:00Z"
+			"revision": "33eb2ad02f4f784ee66b5eb2e1a0c00c56d7a86e",
+			"revisionTime": "2017-11-03T01:56:12Z"
 		},
 		{
 			"checksumSHA1": "tw3ocqSpa9ikzUV6qhcKBAAO6WU=",

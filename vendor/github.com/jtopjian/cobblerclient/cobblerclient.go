@@ -189,6 +189,11 @@ func (c *Client) updateCobblerFields(what string, item reflect.Value, id string)
 			return err
 		} else {
 			if result.(bool) == false && value != false {
+				// It's possible this is a new field that isn't available on
+				// older versions.
+				if cobblerTag == "newfield" {
+					continue
+				}
 				return fmt.Errorf("Error updating %s to %s.", field, value)
 			}
 		}
