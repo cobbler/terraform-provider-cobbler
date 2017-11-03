@@ -1,0 +1,239 @@
+package cobbler
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/hashicorp/terraform/helper/schema"
+	cobbler "github.com/jtopjian/cobblerclient"
+)
+
+func resourceRepo() *schema.Resource {
+	return &schema.Resource{
+		Create: resourceRepoCreate,
+		Read:   resourceRepoRead,
+		Update: resourceRepoUpdate,
+		Delete: resourceRepoDelete,
+
+		Schema: map[string]*schema.Schema{
+			"apt_components": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Computed: true,
+			},
+
+			"apt_dists": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Computed: true,
+			},
+
+			"arch": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+				Computed: true,
+			},
+
+			"breed": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+			},
+
+			"comment": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
+			"createrepo_flags": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
+			"environment": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
+			"keep_updated": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+
+			"mirror": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"mirror_locally": &schema.Schema{
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+
+			"name": &schema.Schema{
+				Type:     schema.TypeString,
+				Required: true,
+			},
+
+			"owners": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Computed: true,
+			},
+
+			"proxy": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
+			"rpm_list": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Computed: true,
+			},
+
+			//"yumopts": &schema.Schema{
+			//	Type:     schema.TypeMap,
+			//	Optional: true,
+			//	Computed: true,
+			//},
+		},
+	}
+}
+
+func resourceRepoCreate(d *schema.ResourceData, meta interface{}) error {
+	config := meta.(*Config)
+
+	// Create a cobblerclient.Repo
+	repo := buildRepo(d, config)
+
+	// Attempte to create the Repo
+	log.Printf("[DEBUG] Cobbler Repo: Create Options: %#v", repo)
+	newRepo, err := config.cobblerClient.CreateRepo(repo)
+	if err != nil {
+		return fmt.Errorf("Cobbler Repo: Error Creating: %s", err)
+	}
+
+	d.SetId(newRepo.Name)
+
+	return resourceRepoRead(d, meta)
+}
+
+func resourceRepoRead(d *schema.ResourceData, meta interface{}) error {
+	config := meta.(*Config)
+
+	// Retrieve the repo from cobbler
+	repo, err := config.cobblerClient.GetRepo(d.Id())
+	if err != nil {
+		return fmt.Errorf("Cobbler Repo: Error Reading (%s): %s", d.Id(), err)
+	}
+
+	// Set all fields
+	d.Set("apt_components", repo.AptComponents)
+	d.Set("apt_dists", repo.AptDists)
+	d.Set("arch", repo.Arch)
+	d.Set("breed", repo.Breed)
+	d.Set("comment", repo.Comment)
+	d.Set("createrepo_flags", repo.CreateRepoFlags)
+	d.Set("environment", repo.Environment)
+	d.Set("keep_updated", repo.KeepUpdated)
+	d.Set("mirror", repo.Mirror)
+	d.Set("mirror_locally", repo.MirrorLocally)
+	d.Set("name", repo.Name)
+	d.Set("owners", repo.Owners)
+	d.Set("proxy", repo.Proxy)
+	d.Set("rpm_list", repo.RpmList)
+	//d.Set("yumopts", repo.YumOpts)
+
+	return nil
+}
+
+func resourceRepoUpdate(d *schema.ResourceData, meta interface{}) error {
+	config := meta.(*Config)
+
+	// create a cobblerclient.Repo
+	repo := buildRepo(d, config)
+
+	// Attempt to updateh the repo with new information
+	log.Printf("[DEBUG] Cobbler Repo: Updating Repo (%s) with options: %+v", d.Id(), repo)
+	err := config.cobblerClient.UpdateRepo(&repo)
+	if err != nil {
+		return fmt.Errorf("Cobbler Repo: Error Updating (%s): %s", d.Id(), err)
+	}
+
+	return resourceRepoRead(d, meta)
+}
+
+func resourceRepoDelete(d *schema.ResourceData, meta interface{}) error {
+	config := meta.(*Config)
+
+	// Attempt to delete the repo
+	if err := config.cobblerClient.DeleteRepo(d.Id()); err != nil {
+		return fmt.Errorf("Cobbler Repo: Error Deleting (%s): %s", d.Id(), err)
+	}
+
+	return nil
+}
+
+// buildRepo builds a cobbler.Repo from the Terraform attributes
+func buildRepo(d *schema.ResourceData, meta interface{}) cobbler.Repo {
+	aptComponents := []string{}
+	for _, i := range d.Get("apt_components").([]interface{}) {
+		aptComponents = append(aptComponents, i.(string))
+	}
+
+	aptDists := []string{}
+	for _, i := range d.Get("apt_dists").([]interface{}) {
+		aptDists = append(aptDists, i.(string))
+	}
+
+	owners := []string{}
+	for _, i := range d.Get("owners").([]interface{}) {
+		owners = append(owners, i.(string))
+	}
+
+	rpmList := []string{}
+	for _, i := range d.Get("rpm_list").([]interface{}) {
+		rpmList = append(rpmList, i.(string))
+	}
+
+	//yumOpts := make(map[string]interface{})
+	//y := d.Get("yum_opts")
+	//if y != nil {
+	//	m := y.(map[string]interface{})
+	//	for k, v := range m {
+	//		yumOpts[k] = v
+	//	}
+	//}
+
+	repo := cobbler.Repo{
+		AptComponents:   aptComponents,
+		AptDists:        aptDists,
+		Arch:            d.Get("arch").(string),
+		Breed:           d.Get("breed").(string),
+		Comment:         d.Get("comment").(string),
+		CreateRepoFlags: d.Get("createrepo_flags").(string),
+		Environment:     d.Get("environment").(string),
+		KeepUpdated:     d.Get("keep_updated").(bool),
+		Mirror:          d.Get("mirror").(string),
+		MirrorLocally:   d.Get("mirror_locally").(bool),
+		Name:            d.Get("name").(string),
+		Owners:          owners,
+		Proxy:           d.Get("proxy").(string),
+		RpmList:         rpmList,
+		//YumOpts:         yumOpts,
+	}
+
+	return repo
+}

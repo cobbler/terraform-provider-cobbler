@@ -36,6 +36,7 @@ func Provider() terraform.ResourceProvider {
 			"cobbler_distro":         resourceDistro(),
 			"cobbler_kickstart_file": resourceKickstartFile(),
 			"cobbler_profile":        resourceProfile(),
+			"cobbler_repo":           resourceRepo(),
 			"cobbler_snippet":        resourceSnippet(),
 			"cobbler_system":         resourceSystem(),
 		},
