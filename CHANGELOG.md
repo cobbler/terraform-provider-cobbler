@@ -1,8 +1,8 @@
-## 1.0.0 (Unreleased)
+## 1.0.0 (November 15, 2017)
 
 FEATURES:
 
-__New Resource:__ `cobbler_repo` [GH-3]
+__New Resource:__ `cobbler_repo` ([#3](https://github.com/terraform-providers/terraform-provider-cobbler/issues/3))
 
 ## 0.1.0 (June 20, 2017)
 
