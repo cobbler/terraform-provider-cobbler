@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"strings"
 	"sync"
 
 	"github.com/hashicorp/terraform/helper/hashcode"
@@ -462,6 +463,12 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 	// Retrieve the system entry from Cobbler
 	system, err := config.cobblerClient.GetSystem(d.Id())
 	if err != nil {
+		if strings.Contains(err.Error(), "not found") {
+			log.Printf("[WARN] Cobbler System (%s) not found, removing from state", d.Id())
+			d.SetId("")
+			return nil
+		}
+
 		return fmt.Errorf("Cobbler System: Error Reading (%s): %s", d.Id(), err)
 	}
 
