@@ -1,4 +1,9 @@
 ## 1.0.1 (Unreleased)
+
+BUG FIXES
+
+* Recreate systems if they were deleted outside of Terraform [GH-14]
+
 ## 1.0.0 (November 15, 2017)
 
 FEATURES:
