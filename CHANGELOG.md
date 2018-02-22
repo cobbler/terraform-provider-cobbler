@@ -1,5 +1,9 @@
 ## 1.0.1 (Unreleased)
 
+FEATURES:
+
+* Support for self-signed certificates [GH-11]
+
 BUG FIXES
 
 * Recreate systems if they were deleted outside of Terraform [GH-14]
