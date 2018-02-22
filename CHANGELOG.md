@@ -1,12 +1,12 @@
-## 1.0.1 (Unreleased)
+## 1.0.1 (February 22, 2018)
 
 FEATURES:
 
-* Support for self-signed certificates [GH-11]
+* Support for self-signed certificates ([#11](https://github.com/terraform-providers/terraform-provider-cobbler/issues/11))
 
 BUG FIXES
 
-* Recreate systems if they were deleted outside of Terraform [GH-14]
+* Recreate systems if they were deleted outside of Terraform ([#14](https://github.com/terraform-providers/terraform-provider-cobbler/issues/14))
 
 ## 1.0.0 (November 15, 2017)
 
