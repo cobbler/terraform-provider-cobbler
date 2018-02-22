@@ -1,15 +1,22 @@
 package cobbler
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"fmt"
 	"net/http"
+
+	"github.com/hashicorp/terraform/helper/pathorcontents"
 
 	cobbler "github.com/jtopjian/cobblerclient"
 )
 
 type Config struct {
-	Url      string
-	Username string
-	Password string
+	CACertFile string
+	Insecure   bool
+	Url        string
+	Username   string
+	Password   string
 
 	cobblerClient cobbler.Client
 }
@@ -21,7 +28,30 @@ func (c *Config) loadAndValidate() error {
 		Password: c.Password,
 	}
 
-	client := cobbler.NewClient(http.DefaultClient, config)
+	tlsConfig := &tls.Config{}
+	if c.CACertFile != "" {
+		caCert, _, err := pathorcontents.Read(c.CACertFile)
+		if err != nil {
+			return fmt.Errorf("Error reading CA Cert: %s", err)
+		}
+
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM([]byte(caCert))
+		tlsConfig.RootCAs = caCertPool
+	}
+
+	if c.Insecure {
+		tlsConfig.InsecureSkipVerify = true
+	}
+
+	transport := &http.Transport{
+		Proxy:           http.ProxyFromEnvironment,
+		TLSClientConfig: tlsConfig,
+	}
+
+	httpClient := &http.Client{Transport: transport}
+
+	client := cobbler.NewClient(httpClient, config)
 	_, err := client.Login()
 	if err != nil {
 		return err

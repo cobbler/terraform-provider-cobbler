@@ -43,3 +43,10 @@ The following arguments are supported:
 
 * `url` - (Required) The url to the Cobbler service. This can
   also be specified with the `COBBLER_URL` shell environment variable.
+
+* `insecure` - (Optional) Ignore SSL certificate warnings and errors. This
+  can also be specified with the `COBBLER_INSECURE` shell environment variable.
+
+* `cacert_file` - (Optional) The path or contents of an SSL CA certificate.
+  This can also be specified with the `COBBLER_CACERT_FILE` shell environment
+  variable.

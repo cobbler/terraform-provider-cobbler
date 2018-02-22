@@ -30,6 +30,20 @@ func Provider() terraform.ResourceProvider {
 				Description: "The password for accessing Cobbler.",
 				DefaultFunc: envDefaultFunc("COBBLER_PASSWORD"),
 			},
+
+			"insecure": &schema.Schema{
+				Type:        schema.TypeBool,
+				Optional:    true,
+				DefaultFunc: envDefaultFunc("COBBLER_INSECURE"),
+				Description: "Ignore SSL certificate warnings and errors.",
+			},
+
+			"cacert_file": &schema.Schema{
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: envDefaultFunc("COBBLER_CACERT_FILE"),
+				Description: "The path or contents of an SSL CA certificate",
+			},
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -47,9 +61,11 @@ func Provider() terraform.ResourceProvider {
 
 func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
-		Url:      d.Get("url").(string),
-		Username: d.Get("username").(string),
-		Password: d.Get("password").(string),
+		CACertFile: d.Get("cacert_file").(string),
+		Insecure:   d.Get("insecure").(bool),
+		Url:        d.Get("url").(string),
+		Username:   d.Get("username").(string),
+		Password:   d.Get("password").(string),
 	}
 
 	if err := config.loadAndValidate(); err != nil {
