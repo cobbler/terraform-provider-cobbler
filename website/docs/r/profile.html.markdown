@@ -14,8 +14,9 @@ Manages a Profile within Cobbler.
 
 ```hcl
 resource "cobbler_profile" "my_profile" {
-  name   = "/var/lib/cobbler/snippets/my_snippet"
-  distro = "ubuntu-1404-x86_64"
+  name      = "my_profile"
+  distro    = "ubuntu-1404-x86_64"
+  kickstart = "/var/lib/cobbler/kickstarts/default.ks"
 }
 ```
 
