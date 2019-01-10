@@ -16,87 +16,87 @@ func resourceRepo() *schema.Resource {
 		Delete: resourceRepoDelete,
 
 		Schema: map[string]*schema.Schema{
-			"apt_components": &schema.Schema{
+			"apt_components": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Computed: true,
 			},
 
-			"apt_dists": &schema.Schema{
+			"apt_dists": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Computed: true,
 			},
 
-			"arch": &schema.Schema{
+			"arch": {
 				Type:     schema.TypeString,
 				Optional: true,
 				ForceNew: true,
 				Computed: true,
 			},
 
-			"breed": &schema.Schema{
+			"breed": {
 				Type:     schema.TypeString,
 				Required: true,
 				ForceNew: true,
 			},
 
-			"comment": &schema.Schema{
+			"comment": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"createrepo_flags": &schema.Schema{
+			"createrepo_flags": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"environment": &schema.Schema{
+			"environment": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"keep_updated": &schema.Schema{
+			"keep_updated": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
-			"mirror": &schema.Schema{
+			"mirror": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"mirror_locally": &schema.Schema{
+			"mirror_locally": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
 
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
 
-			"owners": &schema.Schema{
+			"owners": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},
 				Computed: true,
 			},
 
-			"proxy": &schema.Schema{
+			"proxy": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
 
-			"rpm_list": &schema.Schema{
+			"rpm_list": {
 				Type:     schema.TypeList,
 				Optional: true,
 				Elem:     &schema.Schema{Type: schema.TypeString},

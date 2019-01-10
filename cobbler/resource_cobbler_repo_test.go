@@ -18,7 +18,7 @@ func TestAccCobblerRepo_basic(t *testing.T) {
 		Providers:    testAccCobblerProviders,
 		CheckDestroy: testAccCobblerCheckRepoDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCobblerRepo_basic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckRepoExists(t, "cobbler_repo.foo", &repo),
@@ -36,13 +36,13 @@ func TestAccCobblerRepo_change(t *testing.T) {
 		Providers:    testAccCobblerProviders,
 		CheckDestroy: testAccCobblerCheckRepoDestroy,
 		Steps: []resource.TestStep{
-			resource.TestStep{
+			{
 				Config: testAccCobblerRepo_change_1,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckRepoExists(t, "cobbler_repo.foo", &repo),
 				),
 			},
-			resource.TestStep{
+			{
 				Config: testAccCobblerRepo_change_2,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckRepoExists(t, "cobbler_repo.foo", &repo),

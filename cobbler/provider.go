@@ -10,35 +10,35 @@ import (
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"url": &schema.Schema{
+			"url": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Cobbler URL",
 				DefaultFunc: envDefaultFunc("COBBLER_URL"),
 			},
 
-			"username": &schema.Schema{
+			"username": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The username for accessing Cobbler.",
 				DefaultFunc: envDefaultFunc("COBBLER_USERNAME"),
 			},
 
-			"password": &schema.Schema{
+			"password": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "The password for accessing Cobbler.",
 				DefaultFunc: envDefaultFunc("COBBLER_PASSWORD"),
 			},
 
-			"insecure": &schema.Schema{
+			"insecure": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				DefaultFunc: envDefaultFunc("COBBLER_INSECURE"),
 				Description: "Ignore SSL certificate warnings and errors.",
 			},
 
-			"cacert_file": &schema.Schema{
+			"cacert_file": {
 				Type:        schema.TypeString,
 				Optional:    true,
 				DefaultFunc: envDefaultFunc("COBBLER_CACERT_FILE"),
