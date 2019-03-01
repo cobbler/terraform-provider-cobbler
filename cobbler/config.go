@@ -54,7 +54,7 @@ func (c *Config) loadAndValidate() error {
 	client := cobbler.NewClient(httpClient, config)
 	_, err := client.Login()
 	if err != nil {
-		return err
+		return fmt.Errorf("Failed to login: %s", err)
 	}
 
 	c.cobblerClient = client
