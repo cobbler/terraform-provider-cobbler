@@ -19,19 +19,16 @@ export PATH=$PATH:$HOME/terraform:$HOME/go/bin
 
 sudo wget -O /usr/local/bin/gimme https://raw.githubusercontent.com/travis-ci/gimme/master/gimme
 sudo chmod +x /usr/local/bin/gimme
-/usr/local/bin/gimme 1.6 >> ~/.bashrc
-eval "$(/usr/local/bin/gimme 1.6)"
+/usr/local/bin/gimme 1.12 >> ~/.bashrc
+eval "$(/usr/local/bin/gimme 1.12)"
 
 mkdir ~/go
 echo 'export GOPATH=$HOME/go' >> ~/.bashrc
-echo 'export GO15VENDOREXPERIMENT=1' >> ~/.bashrc
+echo 'export GO111MODULE=on' >> ~/.bashrc
 export GOPATH=$HOME/go
 source ~/.bashrc
 
-go get github.com/tools/godep
-go get github.com/hashicorp/terraform
-cd $GOPATH/src/github.com/hashicorp/terraform
-godep restore
+git clone https://github.com/terraform-providers/terraform-provider-cobbler
 
 # Cobbler
 sudo apt-get install -y cobbler cobbler-web debmirror dnsmasq
@@ -72,7 +69,7 @@ sudo sed -i -e 's/^server:.*/server: 127.0.0.1/' /etc/cobbler/settings
 
 # User: cobbler / Pass: cobbler
 sudo tee /etc/cobbler/users.digest <<EOF
-cobbler:Cobbler:2d6bae81669d707b72c0bd9806e01f3
+cobbler:Cobbler:a2d6bae81669d707b72c0bd9806e01f3
 EOF
 
 # The stock version of Cobbler in the Ubuntu repository still has the old cobbler homepage URL
@@ -89,6 +86,13 @@ sudo cobbler sync
 
 # Import an Ubuntu 1404 distro
 cd /tmp
-wget http://old-releases.ubuntu.com/releases/14.04.2/ubuntu-14.04-server-amd64.iso
-sudo mount -o loop ubuntu-14.04-server-amd64.iso /mnt
+wget http://releases.ubuntu.com/14.04/ubuntu-14.04.6-server-amd64.iso
+sudo mount -o loop ubuntu-14.04.6-server-amd64.iso /mnt
 sudo cobbler import --name Ubuntu-14.04 --breed ubuntu --path /mnt
+
+# Create a file with the cobbler credential environment variables
+cat > ~/cobblerc <<EOF
+export COBBLER_USERNAME="cobbler"
+export COBBLER_PASSWORD="cobbler"
+export COBBLER_URL="http://localhost:25151"
+EOF
