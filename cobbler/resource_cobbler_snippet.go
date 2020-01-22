@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	cobbler "github.com/jtopjian/cobblerclient"
+	cobbler "github.com/wearespindle/cobblerclient"
 )
 
 func resourceSnippet() *schema.Resource {

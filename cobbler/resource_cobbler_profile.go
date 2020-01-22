@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/terraform/helper/schema"
-	cobbler "github.com/jtopjian/cobblerclient"
+	cobbler "github.com/wearespindle/cobblerclient"
 )
 
 func resourceProfile() *schema.Resource {
@@ -64,7 +64,7 @@ func resourceProfile() *schema.Resource {
 				Computed: true,
 			},
 
-			"kickstart": {
+			"template": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -159,7 +159,7 @@ func resourceProfile() *schema.Resource {
 				Computed: true,
 			},
 
-			"template_remote_kickstarts": {
+			"template_remote_templates": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
@@ -252,7 +252,7 @@ func resourceProfileRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("fetchable_files", profile.FetchableFiles)
 	d.Set("kernel_options", profile.KernelOptions)
 	d.Set("kernel_options_post", profile.KernelOptionsPost)
-	d.Set("kickstart", profile.Kickstart)
+	d.Set("template", profile.Template)
 	d.Set("ks_meta", profile.KSMeta)
 	d.Set("mgmt_classes", profile.MGMTClasses)
 	d.Set("mgmt_parameters", profile.MGMTParameters)
@@ -263,14 +263,14 @@ func resourceProfileRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("redhat_management_key", profile.RedHatManagementKey)
 	d.Set("redhat_management_server", profile.RedHatManagementServer)
 	d.Set("template_files", profile.TemplateFiles)
-	d.Set("template_remote_kickstarts", profile.TemplateRemoteKickstarts)
+	d.Set("template_remote_templates", profile.TemplateRemoteTemplates)
 	d.Set("virt_auto_boot", profile.VirtAutoBoot)
 	d.Set("virt_bridge", profile.VirtBridge)
 	d.Set("virt_cpus", profile.VirtCPUs)
 	d.Set("virt_disk_driver", profile.VirtDiskDriver)
 	d.Set("virt_file_size", profile.VirtFileSize)
 	d.Set("virt_path", profile.VirtPath)
-	d.Set("virt_ram", profile.VirtRam)
+	d.Set("virt_ram", profile.VirtRAM)
 	d.Set("virt_type", profile.VirtType)
 
 	// Split repos into a list
@@ -335,38 +335,38 @@ func buildProfile(d *schema.ResourceData, meta interface{}) cobbler.Profile {
 	}
 
 	profile := cobbler.Profile{
-		BootFiles:                d.Get("boot_files").(string),
-		Comment:                  d.Get("comment").(string),
-		Distro:                   d.Get("distro").(string),
-		EnableGPXE:               d.Get("enable_gpxe").(bool),
-		EnableMenu:               d.Get("enable_menu").(bool),
-		FetchableFiles:           d.Get("fetchable_files").(string),
-		KernelOptions:            d.Get("kernel_options").(string),
-		KernelOptionsPost:        d.Get("kernel_options_post").(string),
-		Kickstart:                d.Get("kickstart").(string),
-		KSMeta:                   d.Get("ks_meta").(string),
-		MGMTClasses:              mgmtClasses,
-		MGMTParameters:           d.Get("mgmt_parameters").(string),
-		Name:                     d.Get("name").(string),
-		NameServersSearch:        nameServersSearch,
-		NameServers:              nameServers,
-		Owners:                   owners,
-		Parent:                   d.Get("parent").(string),
-		Proxy:                    d.Get("proxy").(string),
-		RedHatManagementKey:      d.Get("redhat_management_key").(string),
-		RedHatManagementServer:   d.Get("redhat_management_server").(string),
-		Repos:                    strings.Join(repos, " "),
-		Server:                   d.Get("server").(string),
-		TemplateFiles:            d.Get("template_files").(string),
-		TemplateRemoteKickstarts: d.Get("template_remote_kickstarts").(int),
-		VirtAutoBoot:             d.Get("virt_auto_boot").(string),
-		VirtBridge:               d.Get("virt_bridge").(string),
-		VirtCPUs:                 d.Get("virt_cpus").(string),
-		VirtDiskDriver:           d.Get("virt_disk_driver").(string),
-		VirtFileSize:             d.Get("virt_file_size").(string),
-		VirtPath:                 d.Get("virt_path").(string),
-		VirtRam:                  d.Get("virt_ram").(string),
-		VirtType:                 d.Get("virt_type").(string),
+		BootFiles:               d.Get("boot_files").(string),
+		Comment:                 d.Get("comment").(string),
+		Distro:                  d.Get("distro").(string),
+		EnableGPXE:              d.Get("enable_gpxe").(bool),
+		EnableMenu:              d.Get("enable_menu").(bool),
+		FetchableFiles:          d.Get("fetchable_files").(string),
+		KernelOptions:           d.Get("kernel_options").(string),
+		KernelOptionsPost:       d.Get("kernel_options_post").(string),
+		Template:                d.Get("template").(string),
+		KSMeta:                  d.Get("ks_meta").(string),
+		MGMTClasses:             mgmtClasses,
+		MGMTParameters:          d.Get("mgmt_parameters").(string),
+		Name:                    d.Get("name").(string),
+		NameServersSearch:       nameServersSearch,
+		NameServers:             nameServers,
+		Owners:                  owners,
+		Parent:                  d.Get("parent").(string),
+		Proxy:                   d.Get("proxy").(string),
+		RedHatManagementKey:     d.Get("redhat_management_key").(string),
+		RedHatManagementServer:  d.Get("redhat_management_server").(string),
+		Repos:                   strings.Join(repos, " "),
+		Server:                  d.Get("server").(string),
+		TemplateFiles:           d.Get("template_files").(string),
+		TemplateRemoteTemplates: d.Get("template_remote_templates").(int),
+		VirtAutoBoot:            d.Get("virt_auto_boot").(string),
+		VirtBridge:              d.Get("virt_bridge").(string),
+		VirtCPUs:                d.Get("virt_cpus").(string),
+		VirtDiskDriver:          d.Get("virt_disk_driver").(string),
+		VirtFileSize:            d.Get("virt_file_size").(string),
+		VirtPath:                d.Get("virt_path").(string),
+		VirtRAM:                 d.Get("virt_ram").(string),
+		VirtType:                d.Get("virt_type").(string),
 	}
 
 	return profile
