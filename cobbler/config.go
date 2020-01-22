@@ -8,13 +8,13 @@ import (
 
 	"github.com/hashicorp/terraform/helper/pathorcontents"
 
-	cobbler "github.com/jtopjian/cobblerclient"
+	cobbler "github.com/wearespindle/cobblerclient"
 )
 
 type Config struct {
 	CACertFile string
 	Insecure   bool
-	Url        string
+	URL        string
 	Username   string
 	Password   string
 
@@ -23,7 +23,7 @@ type Config struct {
 
 func (c *Config) loadAndValidate() error {
 	config := cobbler.ClientConfig{
-		Url:      c.Url,
+		URL:      c.URL,
 		Username: c.Username,
 		Password: c.Password,
 	}

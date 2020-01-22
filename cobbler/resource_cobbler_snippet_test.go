@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 
-	cobbler "github.com/jtopjian/cobblerclient"
+	cobbler "github.com/wearespindle/cobblerclient"
 )
 
 func TestAccCobblerSnippet_basic(t *testing.T) {
