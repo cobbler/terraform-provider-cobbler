@@ -63,7 +63,7 @@ func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
 		CACertFile: d.Get("cacert_file").(string),
 		Insecure:   d.Get("insecure").(bool),
-		URL:        d.Get("URL").(string),
+		URL:        d.Get("url").(string),
 		Username:   d.Get("username").(string),
 		Password:   d.Get("password").(string),
 	}
