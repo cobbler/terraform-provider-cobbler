@@ -4,5 +4,6 @@ go 1.13
 
 require (
 	github.com/hashicorp/terraform v0.12.19
-	github.com/wearespindle/cobblerclient v0.3.1-0.20200122094511-ef8338e65cf4
+	github.com/wearespindle/cobblerclient master
+	gopkg.in/xmlpath.v2 v2.0.0-20150820204837-860cbeca3ebc // indirect
 )
