@@ -1,4 +1,4 @@
-module github.com/terraform-providers/terraform-provider-cobbler
+module github.com/wearespindle/terraform-provider-cobbler
 
 go 1.13
 
