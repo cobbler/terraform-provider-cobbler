@@ -64,9 +64,10 @@ The following arguments are supported:
 
 * `kernel_options_post` - (Optional) Kernel options (post install).
 
-* `kickstart` - (Optional) Path to kickstart template.
+* `template` - (Optional) Path to kickstart or preseed template.
 
-* `ks_meta` - (Optional) Kickstart metadata.
+* `ks_meta` - (Optional) Automatic installation template metadata,
+  formerly Kickstart metadata.
 
 * `ldap_enabled` - (Optional) Configure LDAP at next config update.
 
@@ -116,8 +117,8 @@ The following arguments are supported:
 * `template_files` - (Optional) File mappings for built-in
   configuration management.
 
-* `template_remote_kickstarts` - (Optional) template remote
-  kickstarts.
+* `template_remote_templates` - (Optional) template remote
+  kickstarts or preseeds.
 
 * `virt_auto_boot` - (Optional) Auto boot the VM.
 

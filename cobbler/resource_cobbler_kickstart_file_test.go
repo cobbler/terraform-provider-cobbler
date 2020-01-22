@@ -7,44 +7,44 @@ import (
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
 
-	cobbler "github.com/jtopjian/cobblerclient"
+	cobbler "github.com/wearespindle/cobblerclient"
 )
 
-func TestAccCobblerKickstartFile_basic(t *testing.T) {
-	var ks cobbler.KickstartFile
+func TestAccCobblerTemplateFile_basic(t *testing.T) {
+	var ks cobbler.TemplateFile
 
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccCobblerPreCheck(t) },
 		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckKickstartFileDestroy,
+		CheckDestroy: testAccCobblerCheckTemplateFileDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCobblerKickstartFile_basic,
+				Config: testAccCobblerTemplateFile_basic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCobblerCheckKickstartFileExists(t, "cobbler_kickstart_file.foo", &ks),
+					testAccCobblerCheckTemplateFileExists(t, "cobbler_template_file.foo", &ks),
 				),
 			},
 		},
 	})
 }
 
-func testAccCobblerCheckKickstartFileDestroy(s *terraform.State) error {
+func testAccCobblerCheckTemplateFileDestroy(s *terraform.State) error {
 	config := testAccCobblerProvider.Meta().(*Config)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "cobbler_kickstart_file" {
+		if rs.Type != "cobbler_template_file" {
 			continue
 		}
 
-		if _, err := config.cobblerClient.GetKickstartFile(rs.Primary.ID); err == nil {
-			return fmt.Errorf("Kickstart File still exists")
+		if _, err := config.cobblerClient.GetTemplateFile(rs.Primary.ID); err == nil {
+			return fmt.Errorf("Template File still exists")
 		}
 	}
 
 	return nil
 }
 
-func testAccCobblerCheckKickstartFileExists(t *testing.T, n string, ks *cobbler.KickstartFile) resource.TestCheckFunc {
+func testAccCobblerCheckTemplateFileExists(t *testing.T, n string, ks *cobbler.TemplateFile) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -57,13 +57,13 @@ func testAccCobblerCheckKickstartFileExists(t *testing.T, n string, ks *cobbler.
 
 		config := testAccCobblerProvider.Meta().(*Config)
 
-		found, err := config.cobblerClient.GetKickstartFile(rs.Primary.ID)
+		found, err := config.cobblerClient.GetTemplateFile(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
 
 		if found.Name != rs.Primary.ID {
-			return fmt.Errorf("Kickstart File not found")
+			return fmt.Errorf("Template File not found")
 		}
 
 		*ks = *found
@@ -72,8 +72,8 @@ func testAccCobblerCheckKickstartFileExists(t *testing.T, n string, ks *cobbler.
 	}
 }
 
-var testAccCobblerKickstartFile_basic = `
-	resource "cobbler_kickstart_file" "foo" {
-		name = "/var/lib/cobbler/kickstarts/foo.ks"
-		body = "I'm a kickstart file."
+var testAccCobblerTemplateFile_basic = `
+	resource "cobbler_template_file" "foo" {
+		name = "/var/lib/cobbler/Templates/foo.ks"
+		body = "I'm a Template file."
 	}`

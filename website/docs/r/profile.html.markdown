@@ -16,7 +16,7 @@ Manages a Profile within Cobbler.
 resource "cobbler_profile" "my_profile" {
   name      = "my_profile"
   distro    = "ubuntu-1404-x86_64"
-  kickstart = "/var/lib/cobbler/kickstarts/default.ks"
+  template = "/var/lib/cobbler/templates/default.ks"
 }
 ```
 
@@ -46,9 +46,10 @@ The following arguments are supported:
 
 * `kernel_options_post` - (Optional) Post install kernel options.
 
-* `kickstart` - (Optional) The kickstart file to use.
+* `template` - (Optional) The template file to use.
 
-* `ks_meta` - (Optional) Kickstart metadata.
+* `ks_meta` - (Optional) Automatic installation template metadata,
+  formerly Kickstart metadata.
 
 * `mgmt_classes` - (Optional) For external configuration management.
 
@@ -74,8 +75,8 @@ The following arguments are supported:
 * `template_files` - (Optional) File mappings for built-in config
   management.
 
-* `template_remote_kickstarts` - (Optional) remote kickstart
-  templates.
+* `template_remote_templates` - (Optional) template remote
+  kickstarts or preseeds.
 
 * `virt_auto_boot` - (Optional) Auto boot virtual machines.
 

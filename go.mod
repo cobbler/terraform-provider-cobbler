@@ -1,9 +1,9 @@
-module github.com/terraform-providers/terraform-provider-cobbler
+module github.com/wearespindle/terraform-provider-cobbler
+
+go 1.13
 
 require (
-	github.com/ContainerSolutions/go-utils v0.1.0 // indirect
-	github.com/fatih/structs v1.0.0 // indirect
-	github.com/hashicorp/terraform v0.12.0
-	github.com/jtopjian/cobblerclient v0.0.0-20171103015612-33eb2ad02f4f
-	github.com/kolo/xmlrpc v0.0.0-20150413191830-0826b98aaa29 // indirect
+	github.com/hashicorp/terraform v0.12.19
+	github.com/wearespindle/cobblerclient master
+	gopkg.in/xmlpath.v2 v2.0.0-20150820204837-860cbeca3ebc // indirect
 )

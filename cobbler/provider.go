@@ -47,12 +47,12 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"cobbler_distro":         resourceDistro(),
-			"cobbler_kickstart_file": resourceKickstartFile(),
-			"cobbler_profile":        resourceProfile(),
-			"cobbler_repo":           resourceRepo(),
-			"cobbler_snippet":        resourceSnippet(),
-			"cobbler_system":         resourceSystem(),
+			"cobbler_distro":        resourceDistro(),
+			"cobbler_template_file": resourceTemplateFile(),
+			"cobbler_profile":       resourceProfile(),
+			"cobbler_repo":          resourceRepo(),
+			"cobbler_snippet":       resourceSnippet(),
+			"cobbler_system":        resourceSystem(),
 		},
 
 		ConfigureFunc: configureProvider,
@@ -63,7 +63,7 @@ func configureProvider(d *schema.ResourceData) (interface{}, error) {
 	config := Config{
 		CACertFile: d.Get("cacert_file").(string),
 		Insecure:   d.Get("insecure").(bool),
-		Url:        d.Get("url").(string),
+		URL:        d.Get("URL").(string),
 		Username:   d.Get("username").(string),
 		Password:   d.Get("password").(string),
 	}

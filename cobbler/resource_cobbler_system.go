@@ -9,7 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/hashicorp/terraform/helper/schema"
-	cobbler "github.com/jtopjian/cobblerclient"
+	cobbler "github.com/wearespindle/cobblerclient"
 )
 
 var systemSyncLock sync.Mutex
@@ -221,7 +221,7 @@ func resourceSystem() *schema.Resource {
 				Computed: true,
 			},
 
-			"kickstart": {
+			"template": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -362,7 +362,7 @@ func resourceSystem() *schema.Resource {
 				Computed: true,
 			},
 
-			"template_remote_kickstarts": {
+			"template_remote_templates": {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
@@ -483,7 +483,7 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("ipv6_default_device", system.IPv6DefaultDevice)
 	d.Set("kernel_options", system.KernelOptions)
 	d.Set("kernel_options_post", system.KernelOptionsPost)
-	d.Set("kickstart", system.Kickstart)
+	d.Set("template", system.Template)
 	d.Set("ks_meta", system.KSMeta)
 	d.Set("ldap_enabled", system.LDAPEnabled)
 	d.Set("ldap_type", system.LDAPType)
@@ -505,14 +505,14 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("redhat_management_server", system.RedHatManagementServer)
 	d.Set("status", system.Status)
 	d.Set("template_files", system.TemplateFiles)
-	d.Set("template_remote_kickstarts", system.TemplateRemoteKickstarts)
+	d.Set("template_remote_templates", system.TemplateRemoteTemplates)
 	d.Set("virt_auto_boot", system.VirtAutoBoot)
 	d.Set("virt_file_size", system.VirtFileSize)
 	d.Set("virt_cpus", system.VirtCPUs)
 	d.Set("virt_type", system.VirtType)
 	d.Set("virt_path", system.VirtPath)
 	d.Set("virt_pxe_boot", system.VirtPXEBoot)
-	d.Set("virt_ram", system.VirtRam)
+	d.Set("virt_ram", system.VirtRAM)
 	d.Set("virt_disk_driver", system.VirtDiskDriver)
 
 	// Get all interfaces that the System has
@@ -658,48 +658,48 @@ func buildSystem(d *schema.ResourceData) cobbler.System {
 	}
 
 	system := cobbler.System{
-		BootFiles:                d.Get("boot_files").(string),
-		Comment:                  d.Get("comment").(string),
-		EnableGPXE:               d.Get("enable_gpxe").(bool),
-		FetchableFiles:           d.Get("fetchable_files").(string),
-		Gateway:                  d.Get("gateway").(string),
-		Hostname:                 d.Get("hostname").(string),
-		Image:                    d.Get("image").(string),
-		IPv6DefaultDevice:        d.Get("ipv6_default_device").(string),
-		KernelOptions:            d.Get("kernel_options").(string),
-		KernelOptionsPost:        d.Get("kernel_options_post").(string),
-		Kickstart:                d.Get("kickstart").(string),
-		KSMeta:                   d.Get("ks_meta").(string),
-		LDAPEnabled:              d.Get("ldap_enabled").(bool),
-		LDAPType:                 d.Get("ldap_type").(string),
-		MGMTClasses:              mgmtClasses,
-		MGMTParameters:           d.Get("mgmt_parameters").(string),
-		MonitEnabled:             d.Get("monit_enabled").(bool),
-		Name:                     d.Get("name").(string),
-		NameServersSearch:        nameServersSearch,
-		NameServers:              nameServers,
-		NetbootEnabled:           d.Get("netboot_enabled").(bool),
-		Owners:                   owners,
-		PowerAddress:             d.Get("power_address").(string),
-		PowerID:                  d.Get("power_id").(string),
-		PowerPass:                d.Get("power_pass").(string),
-		PowerType:                d.Get("power_type").(string),
-		PowerUser:                d.Get("power_user").(string),
-		Profile:                  d.Get("profile").(string),
-		Proxy:                    d.Get("proxy").(string),
-		RedHatManagementKey:      d.Get("redhat_management_key").(string),
-		RedHatManagementServer:   d.Get("redhat_management_server").(string),
-		Status:                   d.Get("status").(string),
-		TemplateFiles:            d.Get("template_files").(string),
-		TemplateRemoteKickstarts: d.Get("template_remote_kickstarts").(int),
-		VirtAutoBoot:             d.Get("virt_auto_boot").(string),
-		VirtFileSize:             d.Get("virt_file_size").(string),
-		VirtCPUs:                 d.Get("virt_cpus").(string),
-		VirtType:                 d.Get("virt_type").(string),
-		VirtPath:                 d.Get("virt_path").(string),
-		VirtPXEBoot:              d.Get("virt_pxe_boot").(int),
-		VirtRam:                  d.Get("virt_ram").(string),
-		VirtDiskDriver:           d.Get("virt_disk_driver").(string),
+		BootFiles:               d.Get("boot_files").(string),
+		Comment:                 d.Get("comment").(string),
+		EnableGPXE:              d.Get("enable_gpxe").(bool),
+		FetchableFiles:          d.Get("fetchable_files").(string),
+		Gateway:                 d.Get("gateway").(string),
+		Hostname:                d.Get("hostname").(string),
+		Image:                   d.Get("image").(string),
+		IPv6DefaultDevice:       d.Get("ipv6_default_device").(string),
+		KernelOptions:           d.Get("kernel_options").(string),
+		KernelOptionsPost:       d.Get("kernel_options_post").(string),
+		Template:                d.Get("template").(string),
+		KSMeta:                  d.Get("ks_meta").(string),
+		LDAPEnabled:             d.Get("ldap_enabled").(bool),
+		LDAPType:                d.Get("ldap_type").(string),
+		MGMTClasses:             mgmtClasses,
+		MGMTParameters:          d.Get("mgmt_parameters").(string),
+		MonitEnabled:            d.Get("monit_enabled").(bool),
+		Name:                    d.Get("name").(string),
+		NameServersSearch:       nameServersSearch,
+		NameServers:             nameServers,
+		NetbootEnabled:          d.Get("netboot_enabled").(bool),
+		Owners:                  owners,
+		PowerAddress:            d.Get("power_address").(string),
+		PowerID:                 d.Get("power_id").(string),
+		PowerPass:               d.Get("power_pass").(string),
+		PowerType:               d.Get("power_type").(string),
+		PowerUser:               d.Get("power_user").(string),
+		Profile:                 d.Get("profile").(string),
+		Proxy:                   d.Get("proxy").(string),
+		RedHatManagementKey:     d.Get("redhat_management_key").(string),
+		RedHatManagementServer:  d.Get("redhat_management_server").(string),
+		Status:                  d.Get("status").(string),
+		TemplateFiles:           d.Get("template_files").(string),
+		TemplateRemoteTemplates: d.Get("template_remote_templates").(int),
+		VirtAutoBoot:            d.Get("virt_auto_boot").(string),
+		VirtFileSize:            d.Get("virt_file_size").(string),
+		VirtCPUs:                d.Get("virt_cpus").(string),
+		VirtType:                d.Get("virt_type").(string),
+		VirtPath:                d.Get("virt_path").(string),
+		VirtPXEBoot:             d.Get("virt_pxe_boot").(int),
+		VirtRAM:                 d.Get("virt_ram").(string),
+		VirtDiskDriver:          d.Get("virt_disk_driver").(string),
 	}
 
 	return system
