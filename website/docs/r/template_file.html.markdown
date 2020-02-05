@@ -14,7 +14,7 @@ Manages a Template File within Cobbler.
 
 ```hcl
 resource "cobbler_template_file" "my_template" {
-  name = "/var/lib/cobbler/templates/my_template.ks"
+  name = "my_template.ks"
   body = "<content of template file>"
 }
 ```
@@ -26,4 +26,4 @@ The following arguments are supported:
 * `body` - (Required) The body of the template file.
 
 * `name` - (Required) The name of the template file. This must be
-  the full path, including `/var/lib/cobbler/templates`.
+  the name only, so without `/var/lib/cobbler/templates`.

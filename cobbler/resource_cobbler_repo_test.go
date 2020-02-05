@@ -102,7 +102,7 @@ var testAccCobblerRepo_basic = `
     breed = "apt"
     arch = "x86_64"
     apt_components = ["main"]
-    apt_dists = ["trusty"]
+    apt_dists = ["bionic"]
     mirror = "http://us.archive.ubuntu.com/ubuntu/"
   }`
 
@@ -113,7 +113,7 @@ var testAccCobblerRepo_change_1 = `
     breed = "apt"
     arch = "x86_64"
     apt_components = ["main"]
-    apt_dists = ["trusty"]
+    apt_dists = ["bionic"]
     mirror = "http://us.archive.ubuntu.com/ubuntu/"
   }`
 
@@ -124,6 +124,6 @@ var testAccCobblerRepo_change_2 = `
     breed = "apt"
     arch = "x86_64"
     apt_components = ["main"]
-    apt_dists = ["trusty"]
+    apt_dists = ["bionic"]
     mirror = "http://us.archive.ubuntu.com/ubuntu/"
   }`

@@ -41,6 +41,11 @@ resource "cobbler_system" "my_system" {
 
 The following arguments are supported:
 
+* `autoinstall` - (Optional) Template remote kickstarts or preseeds.
+
+* `autoinstall_meta` - (Optional) Automatic installation template metadata,
+  formerly Kickstart metadata.
+
 * `boot_files` - (Optional) TFTP boot files copied into tftpboot.
 
 * `comment` - (Optional) Free form text description
@@ -66,20 +71,11 @@ The following arguments are supported:
 
 * `template` - (Optional) Path to kickstart or preseed template.
 
-* `ks_meta` - (Optional) Automatic installation template metadata,
-  formerly Kickstart metadata.
-
-* `ldap_enabled` - (Optional) Configure LDAP at next config update.
-
-* `ldap_type` - (Optional) LDAP management type.
-
 * `mgmt_classes` - (Optional) Management classes for external config
   management.
+
 * `mgmt_parameters` - (Optional) Parameters which will be handed to
   your management application. Must be a valid YAML dictionary.
-
-* `monit_enabled` - (Optional) Configure monit on this machine at
-  next config update.
 
 * `name_servers_search` - (Optional) Name servers search path.
 
@@ -107,18 +103,11 @@ The following arguments are supported:
 
 * `proxy` - (Optional) Proxy URL.
 
-* `redhat_management_key` - (Optional) Red Hat management key.
-
-* `redhat_management_server` - (Optional) Red Hat management server.
-
 * `status` - (Optional) System status (development, testing,
   acceptance, production).
 
 * `template_files` - (Optional) File mappings for built-in
   configuration management.
-
-* `template_remote_templates` - (Optional) template remote
-  kickstarts or preseeds.
 
 * `virt_auto_boot` - (Optional) Auto boot the VM.
 

@@ -14,7 +14,7 @@ Manages a Snippet within Cobbler.
 
 ```hcl
 resource "cobbler_snippet" "my_snippet" {
-  name = "/var/lib/cobbler/snippets/my_snippet"
+  name = "my_snippet"
   body = "<content of snippet>"
 }
 ```
@@ -25,5 +25,5 @@ The following arguments are supported:
 
 * `body` - (Required) The body of the snippet.
 
-* `name` - (Required) The name of the snippet. This must be the full
-  path, including `/var/lib/cobbler/snippets`.
+* `name` - (Required) The name of the snippet. This must be the name
+  only, so without `/var/lib/cobbler/snippets`.

@@ -14,15 +14,20 @@ Manages a Profile within Cobbler.
 
 ```hcl
 resource "cobbler_profile" "my_profile" {
-  name      = "my_profile"
-  distro    = "ubuntu-1404-x86_64"
-  template = "/var/lib/cobbler/templates/default.ks"
+  name        = "my_profile"
+  distro      = "ubuntu-1404-x86_64"
+  autoinstall = "default.ks"
 }
 ```
 
 ## Argument Reference
 
 The following arguments are supported:
+
+* `autoinstall` - (Optional) Template remote kickstarts or preseeds.
+
+* `autoinstall_meta` - (Optional) Automatic installation template metadata,
+  formerly Kickstart metadata.
 
 * `boot_files` - (Optional) Files copied into tftpboot beyond the
   kernel/initrd.
@@ -48,9 +53,6 @@ The following arguments are supported:
 
 * `template` - (Optional) The template file to use.
 
-* `ks_meta` - (Optional) Automatic installation template metadata,
-  formerly Kickstart metadata.
-
 * `mgmt_classes` - (Optional) For external configuration management.
 
 * `mgmt_parameters` - (Optional) Parameters which will be handed to
@@ -74,9 +76,6 @@ The following arguments are supported:
 
 * `template_files` - (Optional) File mappings for built-in config
   management.
-
-* `template_remote_templates` - (Optional) template remote
-  kickstarts or preseeds.
 
 * `virt_auto_boot` - (Optional) Auto boot virtual machines.
 

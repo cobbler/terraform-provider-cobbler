@@ -17,6 +17,18 @@ func resourceProfile() *schema.Resource {
 		Delete: resourceProfileDelete,
 
 		Schema: map[string]*schema.Schema{
+			"autoinstall": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
+			"autoinstall_meta": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
 			"boot_files": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -27,6 +39,11 @@ func resourceProfile() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
+			},
+
+			"dhcp_tag": {
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 
 			"distro": {
@@ -59,18 +76,6 @@ func resourceProfile() *schema.Resource {
 			},
 
 			"kernel_options_post": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"template": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"ks_meta": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -109,6 +114,12 @@ func resourceProfile() *schema.Resource {
 				Elem:     &schema.Schema{Type: schema.TypeString},
 			},
 
+			"next_server": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
 			"owners": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -123,18 +134,6 @@ func resourceProfile() *schema.Resource {
 			},
 
 			"proxy": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"redhat_management_key": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"redhat_management_server": {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
@@ -155,12 +154,6 @@ func resourceProfile() *schema.Resource {
 
 			"template_files": {
 				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"template_remote_templates": {
-				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
@@ -244,26 +237,28 @@ func resourceProfileRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	// Set all fields
+	d.Set("autoinstall", profile.Autoinstall)
+	d.Set("autoinstall_meta", profile.AutoinstallMeta)
 	d.Set("boot_files", profile.BootFiles)
 	d.Set("comment", profile.Comment)
+	d.Set("dhcp_tag", profile.DHCPTag)
 	d.Set("distro", profile.Distro)
 	d.Set("enable_gpxe", profile.EnableGPXE)
 	d.Set("enable_menu", profile.EnableMenu)
 	d.Set("fetchable_files", profile.FetchableFiles)
 	d.Set("kernel_options", profile.KernelOptions)
 	d.Set("kernel_options_post", profile.KernelOptionsPost)
-	d.Set("template", profile.Template)
-	d.Set("ks_meta", profile.KSMeta)
 	d.Set("mgmt_classes", profile.MGMTClasses)
 	d.Set("mgmt_parameters", profile.MGMTParameters)
+	d.Set("name", profile.Name)
 	d.Set("name_servers_search", profile.NameServersSearch)
 	d.Set("name_servers", profile.NameServers)
+	d.Set("next_server", profile.NextServer)
 	d.Set("owners", profile.Owners)
 	d.Set("proxy", profile.Proxy)
-	d.Set("redhat_management_key", profile.RedHatManagementKey)
-	d.Set("redhat_management_server", profile.RedHatManagementServer)
+	//d.Set("redhat_management_key", profile.RedHatManagementKey)         // Removed in Cobbler 3
+	//d.Set("redhat_management_server", profile.RedHatManagementServer)   // Removed in Cobbler 3
 	d.Set("template_files", profile.TemplateFiles)
-	d.Set("template_remote_templates", profile.TemplateRemoteTemplates)
 	d.Set("virt_auto_boot", profile.VirtAutoBoot)
 	d.Set("virt_bridge", profile.VirtBridge)
 	d.Set("virt_cpus", profile.VirtCPUs)
@@ -335,38 +330,38 @@ func buildProfile(d *schema.ResourceData, meta interface{}) cobbler.Profile {
 	}
 
 	profile := cobbler.Profile{
-		BootFiles:               d.Get("boot_files").(string),
-		Comment:                 d.Get("comment").(string),
-		Distro:                  d.Get("distro").(string),
-		EnableGPXE:              d.Get("enable_gpxe").(bool),
-		EnableMenu:              d.Get("enable_menu").(bool),
-		FetchableFiles:          d.Get("fetchable_files").(string),
-		KernelOptions:           d.Get("kernel_options").(string),
-		KernelOptionsPost:       d.Get("kernel_options_post").(string),
-		Template:                d.Get("template").(string),
-		KSMeta:                  d.Get("ks_meta").(string),
-		MGMTClasses:             mgmtClasses,
-		MGMTParameters:          d.Get("mgmt_parameters").(string),
-		Name:                    d.Get("name").(string),
-		NameServersSearch:       nameServersSearch,
-		NameServers:             nameServers,
-		Owners:                  owners,
-		Parent:                  d.Get("parent").(string),
-		Proxy:                   d.Get("proxy").(string),
-		RedHatManagementKey:     d.Get("redhat_management_key").(string),
-		RedHatManagementServer:  d.Get("redhat_management_server").(string),
-		Repos:                   strings.Join(repos, " "),
-		Server:                  d.Get("server").(string),
-		TemplateFiles:           d.Get("template_files").(string),
-		TemplateRemoteTemplates: d.Get("template_remote_templates").(int),
-		VirtAutoBoot:            d.Get("virt_auto_boot").(string),
-		VirtBridge:              d.Get("virt_bridge").(string),
-		VirtCPUs:                d.Get("virt_cpus").(string),
-		VirtDiskDriver:          d.Get("virt_disk_driver").(string),
-		VirtFileSize:            d.Get("virt_file_size").(string),
-		VirtPath:                d.Get("virt_path").(string),
-		VirtRAM:                 d.Get("virt_ram").(string),
-		VirtType:                d.Get("virt_type").(string),
+		Autoinstall:       d.Get("autoinstall").(string),
+		AutoinstallMeta:   d.Get("autoinstall_meta").(string),
+		BootFiles:         d.Get("boot_files").(string),
+		Comment:           d.Get("comment").(string),
+		DHCPTag:           d.Get("dhcp_tag").(string),
+		Distro:            d.Get("distro").(string),
+		EnableGPXE:        d.Get("enable_gpxe").(bool),
+		EnableMenu:        d.Get("enable_menu").(bool),
+		FetchableFiles:    d.Get("fetchable_files").(string),
+		KernelOptions:     d.Get("kernel_options").(string),
+		KernelOptionsPost: d.Get("kernel_options_post").(string),
+		MGMTClasses:       mgmtClasses,
+		MGMTParameters:    d.Get("mgmt_parameters").(string),
+		Name:              d.Get("name").(string),
+		NameServersSearch: nameServersSearch,
+		NameServers:       nameServers,
+		NextServer:        d.Get("next_server").(string),
+		Owners:            owners,
+		Proxy:             d.Get("proxy").(string),
+		//RedHatManagementKey:     d.Get("redhat_management_key").(string),    // Removed in Cobbler 3
+		//RedHatManagementServer:  d.Get("redhat_management_server").(string), // Removed in Cobbler 3
+		Repos:          strings.Join(repos, " "),
+		Server:         d.Get("server").(string),
+		TemplateFiles:  d.Get("template_files").(string),
+		VirtAutoBoot:   d.Get("virt_auto_boot").(string),
+		VirtBridge:     d.Get("virt_bridge").(string),
+		VirtCPUs:       d.Get("virt_cpus").(string),
+		VirtDiskDriver: d.Get("virt_disk_driver").(string),
+		VirtFileSize:   d.Get("virt_file_size").(string),
+		VirtPath:       d.Get("virt_path").(string),
+		VirtRAM:        d.Get("virt_ram").(string),
+		VirtType:       d.Get("virt_type").(string),
 	}
 
 	return profile

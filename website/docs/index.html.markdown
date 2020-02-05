@@ -20,9 +20,9 @@ Use the navigation to the left to read about the available resources.
 ```hcl
 # Configure the Cobbler provider
 provider "cobbler" {
-  username = "${var.cobbler_username}"
-  password = "${var.cobbler_password}"
-  url      = "${var.cobbler_url}"
+  username = var.cobbler_username
+  password = var.cobbler_password
+  url      = var.cobbler_url
 }
 
 # Create a Cobbler Distro

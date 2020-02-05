@@ -16,10 +16,10 @@ Manages a distribution within Cobbler.
 resource "cobbler_distro" "ubuntu-1404-x86_64" {
   name       = "foo"
   breed      = "ubuntu"
-  os_version = "trusty"
+  os_version = "bionic"
   arch       = "x86_64"
-  kernel     = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/linux"
-  initrd     = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+  kernel     = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+  initrd     = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 }
 ```
 
@@ -62,13 +62,9 @@ The following arguments are supported:
 * `os_version` - (Required) The version of the distro you are
   creating. This varies with the version of Cobbler you are using.
   An updated signature list may need to be obtained in order to
-  support a newer version. Example: `trusty`.
+  support a newer version. Example: `bionic`.
 
 * `owners` - (Optional) Owners list for authz_ownership.
-
-* `redhat_management_key` - (Optional) Red Hat Management key.
-
-* `redhat_management_server` - (Optional) Red Hat Management server.
 
 * `template_files` - (Optional) File mappings for built-in config
   management.

@@ -94,18 +94,6 @@ func resourceDistro() *schema.Resource {
 				Computed: true,
 			},
 
-			"redhat_management_key": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"redhat_management_server": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
 			"template_files": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -155,8 +143,8 @@ func resourceDistroRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("mgmt_classes", distro.MGMTClasses)
 	d.Set("os_version", distro.OSVersion)
 	d.Set("owners", distro.Owners)
-	d.Set("redhat_management_key", distro.RedHatManagementKey)
-	d.Set("redhat_management_server", distro.RedHatManagementServer)
+	//d.Set("redhat_management_key", distro.RedHatManagementKey)               // Removed in Cobbler 3
+	//d.Set("redhat_management_server", distro.RedHatManagementServer)         // Removed in Cobbler 3
 	d.Set("template_files", distro.TemplateFiles)
 
 	return nil
@@ -202,22 +190,22 @@ func buildDistro(d *schema.ResourceData, meta interface{}) cobbler.Distro {
 	}
 
 	distro := cobbler.Distro{
-		Arch:                   d.Get("arch").(string),
-		Breed:                  d.Get("breed").(string),
-		BootFiles:              d.Get("boot_files").(string),
-		Comment:                d.Get("comment").(string),
-		FetchableFiles:         d.Get("fetchable_files").(string),
-		Kernel:                 d.Get("kernel").(string),
-		KernelOptions:          d.Get("kernel_options").(string),
-		KernelOptionsPost:      d.Get("kernel_options_post").(string),
-		Initrd:                 d.Get("initrd").(string),
-		MGMTClasses:            mgmtClasses,
-		Name:                   d.Get("name").(string),
-		OSVersion:              d.Get("os_version").(string),
-		Owners:                 owners,
-		RedHatManagementKey:    d.Get("redhat_management_key").(string),
-		RedHatManagementServer: d.Get("redhat_management_server").(string),
-		TemplateFiles:          d.Get("template_files").(string),
+		Arch:              d.Get("arch").(string),
+		Breed:             d.Get("breed").(string),
+		BootFiles:         d.Get("boot_files").(string),
+		Comment:           d.Get("comment").(string),
+		FetchableFiles:    d.Get("fetchable_files").(string),
+		Kernel:            d.Get("kernel").(string),
+		KernelOptions:     d.Get("kernel_options").(string),
+		KernelOptionsPost: d.Get("kernel_options_post").(string),
+		Initrd:            d.Get("initrd").(string),
+		MGMTClasses:       mgmtClasses,
+		Name:              d.Get("name").(string),
+		OSVersion:         d.Get("os_version").(string),
+		Owners:            owners,
+		//RedHatManagementKey:    d.Get("redhat_management_key").(string),     // Removed in Cobbler 3
+		//RedHatManagementServer: d.Get("redhat_management_server").(string),  // Removed in Cobbler 3
+		TemplateFiles: d.Get("template_files").(string),
 	}
 
 	return distro

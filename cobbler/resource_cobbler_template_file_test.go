@@ -74,6 +74,6 @@ func testAccCobblerCheckTemplateFileExists(t *testing.T, n string, ks *cobbler.T
 
 var testAccCobblerTemplateFile_basic = `
 	resource "cobbler_template_file" "foo" {
-		name = "/var/lib/cobbler/Templates/foo.ks"
+		name = "/var/lib/cobbler/templates/foo.ks"
 		body = "I'm a Template file."
 	}`

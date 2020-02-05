@@ -100,10 +100,10 @@ var testAccCobblerDistro_basic = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		breed = "ubuntu"
-		os_version = "trusty"
+		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}`
 
 var testAccCobblerDistro_change_1 = `
@@ -111,10 +111,10 @@ var testAccCobblerDistro_change_1 = `
 		name = "foo"
 		comment = "I am a distro"
 		breed = "ubuntu"
-		os_version = "trusty"
+		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}`
 
 var testAccCobblerDistro_change_2 = `
@@ -122,8 +122,8 @@ var testAccCobblerDistro_change_2 = `
 		name = "foo"
 		comment = "I am a distro again"
 		breed = "ubuntu"
-		os_version = "trusty"
+		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}`

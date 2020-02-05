@@ -18,7 +18,7 @@ resource "cobbler_repo" "my_repo" {
   breed          = "apt"
   arch           = "x86_64"
   apt_components = ["main"]
-  apt_dists      = ["trusty"]
+  apt_dists      = ["bionic"]
   mirror         = "http://us.archive.ubuntu.com/ubuntu/"
 }
 ```
@@ -30,8 +30,8 @@ The following arguments are supported:
 * `apt_components` - (Optional) List of Apt components such as main,
   restricted, universe. Applicable to apt breeds only.
 
-* `apt_dists` - (Optional) List of Apt distribution names such as trusty,
-  trusty-updates. Applicable to apt breeds only.
+* `apt_dists` - (Optional) List of Apt distribution names such as bionic,
+  bionic-updates. Applicable to apt breeds only.
 
 * `arch` - (Optional) The architecture of the repo. Valid options
   are: i386, x86_64, ia64, ppc, ppc64, s390, arm.

@@ -22,6 +22,18 @@ func resourceSystem() *schema.Resource {
 		Delete: resourceSystemDelete,
 
 		Schema: map[string]*schema.Schema{
+			"autoinstall": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
+			"autoinstall_meta": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
 			"boot_files": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -221,30 +233,6 @@ func resourceSystem() *schema.Resource {
 				Computed: true,
 			},
 
-			"template": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"ks_meta": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"ldap_enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Computed: true,
-			},
-
-			"ldap_type": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
 			"mgmt_classes": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -254,12 +242,6 @@ func resourceSystem() *schema.Resource {
 
 			"mgmt_parameters": {
 				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"monit_enabled": {
-				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 			},
@@ -286,6 +268,12 @@ func resourceSystem() *schema.Resource {
 
 			"netboot_enabled": {
 				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+
+			"next_server": {
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 			},
@@ -338,18 +326,6 @@ func resourceSystem() *schema.Resource {
 				Computed: true,
 			},
 
-			"redhat_management_key": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"redhat_management_server": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
 			"status": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -358,12 +334,6 @@ func resourceSystem() *schema.Resource {
 
 			"template_files": {
 				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-			},
-
-			"template_remote_templates": {
-				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 			},
@@ -483,16 +453,17 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("ipv6_default_device", system.IPv6DefaultDevice)
 	d.Set("kernel_options", system.KernelOptions)
 	d.Set("kernel_options_post", system.KernelOptionsPost)
-	d.Set("template", system.Template)
-	d.Set("ks_meta", system.KSMeta)
-	d.Set("ldap_enabled", system.LDAPEnabled)
-	d.Set("ldap_type", system.LDAPType)
+	d.Set("autoinstall_meta", system.AutoinstallMeta)
+	//d.Set("ldap_enabled", system.LDAPEnabled)                         // Removed in Cobbler 3
+	//d.Set("ldap_type", system.LDAPType)                               // Removed in Cobbler 3
 	d.Set("mgmt_classes", system.MGMTClasses)
 	d.Set("mgmt_parameters", system.MGMTParameters)
-	d.Set("monit_enabled", system.MonitEnabled)
+	//d.Set("monit_enabled", system.MonitEnabled)                       // Removed in Cobbler 3
+	d.Set("name", system.Name)
 	d.Set("name_servers_search", system.NameServersSearch)
 	d.Set("name_servers", system.NameServers)
 	d.Set("netboot_enabled", system.NetbootEnabled)
+	d.Set("next_server", system.NextServer)
 	d.Set("owners", system.Owners)
 	d.Set("power_address", system.PowerAddress)
 	d.Set("power_id", system.PowerID)
@@ -501,11 +472,10 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("power_user", system.PowerUser)
 	d.Set("profile", system.Profile)
 	d.Set("proxy", system.Proxy)
-	d.Set("redhat_management_key", system.RedHatManagementKey)
-	d.Set("redhat_management_server", system.RedHatManagementServer)
+	//d.Set("redhat_management_key", system.RedHatManagementKey)        // Removed in Cobbler 3
+	//d.Set("redhat_management_server", system.RedHatManagementServer)  // Removed in Cobbler 3
 	d.Set("status", system.Status)
 	d.Set("template_files", system.TemplateFiles)
-	d.Set("template_remote_templates", system.TemplateRemoteTemplates)
 	d.Set("virt_auto_boot", system.VirtAutoBoot)
 	d.Set("virt_file_size", system.VirtFileSize)
 	d.Set("virt_cpus", system.VirtCPUs)
@@ -658,48 +628,48 @@ func buildSystem(d *schema.ResourceData) cobbler.System {
 	}
 
 	system := cobbler.System{
-		BootFiles:               d.Get("boot_files").(string),
-		Comment:                 d.Get("comment").(string),
-		EnableGPXE:              d.Get("enable_gpxe").(bool),
-		FetchableFiles:          d.Get("fetchable_files").(string),
-		Gateway:                 d.Get("gateway").(string),
-		Hostname:                d.Get("hostname").(string),
-		Image:                   d.Get("image").(string),
-		IPv6DefaultDevice:       d.Get("ipv6_default_device").(string),
-		KernelOptions:           d.Get("kernel_options").(string),
-		KernelOptionsPost:       d.Get("kernel_options_post").(string),
-		Template:                d.Get("template").(string),
-		KSMeta:                  d.Get("ks_meta").(string),
-		LDAPEnabled:             d.Get("ldap_enabled").(bool),
-		LDAPType:                d.Get("ldap_type").(string),
-		MGMTClasses:             mgmtClasses,
-		MGMTParameters:          d.Get("mgmt_parameters").(string),
-		MonitEnabled:            d.Get("monit_enabled").(bool),
-		Name:                    d.Get("name").(string),
-		NameServersSearch:       nameServersSearch,
-		NameServers:             nameServers,
-		NetbootEnabled:          d.Get("netboot_enabled").(bool),
-		Owners:                  owners,
-		PowerAddress:            d.Get("power_address").(string),
-		PowerID:                 d.Get("power_id").(string),
-		PowerPass:               d.Get("power_pass").(string),
-		PowerType:               d.Get("power_type").(string),
-		PowerUser:               d.Get("power_user").(string),
-		Profile:                 d.Get("profile").(string),
-		Proxy:                   d.Get("proxy").(string),
-		RedHatManagementKey:     d.Get("redhat_management_key").(string),
-		RedHatManagementServer:  d.Get("redhat_management_server").(string),
-		Status:                  d.Get("status").(string),
-		TemplateFiles:           d.Get("template_files").(string),
-		TemplateRemoteTemplates: d.Get("template_remote_templates").(int),
-		VirtAutoBoot:            d.Get("virt_auto_boot").(string),
-		VirtFileSize:            d.Get("virt_file_size").(string),
-		VirtCPUs:                d.Get("virt_cpus").(string),
-		VirtType:                d.Get("virt_type").(string),
-		VirtPath:                d.Get("virt_path").(string),
-		VirtPXEBoot:             d.Get("virt_pxe_boot").(int),
-		VirtRAM:                 d.Get("virt_ram").(string),
-		VirtDiskDriver:          d.Get("virt_disk_driver").(string),
+		Autoinstall:       d.Get("autoinstall").(string),
+		AutoinstallMeta:   d.Get("autoinstall_meta").(string),
+		BootFiles:         d.Get("boot_files").(string),
+		Comment:           d.Get("comment").(string),
+		EnableGPXE:        d.Get("enable_gpxe").(bool),
+		FetchableFiles:    d.Get("fetchable_files").(string),
+		Gateway:           d.Get("gateway").(string),
+		Hostname:          d.Get("hostname").(string),
+		Image:             d.Get("image").(string),
+		IPv6DefaultDevice: d.Get("ipv6_default_device").(string),
+		KernelOptions:     d.Get("kernel_options").(string),
+		KernelOptionsPost: d.Get("kernel_options_post").(string),
+		//LDAPEnabled:             d.Get("ldap_enabled").(bool),               // Removed in Cobbler 3
+		//LDAPType:                d.Get("ldap_type").(string),                // Removed in Cobbler 3
+		MGMTClasses:    mgmtClasses,
+		MGMTParameters: d.Get("mgmt_parameters").(string),
+		//MonitEnabled:            d.Get("monit_enabled").(bool),              // Removed in Cobbler 3
+		Name:              d.Get("name").(string),
+		NameServersSearch: nameServersSearch,
+		NameServers:       nameServers,
+		NetbootEnabled:    d.Get("netboot_enabled").(bool),
+		NextServer:        d.Get("next_server").(string),
+		Owners:            owners,
+		PowerAddress:      d.Get("power_address").(string),
+		PowerID:           d.Get("power_id").(string),
+		PowerPass:         d.Get("power_pass").(string),
+		PowerType:         d.Get("power_type").(string),
+		PowerUser:         d.Get("power_user").(string),
+		Profile:           d.Get("profile").(string),
+		Proxy:             d.Get("proxy").(string),
+		//RedHatManagementKey:     d.Get("redhat_management_key").(string),    // Removed in Cobbler 3
+		//RedHatManagementServer:  d.Get("redhat_management_server").(string), // Removed in Cobbler 3
+		Status:         d.Get("status").(string),
+		TemplateFiles:  d.Get("template_files").(string),
+		VirtAutoBoot:   d.Get("virt_auto_boot").(string),
+		VirtFileSize:   d.Get("virt_file_size").(string),
+		VirtCPUs:       d.Get("virt_cpus").(string),
+		VirtType:       d.Get("virt_type").(string),
+		VirtPath:       d.Get("virt_path").(string),
+		VirtPXEBoot:    d.Get("virt_pxe_boot").(int),
+		VirtRAM:        d.Get("virt_ram").(string),
+		VirtDiskDriver: d.Get("virt_disk_driver").(string),
 	}
 
 	return system

@@ -125,10 +125,10 @@ var testAccCobblerProfile_basic = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		breed = "ubuntu"
-		os_version = "trusty"
+		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
@@ -140,10 +140,10 @@ var testAccCobblerProfile_change_1 = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		breed = "ubuntu"
-		os_version = "trusty"
+		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
@@ -156,10 +156,10 @@ var testAccCobblerProfile_change_2 = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		breed = "ubuntu"
-		os_version = "trusty"
+		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
@@ -172,15 +172,15 @@ var testAccCobblerProfile_withRepo = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		breed = "ubuntu"
-		os_version = "trusty"
+		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-14.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
 		name = "foo"
 		comment = "I am a profile again"
 		distro = "${cobbler_distro.foo.name}"
-		repos = ["Ubuntu-14.04-x86_64"]
+		repos = ["Ubuntu-18.04-x86_64"]
 	}`

@@ -3,7 +3,7 @@
 # the Terraform acceptance tests against it.
 
 module "ami" {
-  source        = "github.com/terraform-community-modules/tf_aws_ubuntu_ami/ebs"
+  source        = "github.com/terraform-community-modules/tf_aws_ubuntu_ami/ebs" // Deprecated
   region        = "us-west-2"
   distribution  = "trusty"
   instance_type = "t2.nano"

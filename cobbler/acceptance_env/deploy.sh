@@ -2,7 +2,7 @@
 
 set -e
 
-# This script assumes Ubuntu 14.04 is being used.
+# This script assumes Ubuntu 18.04 is being used.
 # It will create a standard Cobbler environment that can be used for acceptance testing.
 
 # With this enviornment spun up, the config should be:
@@ -86,9 +86,9 @@ sudo cobbler sync
 
 # Import an Ubuntu 1404 distro
 cd /tmp
-wget http://releases.ubuntu.com/14.04/ubuntu-14.04.6-server-amd64.iso
-sudo mount -o loop ubuntu-14.04.6-server-amd64.iso /mnt
-sudo cobbler import --name Ubuntu-14.04 --breed ubuntu --path /mnt
+wget http://releases.ubuntu.com/18.04/ubuntu-18.04.6-server-amd64.iso
+sudo mount -o loop ubuntu-18.04.6-server-amd64.iso /mnt
+sudo cobbler import --name Ubuntu-18.04 --breed ubuntu --path /mnt
 
 # Create a file with the cobbler credential environment variables
 cat > ~/cobblerc <<EOF
