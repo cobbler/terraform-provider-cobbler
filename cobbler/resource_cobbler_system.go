@@ -40,6 +40,12 @@ func resourceSystem() *schema.Resource {
 				Computed: true,
 			},
 
+			"boot_loader": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
 			"comment": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -444,6 +450,7 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 
 	// Set all fields
 	d.Set("boot_files", system.BootFiles)
+	d.Set("boot_loader", system.BootLoader)
 	d.Set("comment", system.Comment)
 	d.Set("enable_gpxe", system.EnableGPXE)
 	d.Set("fetchable_files", system.FetchableFiles)
@@ -631,6 +638,7 @@ func buildSystem(d *schema.ResourceData) cobbler.System {
 		Autoinstall:       d.Get("autoinstall").(string),
 		AutoinstallMeta:   d.Get("autoinstall_meta").(string),
 		BootFiles:         d.Get("boot_files").(string),
+		BootLoader:        d.Get("boot_loader").(string),
 		Comment:           d.Get("comment").(string),
 		EnableGPXE:        d.Get("enable_gpxe").(bool),
 		FetchableFiles:    d.Get("fetchable_files").(string),

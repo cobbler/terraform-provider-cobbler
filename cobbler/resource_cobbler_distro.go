@@ -36,6 +36,13 @@ func resourceDistro() *schema.Resource {
 				Computed: true,
 			},
 
+			"boot_loader": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+				Computed: true,
+			},
+
 			"comment": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -134,6 +141,7 @@ func resourceDistroRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("arch", distro.Arch)
 	d.Set("breed", distro.Breed)
 	d.Set("boot_files", distro.BootFiles)
+	d.Set("boot_loader", distro.BootLoader)
 	d.Set("comment", distro.Comment)
 	d.Set("fetchable_files", distro.FetchableFiles)
 	d.Set("kernel", distro.Kernel)
@@ -193,6 +201,7 @@ func buildDistro(d *schema.ResourceData, meta interface{}) cobbler.Distro {
 		Arch:              d.Get("arch").(string),
 		Breed:             d.Get("breed").(string),
 		BootFiles:         d.Get("boot_files").(string),
+		BootLoader:        d.Get("boot_loader").(string),
 		Comment:           d.Get("comment").(string),
 		FetchableFiles:    d.Get("fetchable_files").(string),
 		Kernel:            d.Get("kernel").(string),

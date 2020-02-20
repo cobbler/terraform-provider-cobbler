@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform/terraform"
 )
 
+// Provider does the talking to the Cobbler API
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
