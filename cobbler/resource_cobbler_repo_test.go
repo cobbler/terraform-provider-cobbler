@@ -1,5 +1,3 @@
-//revive:disable
-
 package cobbler
 
 import (
@@ -21,7 +19,7 @@ func TestAccCobblerRepo_basic(t *testing.T) {
 		CheckDestroy: testAccCobblerCheckRepoDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCobblerRepo_basic,
+				Config: testAccCobblerRepoBasic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckRepoExists(t, "cobbler_repo.foo", &repo),
 				),
@@ -39,13 +37,13 @@ func TestAccCobblerRepo_change(t *testing.T) {
 		CheckDestroy: testAccCobblerCheckRepoDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCobblerRepo_change_1,
+				Config: testAccCobblerRepoChange1,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckRepoExists(t, "cobbler_repo.foo", &repo),
 				),
 			},
 			{
-				Config: testAccCobblerRepo_change_2,
+				Config: testAccCobblerRepoChange2,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckRepoExists(t, "cobbler_repo.foo", &repo),
 				),
@@ -98,7 +96,7 @@ func testAccCobblerCheckRepoExists(t *testing.T, n string, repo *cobbler.Repo) r
 	}
 }
 
-var testAccCobblerRepo_basic = `
+var testAccCobblerRepoBasic = `
   resource "cobbler_repo" "foo" {
     name = "foo"
     breed = "apt"
@@ -108,7 +106,7 @@ var testAccCobblerRepo_basic = `
     mirror = "http://us.archive.ubuntu.com/ubuntu/"
   }`
 
-var testAccCobblerRepo_change_1 = `
+var testAccCobblerRepoChange1 = `
   resource "cobbler_repo" "foo" {
     name = "foo"
     comment = "I am a repo"
@@ -119,7 +117,7 @@ var testAccCobblerRepo_change_1 = `
     mirror = "http://us.archive.ubuntu.com/ubuntu/"
   }`
 
-var testAccCobblerRepo_change_2 = `
+var testAccCobblerRepoChange2 = `
   resource "cobbler_repo" "foo" {
     name = "foo"
     comment = "I am a repo again"

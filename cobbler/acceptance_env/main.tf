@@ -5,7 +5,7 @@
 module "ami" {
   source        = "github.com/terraform-community-modules/tf_aws_ubuntu_ami/ebs" // Deprecated
   region        = "us-west-2"
-  distribution  = "trusty"
+  distribution  = "bionic"
   instance_type = "t2.nano"
 }
 

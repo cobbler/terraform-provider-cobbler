@@ -1,5 +1,3 @@
-//revive:disable
-
 package cobbler
 
 import (
@@ -21,7 +19,7 @@ func TestAccCobblerDistro_basic(t *testing.T) {
 		CheckDestroy: testAccCobblerCheckDistroDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCobblerDistro_basic,
+				Config: testAccCobblerDistroBasic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
 				),
@@ -39,13 +37,13 @@ func TestAccCobblerDistro_change(t *testing.T) {
 		CheckDestroy: testAccCobblerCheckDistroDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCobblerDistro_change_1,
+				Config: testAccCobblerDistroChange1,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
 				),
 			},
 			{
-				Config: testAccCobblerDistro_change_2,
+				Config: testAccCobblerDistroChange2,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
 				),
@@ -98,34 +96,37 @@ func testAccCobblerCheckDistroExists(t *testing.T, n string, distro *cobbler.Dis
 	}
 }
 
-var testAccCobblerDistro_basic = `
+var testAccCobblerDistroBasic = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		breed = "ubuntu"
 		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		boot_loader = "grub"
+		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}`
 
-var testAccCobblerDistro_change_1 = `
+var testAccCobblerDistroChange1 = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		comment = "I am a distro"
 		breed = "ubuntu"
 		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		boot_loader = "grub"
+		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}`
 
-var testAccCobblerDistro_change_2 = `
+var testAccCobblerDistroChange2 = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		comment = "I am a distro again"
 		breed = "ubuntu"
 		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		boot_loader = "grub"
+		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}`

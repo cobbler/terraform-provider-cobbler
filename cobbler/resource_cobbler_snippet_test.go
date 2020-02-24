@@ -1,5 +1,3 @@
-//revive:disable
-
 package cobbler
 
 import (
@@ -21,7 +19,7 @@ func TestAccCobblerSnippet_basic(t *testing.T) {
 		CheckDestroy: testAccCobblerCheckSnippetDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCobblerSnippet_basic,
+				Config: testAccCobblerSnippetBasic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckSnippetExists(t, "cobbler_snippet.foo", &snippet),
 				),
@@ -74,8 +72,8 @@ func testAccCobblerCheckSnippetExists(t *testing.T, n string, snippet *cobbler.S
 	}
 }
 
-var testAccCobblerSnippet_basic = `
+var testAccCobblerSnippetBasic = `
 	resource "cobbler_snippet" "foo" {
-		name = "/var/lib/cobbler/snippets/foo"
+		name = "foo"
 		body = "I'm a Snippet."
 	}`

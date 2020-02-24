@@ -5,7 +5,7 @@ set -e
 # This script assumes Ubuntu 18.04 is being used.
 # It will create a standard Cobbler environment that can be used for acceptance testing.
 
-# With this enviornment spun up, the config should be:
+# With this environment spun up, the config should be:
 #  COBBLER_URL=http://127.0.0.1:25151
 #  COBBLER_USERNAME=cobbler
 #  COBBLER_PASSWORD=cobbler
@@ -28,22 +28,23 @@ echo 'export GO111MODULE=on' >> ~/.bashrc
 export GOPATH=$HOME/go
 source ~/.bashrc
 
-git clone https://github.com/terraform-providers/terraform-provider-cobbler
+#git clone https://github.com/terraform-providers/terraform-provider-cobbler
+git clone https://github.com/wearespindle/terraform-provider-cobbler
 
 # Cobbler
 sudo apt-get install -y cobbler cobbler-web debmirror dnsmasq
 
 sudo tee /etc/cobbler/modules.conf <<EOF
 [authentication]
-module = authn_configfile
+module = authentication.configfile
 [authorization]
-module = authz_allowall
+module = authorization.allowall
 [dns]
-module = manage_dnsmasq
+module = managers.dnsmasq
 [dhcp]
-module = manage_dnsmasq
+module = managers.dnsmasq
 [tftpd]
-module = manage_in_tftpd
+module = managers.in_tftpd
 EOF
 
 sudo tee /etc/cobbler/dnsmasq.template <<EOF
@@ -72,22 +73,19 @@ sudo tee /etc/cobbler/users.digest <<EOF
 cobbler:Cobbler:a2d6bae81669d707b72c0bd9806e01f3
 EOF
 
-# The stock version of Cobbler in the Ubuntu repository still has the old cobbler homepage URL
-sudo sed -i -e 's#content_server = "http://www.cobblerd.org/loaders"#content_server = "http://cobbler.github.com/loaders"#' /usr/lib/python2.7/dist-packages/cobbler/action_dlcontent.py
-sudo rm /usr/lib/python2.7/dist-packages/cobbler/action_dlcontent.pyc
-
-sudo /etc/init.d/apache2 restart
-sudo stop cobbler
+sudo systemctl daemon-reload
+sudo systemctl restart httpd
+sudo systemctl stop cobblerd
 sleep 2
-sudo start cobbler
-sleep 10
+sudo systemctl start cobblerd
+sleep 5
 sudo cobbler get-loaders
 sudo cobbler sync
 
-# Import an Ubuntu 1404 distro
+# Import a recent Ubuntu distro
 cd /tmp
-wget http://releases.ubuntu.com/18.04/ubuntu-18.04.6-server-amd64.iso
-sudo mount -o loop ubuntu-18.04.6-server-amd64.iso /mnt
+wget http://cdimage.ubuntu.com/ubuntu/releases/18.04/release/ubuntu-18.04.4-server-amd64.iso
+sudo mount -o loop ubuntu-18.04.4-server-amd64.iso /mnt
 sudo cobbler import --name Ubuntu-18.04 --breed ubuntu --path /mnt
 
 # Create a file with the cobbler credential environment variables

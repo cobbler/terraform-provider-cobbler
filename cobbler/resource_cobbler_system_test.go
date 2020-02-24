@@ -1,5 +1,3 @@
-//revive:disable
-
 package cobbler
 
 import (
@@ -23,7 +21,7 @@ func TestAccCobblerSystem_basic(t *testing.T) {
 		CheckDestroy: testAccCobblerCheckSystemDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCobblerSystem_basic,
+				Config: testAccCobblerSystemBasic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
 					testAccCobblerCheckProfileExists(t, "cobbler_profile.foo", &profile),
@@ -45,7 +43,7 @@ func TestAccCobblerSystem_multi(t *testing.T) {
 		CheckDestroy: testAccCobblerCheckSystemDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCobblerSystem_multi,
+				Config: testAccCobblerSystemMulti,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
 					testAccCobblerCheckProfileExists(t, "cobbler_profile.foo", &profile),
@@ -67,7 +65,7 @@ func TestAccCobblerSystem_change(t *testing.T) {
 		CheckDestroy: testAccCobblerCheckSystemDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCobblerSystem_change_1,
+				Config: testAccCobblerSystemChange1,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
 					testAccCobblerCheckProfileExists(t, "cobbler_profile.foo", &profile),
@@ -75,7 +73,7 @@ func TestAccCobblerSystem_change(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCobblerSystem_change_2,
+				Config: testAccCobblerSystemChange2,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
 					testAccCobblerCheckProfileExists(t, "cobbler_profile.foo", &profile),
@@ -97,7 +95,7 @@ func TestAccCobblerSystem_removeInterface(t *testing.T) {
 		CheckDestroy: testAccCobblerCheckSystemDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCobblerSystem_removeInterface_1,
+				Config: testAccCobblerSystemRemoveInterface1,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
 					testAccCobblerCheckProfileExists(t, "cobbler_profile.foo", &profile),
@@ -107,7 +105,7 @@ func TestAccCobblerSystem_removeInterface(t *testing.T) {
 				),
 			},
 			{
-				Config: testAccCobblerSystem_removeInterface_2,
+				Config: testAccCobblerSystemRemoveInterface2,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
 					testAccCobblerCheckProfileExists(t, "cobbler_profile.foo", &profile),
@@ -162,19 +160,20 @@ func testAccCobblerCheckSystemExists(t *testing.T, n string, system *cobbler.Sys
 	}
 }
 
-var testAccCobblerSystem_basic = `
+var testAccCobblerSystemBasic = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		breed = "ubuntu"
 		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		boot_loader = "grub"
+		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
 		name = "foo"
-		distro = "${cobbler_distro.foo.name}"
+		distro = cobbler_distro.foo.name
 	}
 
 	resource "cobbler_system" "foo" {
@@ -202,19 +201,20 @@ var testAccCobblerSystem_basic = `
 
 	}`
 
-var testAccCobblerSystem_multi = `
+var testAccCobblerSystemMulti = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		breed = "ubuntu"
 		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		boot_loader = "grub"
+		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
 		name = "foo"
-		distro = "${cobbler_distro.foo.name}"
+		distro = cobbler_distro.foo.name
 	}
 
 	resource "cobbler_system" "foo" {
@@ -234,19 +234,20 @@ var testAccCobblerSystem_multi = `
 		}
 	}`
 
-var testAccCobblerSystem_change_1 = `
+var testAccCobblerSystemChange1 = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		breed = "ubuntu"
 		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		boot_loader = "grub"
+		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
 		name = "foo"
-		distro = "${cobbler_distro.foo.name}"
+		distro = cobbler_distro.foo.name
 	}
 
 	resource "cobbler_system" "foo" {
@@ -274,19 +275,20 @@ var testAccCobblerSystem_change_1 = `
 
 	}`
 
-var testAccCobblerSystem_change_2 = `
+var testAccCobblerSystemChange2 = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		breed = "ubuntu"
 		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		boot_loader = "grub"
+		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
 		name = "foo"
-		distro = "${cobbler_distro.foo.name}"
+		distro = cobbler_distro.foo.name
 	}
 
 	resource "cobbler_system" "foo" {
@@ -314,19 +316,20 @@ var testAccCobblerSystem_change_2 = `
 
 	}`
 
-var testAccCobblerSystem_removeInterface_1 = `
+var testAccCobblerSystemRemoveInterface1 = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		breed = "ubuntu"
 		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		boot_loader = "grub"
+		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
 		name = "foo"
-		distro = "${cobbler_distro.foo.name}"
+		distro = cobbler_distro.foo.name
 	}
 
 	resource "cobbler_system" "foo" {
@@ -354,19 +357,20 @@ var testAccCobblerSystem_removeInterface_1 = `
 
 	}`
 
-var testAccCobblerSystem_removeInterface_2 = `
+var testAccCobblerSystemRemoveInterface2 = `
 	resource "cobbler_distro" "foo" {
 		name = "foo"
 		breed = "ubuntu"
 		os_version = "bionic"
 		arch = "x86_64"
-		kernel = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/ks_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		boot_loader = "grub"
+		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
+		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
 		name = "foo"
-		distro = "${cobbler_distro.foo.name}"
+		distro = cobbler_distro.foo.name
 	}
 
 	resource "cobbler_system" "foo" {

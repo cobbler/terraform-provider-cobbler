@@ -1,5 +1,3 @@
-//revive:disable
-
 package cobbler
 
 import (
@@ -21,7 +19,7 @@ func TestAccCobblerTemplateFile_basic(t *testing.T) {
 		CheckDestroy: testAccCobblerCheckTemplateFileDestroy,
 		Steps: []resource.TestStep{
 			{
-				Config: testAccCobblerTemplateFile_basic,
+				Config: testAccCobblerTemplateFileBasic,
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckTemplateFileExists(t, "cobbler_template_file.foo", &ks),
 				),
@@ -74,8 +72,8 @@ func testAccCobblerCheckTemplateFileExists(t *testing.T, n string, ks *cobbler.T
 	}
 }
 
-var testAccCobblerTemplateFile_basic = `
+var testAccCobblerTemplateFileBasic = `
 	resource "cobbler_template_file" "foo" {
-		name = "/var/lib/cobbler/templates/foo.ks"
+		name = "foo.seed"
 		body = "I'm a Template file."
 	}`
