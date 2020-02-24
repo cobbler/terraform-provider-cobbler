@@ -144,7 +144,7 @@ func resourceRepoRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("breed", repo.Breed)
 	d.Set("comment", repo.Comment)
 	d.Set("createrepo_flags", repo.CreateRepoFlags)
-	d.Set("environment", repo.Environment)
+	//d.Set("environment", repo.Environment)
 	d.Set("keep_updated", repo.KeepUpdated)
 	d.Set("mirror", repo.Mirror)
 	d.Set("mirror_locally", repo.MirrorLocally)
@@ -240,14 +240,14 @@ func buildRepo(d *schema.ResourceData, meta interface{}) cobbler.Repo {
 		Breed:           d.Get("breed").(string),
 		Comment:         d.Get("comment").(string),
 		CreateRepoFlags: d.Get("createrepo_flags").(string),
-		Environment:     d.Get("environment").(string),
-		KeepUpdated:     d.Get("keep_updated").(bool),
-		Mirror:          d.Get("mirror").(string),
-		MirrorLocally:   d.Get("mirror_locally").(bool),
-		Name:            d.Get("name").(string),
-		Owners:          owners,
-		Proxy:           d.Get("proxy").(string),
-		RpmList:         rpmList,
+		//Environment:     d.Get("environment").(string),
+		KeepUpdated:   d.Get("keep_updated").(bool),
+		Mirror:        d.Get("mirror").(string),
+		MirrorLocally: d.Get("mirror_locally").(bool),
+		Name:          d.Get("name").(string),
+		Owners:        owners,
+		Proxy:         d.Get("proxy").(string),
+		RpmList:       rpmList,
 		//YumOpts:         yumOpts,
 	}
 
