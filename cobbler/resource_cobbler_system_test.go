@@ -227,10 +227,12 @@ var testAccCobblerSystemMulti = `
 
 		interface {
 			name = "eth0"
+			mac_address = "aa:bb:cc:dd:ee:${format("%d", count.index)}"
 		}
 
 		interface {
 			name = "eth1"
+			mac_address = "aa:bb:cc:dd:ef:${format("%d", count.index)}"
 		}
 	}`
 
@@ -281,7 +283,6 @@ var testAccCobblerSystemChange2 = `
 		breed = "ubuntu"
 		os_version = "bionic"
 		arch = "x86_64"
-		boot_loader = "grub"
 		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
 		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}
@@ -330,6 +331,7 @@ var testAccCobblerSystemRemoveInterface1 = `
 	resource "cobbler_profile" "foo" {
 		name = "foo"
 		distro = cobbler_distro.foo.name
+
 	}
 
 	resource "cobbler_system" "foo" {
@@ -363,7 +365,6 @@ var testAccCobblerSystemRemoveInterface2 = `
 		breed = "ubuntu"
 		os_version = "bionic"
 		arch = "x86_64"
-		boot_loader = "grub"
 		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
 		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}

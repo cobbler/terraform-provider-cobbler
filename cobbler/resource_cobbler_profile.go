@@ -139,6 +139,12 @@ func resourceProfile() *schema.Resource {
 				Computed: true,
 			},
 
+			"redhat_management_key": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
 			"repos": {
 				Type:     schema.TypeList,
 				Optional: true,
@@ -256,7 +262,7 @@ func resourceProfileRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("next_server", profile.NextServer)
 	d.Set("owners", profile.Owners)
 	d.Set("proxy", profile.Proxy)
-	//d.Set("redhat_management_key", profile.RedHatManagementKey)         // Removed in Cobbler 3
+	d.Set("redhat_management_key", profile.RedHatManagementKey)
 	//d.Set("redhat_management_server", profile.RedHatManagementServer)   // Removed in Cobbler 3
 	d.Set("template_files", profile.TemplateFiles)
 	d.Set("virt_auto_boot", profile.VirtAutoBoot)
@@ -330,26 +336,26 @@ func buildProfile(d *schema.ResourceData, meta interface{}) cobbler.Profile {
 	}
 
 	profile := cobbler.Profile{
-		Autoinstall:       d.Get("autoinstall").(string),
-		AutoinstallMeta:   d.Get("autoinstall_meta").(string),
-		BootFiles:         d.Get("boot_files").(string),
-		Comment:           d.Get("comment").(string),
-		DHCPTag:           d.Get("dhcp_tag").(string),
-		Distro:            d.Get("distro").(string),
-		EnableGPXE:        d.Get("enable_gpxe").(bool),
-		EnableMenu:        d.Get("enable_menu").(bool),
-		FetchableFiles:    d.Get("fetchable_files").(string),
-		KernelOptions:     d.Get("kernel_options").(string),
-		KernelOptionsPost: d.Get("kernel_options_post").(string),
-		MGMTClasses:       mgmtClasses,
-		MGMTParameters:    d.Get("mgmt_parameters").(string),
-		Name:              d.Get("name").(string),
-		NameServersSearch: nameServersSearch,
-		NameServers:       nameServers,
-		NextServer:        d.Get("next_server").(string),
-		Owners:            owners,
-		Proxy:             d.Get("proxy").(string),
-		//RedHatManagementKey:     d.Get("redhat_management_key").(string),    // Removed in Cobbler 3
+		Autoinstall:         d.Get("autoinstall").(string),
+		AutoinstallMeta:     d.Get("autoinstall_meta").(string),
+		BootFiles:           d.Get("boot_files").(string),
+		Comment:             d.Get("comment").(string),
+		DHCPTag:             d.Get("dhcp_tag").(string),
+		Distro:              d.Get("distro").(string),
+		EnableGPXE:          d.Get("enable_gpxe").(bool),
+		EnableMenu:          d.Get("enable_menu").(bool),
+		FetchableFiles:      d.Get("fetchable_files").(string),
+		KernelOptions:       d.Get("kernel_options").(string),
+		KernelOptionsPost:   d.Get("kernel_options_post").(string),
+		MGMTClasses:         mgmtClasses,
+		MGMTParameters:      d.Get("mgmt_parameters").(string),
+		Name:                d.Get("name").(string),
+		NameServersSearch:   nameServersSearch,
+		NameServers:         nameServers,
+		NextServer:          d.Get("next_server").(string),
+		Owners:              owners,
+		Proxy:               d.Get("proxy").(string),
+		RedHatManagementKey: d.Get("redhat_management_key").(string),
 		//RedHatManagementServer:  d.Get("redhat_management_server").(string), // Removed in Cobbler 3
 		Repos:          strings.Join(repos, " "),
 		Server:         d.Get("server").(string),

@@ -129,7 +129,6 @@ var testAccCobblerProfileBasic = `
 		os_version = "bionic"
 		arch = "x86_64"
 		boot_loader = "grub"
-		mgmt_classes = []
 		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
 		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 	}

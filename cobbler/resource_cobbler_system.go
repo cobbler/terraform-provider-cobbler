@@ -332,6 +332,12 @@ func resourceSystem() *schema.Resource {
 				Computed: true,
 			},
 
+			"redhat_management_key": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
+
 			"status": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -479,7 +485,7 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("power_user", system.PowerUser)
 	d.Set("profile", system.Profile)
 	d.Set("proxy", system.Proxy)
-	//d.Set("redhat_management_key", system.RedHatManagementKey)        // Removed in Cobbler 3
+	d.Set("redhat_management_key", system.RedHatManagementKey)
 	//d.Set("redhat_management_server", system.RedHatManagementServer)  // Removed in Cobbler 3
 	d.Set("status", system.Status)
 	d.Set("template_files", system.TemplateFiles)
@@ -653,20 +659,20 @@ func buildSystem(d *schema.ResourceData) cobbler.System {
 		MGMTClasses:    mgmtClasses,
 		MGMTParameters: d.Get("mgmt_parameters").(string),
 		//MonitEnabled:            d.Get("monit_enabled").(bool),              // Removed in Cobbler 3
-		Name:              d.Get("name").(string),
-		NameServersSearch: nameServersSearch,
-		NameServers:       nameServers,
-		NetbootEnabled:    d.Get("netboot_enabled").(bool),
-		NextServer:        d.Get("next_server").(string),
-		Owners:            owners,
-		PowerAddress:      d.Get("power_address").(string),
-		PowerID:           d.Get("power_id").(string),
-		PowerPass:         d.Get("power_pass").(string),
-		PowerType:         d.Get("power_type").(string),
-		PowerUser:         d.Get("power_user").(string),
-		Profile:           d.Get("profile").(string),
-		Proxy:             d.Get("proxy").(string),
-		//RedHatManagementKey:     d.Get("redhat_management_key").(string),    // Removed in Cobbler 3
+		Name:                d.Get("name").(string),
+		NameServersSearch:   nameServersSearch,
+		NameServers:         nameServers,
+		NetbootEnabled:      d.Get("netboot_enabled").(bool),
+		NextServer:          d.Get("next_server").(string),
+		Owners:              owners,
+		PowerAddress:        d.Get("power_address").(string),
+		PowerID:             d.Get("power_id").(string),
+		PowerPass:           d.Get("power_pass").(string),
+		PowerType:           d.Get("power_type").(string),
+		PowerUser:           d.Get("power_user").(string),
+		Profile:             d.Get("profile").(string),
+		Proxy:               d.Get("proxy").(string),
+		RedHatManagementKey: d.Get("redhat_management_key").(string),
 		//RedHatManagementServer:  d.Get("redhat_management_server").(string), // Removed in Cobbler 3
 		Status:         d.Get("status").(string),
 		TemplateFiles:  d.Get("template_files").(string),
