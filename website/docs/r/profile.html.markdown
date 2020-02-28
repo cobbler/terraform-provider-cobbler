@@ -15,7 +15,7 @@ Manages a Profile within Cobbler.
 ```hcl
 resource "cobbler_profile" "my_profile" {
   name        = "my_profile"
-  distro      = "ubuntu-1404-x86_64"
+  distro      = "ubuntu-1804-x86_64"
   autoinstall = "default.ks"
 }
 ```
@@ -69,8 +69,6 @@ The following arguments are supported:
 * `proxy` - (Optional) Proxy URL.
 
 * `redhat_management_key` - (Optional) Red Hat Management Key.
-
-* `redhat_management_server` - (Optional) RedHat Management Server.
 
 * `repos` - (Optional) Repos to auto-assign to this profile.
 

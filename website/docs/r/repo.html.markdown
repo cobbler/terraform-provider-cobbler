@@ -8,7 +8,7 @@ description: |-
 
 # cobbler_repo
 
-Manages a repo within Cobbler.
+Manages a Repo within Cobbler.
 
 ## Example Usage
 

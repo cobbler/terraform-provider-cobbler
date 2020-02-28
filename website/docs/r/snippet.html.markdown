@@ -23,7 +23,8 @@ resource "cobbler_snippet" "my_snippet" {
 
 The following arguments are supported:
 
-* `body` - (Required) The body of the snippet.
+* `body` - (Required) The body of the snippet.  May also point
+  to a file: `body = file("my_snippet")`
 
 * `name` - (Required) The name of the snippet. This must be the name
   only, so without `/var/lib/cobbler/snippets`.

@@ -23,7 +23,8 @@ resource "cobbler_template_file" "my_template" {
 
 The following arguments are supported:
 
-* `body` - (Required) The body of the template file.
+* `body` - (Required) The body of the template file. May also point
+  to a file: `body = file("my_template.ks")`
 
 * `name` - (Required) The name of the template file. This must be
   the name only, so without `/var/lib/cobbler/templates`.

@@ -15,7 +15,7 @@ Manages a System within Cobbler.
 ```hcl
 resource "cobbler_system" "my_system" {
   name         = "my_system"
-  profile      = "${cobbler_profile.my_profile.name}"
+  profile      = "my_profile"
   name_servers = ["8.8.8.8", "8.8.4.4"]
   comment      = "I'm a system"
 
@@ -47,6 +47,8 @@ The following arguments are supported:
   formerly Kickstart metadata.
 
 * `boot_files` - (Optional) TFTP boot files copied into tftpboot.
+
+* `boot_loader` - (Optional) Must be either `grub` or `pxelinux`.
 
 * `comment` - (Optional) Free form text description
 

@@ -13,7 +13,7 @@ Manages a distribution within Cobbler.
 ## Example Usage
 
 ```hcl
-resource "cobbler_distro" "ubuntu-1404-x86_64" {
+resource "cobbler_distro" "ubuntu-1804-x86_64" {
   name       = "foo"
   breed      = "ubuntu"
   os_version = "bionic"
@@ -37,6 +37,8 @@ The following arguments are supported:
 
 * `boot_files` - (Optional) Files copied into tftpboot beyond the
   kernel/initrd.
+
+* `boot_loader` - (Optional) Must be either `grub` or `pxelinux`.
 
 * `comment` - (Optional) Free form text description.
 
