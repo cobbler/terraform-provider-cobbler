@@ -1,4 +1,11 @@
+## 2.0.0 (March 02, 2020)
+
+BACKWARDS INCOMPATIBILITIES
+
+* Rewrites to support Cobbler 3.x (will break support for Cobbler 2.x (EOL)).
+
 ## 1.1.1 (Unreleased)
+
 ## 1.1.0 (June 07, 2019)
 
 IMPROVEMENTS
