@@ -1,3 +1,9 @@
+## 2.0.1 (April 30, 2020)
+
+BUG FIXES
+
+* Bugfix in dependency "cobblerclient" - IPv6DefaultGateway
+
 ## 2.0.0 (March 02, 2020)
 
 BACKWARDS INCOMPATIBILITIES
