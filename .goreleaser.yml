@@ -1,0 +1,26 @@
+project_name: terraform-provider-cobbler
+before:
+  hooks:
+    - go mod download
+builds:
+- id:
+  binary: terraform-provider-cobbler
+  env:
+  - CGO_ENABLED=0
+  goos:
+    - linux
+    - darwin
+  goarch:
+    - amd64
+archives:
+- name_template: "{{ .ProjectName }}-v{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+  format: gz
+  files:
+    - none*
+checksum:
+  name_template: sha256sums.txt
+  algorithm: sha256
+release:
+  github:
+    owner: wearespindle
+    name: terraform-provider-cobbler
