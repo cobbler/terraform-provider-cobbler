@@ -1,11 +1,10 @@
 module github.com/wearespindle/terraform-provider-cobbler
 
-go 1.14
+go 1.15
 
 require (
-	github.com/hashicorp/terraform-plugin-sdk v1.7.0
-	github.com/wearespindle/cobblerclient v0.0.0
-	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
+	github.com/hashicorp/terraform-plugin-sdk v1.16.0
+	github.com/wearespindle/cobblerclient v0.4.0
 )
 
-replace github.com/wearespindle/cobblerclient => ../cobblerclient
+// replace github.com/wearespindle/cobblerclient => ../cobblerclient
