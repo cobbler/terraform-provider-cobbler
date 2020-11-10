@@ -583,7 +583,6 @@ func resourceSystemUpdate(d *schema.ResourceData, meta interface{}) error {
 
 				if err := system.DeleteInterface(interfaceName); err != nil {
 					return fmt.Errorf("Cobbler System: Error deleting Interface %s to %s: %s", interfaceName, system.Name, err)
-
 				}
 			}
 		}
@@ -594,7 +593,6 @@ func resourceSystemUpdate(d *schema.ResourceData, meta interface{}) error {
 
 			if err := system.CreateInterface(interfaceName, interfaceInfo); err != nil {
 				return fmt.Errorf("Cobbler System: Error adding Interface %s to %s: %s", interfaceName, system.Name, err)
-
 			}
 		}
 	}
@@ -618,7 +616,7 @@ func resourceSystemDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-// buildSystem builds a cobblerclient.System out of the Terraform attributes
+// buildSystem builds a cobblerclient.System out of the Terraform attributes.
 func buildSystem(d *schema.ResourceData) cobbler.System {
 	mgmtClasses := []string{}
 	for _, i := range d.Get("mgmt_classes").([]interface{}) {
@@ -689,7 +687,7 @@ func buildSystem(d *schema.ResourceData) cobbler.System {
 	return system
 }
 
-// buildSystemInterface builds a cobblerclient.Interface out of the Terraform attributes
+// buildSystemInterface builds a cobblerclient.Interface out of the Terraform attributes.
 func buildSystemInterfaces(systemInterfaces *schema.Set) cobbler.Interfaces {
 	interfaces := make(cobbler.Interfaces)
 	rawInterfaces := systemInterfaces.List()

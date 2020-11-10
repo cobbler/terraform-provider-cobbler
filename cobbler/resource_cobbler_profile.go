@@ -308,7 +308,7 @@ func resourceProfileDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-// buildProfile builds a cobblerclient.Profile out of the Terraform attributes
+// buildProfile builds a cobblerclient.Profile out of the Terraform attributes.
 func buildProfile(d *schema.ResourceData, meta interface{}) cobbler.Profile {
 	mgmtClasses := []string{}
 	for _, i := range d.Get("mgmt_classes").([]interface{}) {

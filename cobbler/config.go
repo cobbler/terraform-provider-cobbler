@@ -11,7 +11,7 @@ import (
 	cobbler "github.com/wearespindle/cobblerclient"
 )
 
-// Config defines how to access the Cobbler API
+// Config defines how to access the Cobbler API.
 type Config struct {
 	CACertFile string
 	Insecure   bool

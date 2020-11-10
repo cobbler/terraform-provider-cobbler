@@ -202,7 +202,7 @@ func resourceRepoDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-// buildRepo builds a cobbler.Repo from the Terraform attributes
+// buildRepo builds a cobbler.Repo from the Terraform attributes.
 func buildRepo(d *schema.ResourceData, meta interface{}) cobbler.Repo {
 	aptComponents := []string{}
 	for _, i := range d.Get("apt_components").([]interface{}) {

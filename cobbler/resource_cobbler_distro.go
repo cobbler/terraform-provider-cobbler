@@ -191,7 +191,7 @@ func resourceDistroDelete(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-// buildDistro builds a cobbler.Distro from the Terraform attributes
+// buildDistro builds a cobbler.Distro from the Terraform attributes.
 func buildDistro(d *schema.ResourceData, meta interface{}) cobbler.Distro {
 	mgmtClasses := []string{}
 	for _, i := range d.Get("mgmt_classes").([]interface{}) {

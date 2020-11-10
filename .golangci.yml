@@ -1,0 +1,49 @@
+run:
+  deadline: 5m
+
+linters:
+  fast: false
+  disable-all: true
+  enable:
+    - asciicheck
+    - bodyclose
+    - deadcode
+    - depguard
+    - dogsled
+#   - errcheck
+    - exhaustive
+    - exportloopref
+#    - gochecknoglobals
+#    - goconst
+#    - gocritic
+    - godot
+    - gofmt
+#    - gofumpt
+    - goheader
+    - goimports
+    - golint
+#    - gomodguard
+#    - goprintffuncname
+#    - gosec
+#    - gosimple
+    - govet
+#    - ineffassign
+#    - interfacer
+#    - maligned
+    - misspell
+    - nakedret
+    - nolintlint
+#    - prealloc
+    - rowserrcheck
+#    - scopelint
+    - staticcheck
+    - structcheck
+#   - stylecheck
+    - typecheck
+    - unconvert
+    - unused
+    - varcheck
+    - whitespace
+
+service:
+  golangci-lint-version: 1.32.x # use the fixed version to not introduce new linters unexpectedly
