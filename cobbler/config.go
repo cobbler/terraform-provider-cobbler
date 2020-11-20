@@ -8,7 +8,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/pathorcontents"
 
-	cobbler "github.com/wearespindle/cobblerclient"
+	cobbler "github.com/cobbler/cobblerclient"
 )
 
 // Config defines how to access the Cobbler API.

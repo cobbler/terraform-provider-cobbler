@@ -4,7 +4,6 @@ services:
 - docker
 language: go
 go:
-  - 1.14.x
   - 1.15.x
 
 install:
@@ -17,7 +16,6 @@ install:
 script:
 - make test
 - make vet
-- make website-test
 
 branches:
   only:

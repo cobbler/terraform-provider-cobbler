@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
-	cobbler "github.com/wearespindle/cobblerclient"
+	cobbler "github.com/cobbler/cobblerclient"
 )
 
 func TestAccCobblerDistro_basic(t *testing.T) {

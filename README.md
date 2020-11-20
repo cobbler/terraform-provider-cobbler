@@ -1,59 +1,54 @@
-# Terraform Provider
+# Cobbler Terraform Provider
 
-- Website: <https://www.terraform.io>
-- [![Gitter chat](https://badges.gitter.im/hashicorp-terraform/Lobby.png)](https://gitter.im/hashicorp-terraform/Lobby)
-- Mailing list: [Google Groups](http://groups.google.com/group/terraform-tool)
+The Cobbler provider is used to interact with a locally installed Cobbler service.\
+The provider needs to be configured with the proper credentials before it can be used.
 
-<img src="https://cdn.rawgit.com/hashicorp/terraform-website/master/content/source/assets/images/logo-hashicorp.svg" width="600px">
+Original code by [Joe Topjian](https://github.com/jtopjian).
 
-## Requirements
+## Prerequisites
 
-- [Terraform](https://www.terraform.io/downloads.html) 0.12.x
-- [Go](https://golang.org/doc/install) 1.14 (to build the provider plugin)
+- [Terraform](https://terraform.io), 0.12 and above
+- [Cobbler](https://cobbler.github.io/), release 3.2.0 (or higher), with **caching disabled**.\
+   Set `cache_enabled: 0` in file `/etc/cobbler/settings`.
 
-## Building The Provider
+## Using the Provider
 
-Clone repository to: `$GOPATH/src/github.com/terraform-providers/terraform-provider-cobbler`
+Full documentation can be found in the [`docs`](/docs) directory.
 
-```sh
-$ mkdir -p $GOPATH/src/github.com/terraform-providers; cd $GOPATH/src/github.com/terraform-providers
-$ git clone git@github.com:terraform-providers/terraform-provider-cobbler
+### Terraform 0.13 and above
+
+**[WIP]** You can use the provider via the [Terraform provider registry](hxxps://registry.terraform.io/providers/cobbler/cobbler).
+
+### Terraform 0.12 or manual installation
+
+You can download a pre-built binary from the [releases](https://github.com/cobbler/terraform-provider-cobbler/releases/)
+ page.\
+ These are built using [GoReleaser](https://goreleaser.com/) (the [configuration](.goreleaser.yml) is in the repo).
+
+Download and add the pre-built binary for your system (Linux or macOS) to `~/.terraform.d/plugins/`.\
+Replace `linux` with `darwin` for the macOS version.
+
+```console
+wget https://github.com/cobbler/terraform-provider-cobbler/releases/download/v2.0.1/terraform-provider-cobbler_2.0.1_linux_amd64.zip
+unzip terraform-provider-cobbler_2.0.1_linux_amd64.zip
+mkdir -p ~/.terraform.d/plugins/
+mv terraform-provider-cobbler_v2.0.1 ~/.terraform.d/plugins/
+chmod +x ~/.terraform.d/plugins/terraform-provider-cobbler_v2.0.1
 ```
 
-Enter the provider directory and build the provider
+Don't forget to run `terraform init` after installation of a new binary!
 
-```sh
-$ cd $GOPATH/src/github.com/terraform-providers/terraform-provider-cobbler
-$ make build
+Make sure the file `variables.tf` contains the right version in the provider block:
+
+```hcl
+provider "cobbler" {
+  version  = "~> 2.0.1"
+  username = var.cobbler_username
+  password = var.cobbler_password
+  url      = var.cobbler_url
+}
 ```
 
-## Using the provider
+### Development
 
-## Fill in for each provider
-
-## Developing the Provider
-
-If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (version 1.14+ is *required*). You'll also need to correctly setup a [GOPATH](http://golang.org/doc/code.html#GOPATH), as well as adding `$GOPATH/bin` to your `$PATH`.
-
-To compile the provider, run `make build`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
-
-```sh
-$ make build
-...
-$ $GOPATH/bin/terraform-provider-cobbler
-...
-```
-
-In order to test the provider, you can simply run `make test`.
-
-```sh
-$ make test
-```
-
-In order to run the full suite of Acceptance tests, run `make testacc`.
-
-*Note:* Acceptance tests create real resources, and often cost money to run.
-
-```sh
-$ make testacc
-```
+If you want to build from source, you can simply use `make` in the root of the repository.

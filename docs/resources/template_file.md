@@ -3,7 +3,7 @@ layout: "cobbler"
 page_title: "Cobbler: cobbler_template_file"
 sidebar_current: "docs-cobbler-resource-template_file"
 description: |-
-  Manages a template File within Cobbler.
+  Manages a Template File within Cobbler.
 ---
 
 # cobbler_template_file

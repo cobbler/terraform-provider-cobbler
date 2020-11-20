@@ -29,7 +29,7 @@ export GOPATH=$HOME/go
 source ~/.bashrc
 
 #git clone https://github.com/terraform-providers/terraform-provider-cobbler
-git clone https://github.com/wearespindle/terraform-provider-cobbler
+git clone https://github.com/cobbler/terraform-provider-cobbler
 
 # Cobbler
 sudo apt-get install -y cobbler cobbler-web debmirror dnsmasq

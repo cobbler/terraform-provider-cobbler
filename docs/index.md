@@ -1,10 +1,8 @@
 ---
-layout: "cobbler"
+layout: ""
 page_title: "Provider: Cobbler"
-sidebar_current: "docs-cobbler-index"
 description: |-
-  The Cobbler provider is used to interact with a locally installed,
-  Cobbler service.
+  The Cobbler provider provides resources to interact with the Cobbler API.
 ---
 
 # Cobbler Provider
