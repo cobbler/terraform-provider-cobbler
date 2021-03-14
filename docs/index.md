@@ -13,6 +13,15 @@ to be configured with the proper credentials before it can be used.
 
 Use the navigation to the left to read about the available resources.
 
+## Prereq
+
+Until [this issue](https://github.com/cobbler/cobbler/issues/2386) is 
+fixed, it is necessary to disable Cobbler's cache by adding the following
+line to `/etc/cobbler/settings` (since Cobbler 3.2.1 `settings.yaml`) file:
+````
+cache_enabled: 0
+````
+
 ## Example Usage
 
 ```hcl
