@@ -10,21 +10,24 @@ import (
 
 func resourceSnippet() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSnippetCreate,
-		Read:   resourceSnippetRead,
-		Update: resourceSnippetUpdate,
-		Delete: resourceSnippetDelete,
+		Description: "`cobbler_snippet` manages a snippet within Cobbler.",
+		Create:      resourceSnippetCreate,
+		Read:        resourceSnippetRead,
+		Update:      resourceSnippetUpdate,
+		Delete:      resourceSnippetDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The name of the snippet. This must be the name only, so without `/var/lib/cobbler/snippets`.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 
 			"body": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The body of the snippet. May also point to a file: `body = file(\"my_snippet\")`.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 		},
 	}

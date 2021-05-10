@@ -7,7 +7,7 @@ Original code by [Joe Topjian](https://github.com/jtopjian).
 
 ## Prerequisites
 
-- [Terraform](https://terraform.io), 0.12 and above
+- [Terraform](https://terraform.io), 0.14 and above
 - [Cobbler](https://cobbler.github.io/), release 3.2.0 (or higher), with **caching disabled**.\
    Set `cache_enabled: 0` in file `/etc/cobbler/settings`.
 
@@ -17,7 +17,7 @@ Full documentation can be found in the [`docs`](/docs) directory.
 
 ### Terraform 0.13 and above
 
-**[WIP]** You can use the provider via the [Terraform provider registry](hxxps://registry.terraform.io/providers/cobbler/cobbler).
+You can use the provider via the [Terraform provider registry](https://registry.terraform.io/providers/cobbler/cobbler).
 
 ### Terraform 0.12 or manual installation
 
@@ -29,11 +29,11 @@ Download and add the pre-built binary for your system (Linux or macOS) to `~/.te
 Replace `linux` with `darwin` for the macOS version.
 
 ```console
-wget https://github.com/cobbler/terraform-provider-cobbler/releases/download/v2.0.1/terraform-provider-cobbler_2.0.1_linux_amd64.zip
-unzip terraform-provider-cobbler_2.0.1_linux_amd64.zip
+wget https://github.com/cobbler/terraform-provider-cobbler/releases/download/v2.0.3/terraform-provider-cobbler_2.0.3_linux_amd64.zip
+unzip terraform-provider-cobbler_2.0.3_linux_amd64.zip
 mkdir -p ~/.terraform.d/plugins/
-mv terraform-provider-cobbler_v2.0.1 ~/.terraform.d/plugins/
-chmod +x ~/.terraform.d/plugins/terraform-provider-cobbler_v2.0.1
+mv terraform-provider-cobbler_v2.0.3 ~/.terraform.d/plugins/
+chmod +x ~/.terraform.d/plugins/terraform-provider-cobbler_v2.0.3
 ```
 
 Don't forget to run `terraform init` after installation of a new binary!
@@ -42,7 +42,7 @@ Make sure the file `variables.tf` contains the right version in the provider blo
 
 ```hcl
 provider "cobbler" {
-  version  = "~> 2.0.1"
+  version  = "~> 2.0.3"
   username = var.cobbler_username
   password = var.cobbler_password
   url      = var.cobbler_url

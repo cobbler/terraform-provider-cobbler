@@ -11,205 +11,238 @@ import (
 
 func resourceProfile() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceProfileCreate,
-		Read:   resourceProfileRead,
-		Update: resourceProfileUpdate,
-		Delete: resourceProfileDelete,
+		Description: "`cobbler_profile` manages a profile within Cobbler.",
+		Create:      resourceProfileCreate,
+		Read:        resourceProfileRead,
+		Update:      resourceProfileUpdate,
+		Delete:      resourceProfileDelete,
 
 		Schema: map[string]*schema.Schema{
 			"autoinstall": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Template remote kickstarts or preseeds.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"autoinstall_meta": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Automatic installation template metadata, formerly Kickstart metadata.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"boot_files": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Files copied into tftpboot beyond the kernel/initrd.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"comment": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Free form text description.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"dhcp_tag": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Description: "DHCP tag.",
+				Type:        schema.TypeString,
+				Optional:    true,
 			},
 
 			"distro": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "Parent distribution.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 
 			"enable_gpxe": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Computed: true,
+				Description: "Use gPXE instead of PXELINUX for advanced booting options.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"enable_menu": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Computed: true,
+				Description: "Enable a boot menu.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"fetchable_files": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Templates for tftp or wget.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"kernel_options": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Kernel options for the profile.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"kernel_options_post": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Post install kernel options.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"mgmt_classes": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: "For external configuration management.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 
 			"mgmt_parameters": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Parameters which will be handed to your management application (Must be a valid YAML dictionary).",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The name of the profile.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 
 			"name_servers_search": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: "Name server search settings.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 
 			"name_servers": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: "Name servers.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 
 			"next_server": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The next_server option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"owners": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: "Owners list for authz_ownership.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 
 			"parent": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The parent this profile inherits settings from.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"proxy": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Proxy URL.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"redhat_management_key": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Obsolete - removed in Cobbler 3.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"repos": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: "Repos to auto-assign to this profile.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 
 			"server": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The server-override for the profile.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"template_files": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "File mappings for built-in config management.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_auto_boot": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Auto boot virtual machines.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_bridge": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The bridge for virtual machines.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_cpus": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The number of virtual CPUs",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_disk_driver": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The virtual machine disk driver.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_file_size": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The virtual machine file size.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_path": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The virtual machine path.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_ram": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The amount of RAM for the virtual machine.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_type": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The type of virtual machine. Valid options are: xenpv, xenfv, qemu, kvm, vmware, openvz.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}

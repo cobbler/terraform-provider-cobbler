@@ -16,205 +16,238 @@ var systemSyncLock sync.Mutex
 
 func resourceSystem() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSystemCreate,
-		Read:   resourceSystemRead,
-		Update: resourceSystemUpdate,
-		Delete: resourceSystemDelete,
+		Description: "`cobbler_system` manages a system within Cobbler.",
+		Create:      resourceSystemCreate,
+		Read:        resourceSystemRead,
+		Update:      resourceSystemUpdate,
+		Delete:      resourceSystemDelete,
 
 		Schema: map[string]*schema.Schema{
 			"autoinstall": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Template remote kickstarts or preseeds.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"autoinstall_meta": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Automatic installation template metadata, formerly Kickstart metadata.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"boot_files": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Files copied into tftpboot beyond the kernel/initrd.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"boot_loader": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Must be either `grub` or `pxelinux`.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"comment": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Free form text description.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"enable_gpxe": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Computed: true,
+				Description: "Use gPXE instead of PXELINUX for advanced booting options.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"fetchable_files": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Templates for tftp or wget.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"gateway": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Network gateway.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"hostname": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Hostname of the system.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"image": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Parent image (if no profile is used).",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"interface": {
-				Type:     schema.TypeSet,
-				Optional: true,
-				Computed: true,
+				Description: "The `interface` Block Set.",
+				Type:        schema.TypeSet,
+				Optional:    true,
+				Computed:    true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
-							Type:     schema.TypeString,
-							Required: true,
+							Description: "The device name of the interface. ex: `eth0`.",
+							Type:        schema.TypeString,
+							Required:    true,
 						},
 
 						"cnames": {
-							Type:     schema.TypeList,
-							Optional: true,
-							Computed: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
+							Description: "Canonical name records.",
+							Type:        schema.TypeList,
+							Optional:    true,
+							Computed:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
 						},
 
 						"dhcp_tag": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "DHCP tag.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"dns_name": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "DNS name.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"bonding_opts": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "Options for bonded interfaces.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"bridge_opts": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "Options for bridge interfaces.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"gateway": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "Per-interface gateway.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"interface_type": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "The type of interface: na, master, slave, bond, bond_slave, bridge, bridge_slave, bonded_bridge_slave.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"interface_master": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "The master interface when slave.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"ip_address": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "The IP address of the interface.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"ipv6_address": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "The IPv6 address of the interface.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"ipv6_secondaries": {
-							Type:     schema.TypeList,
-							Optional: true,
-							Computed: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
+							Description: "IPv6 secondaries.",
+							Type:        schema.TypeList,
+							Optional:    true,
+							Computed:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
 						},
 
 						"ipv6_mtu": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "The MTU of the IPv6 address.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"ipv6_static_routes": {
-							Type:     schema.TypeList,
-							Optional: true,
-							Computed: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
+							Description: "Static routes for the IPv6 interface.",
+							Type:        schema.TypeList,
+							Optional:    true,
+							Computed:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
 						},
 
 						"ipv6_default_gateway": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "The default gateawy for the IPv6 address / interface.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"mac_address": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "The MAC address of the interface.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"management": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							Computed: true,
+							Description: "Whether this interface is a management interface.",
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"netmask": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "The IPv4 netmask of the interface.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"static": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							Computed: true,
+							Description: "Whether the interface should be static or DHCP.",
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Computed:    true,
 						},
 
 						"static_routes": {
-							Type:     schema.TypeList,
-							Optional: true,
-							Computed: true,
-							Elem:     &schema.Schema{Type: schema.TypeString},
+							Description: "Static routes for the interface.",
+							Type:        schema.TypeList,
+							Optional:    true,
+							Computed:    true,
+							Elem:        &schema.Schema{Type: schema.TypeString},
 						},
 
 						"virt_bridge": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
+							Description: "The virtual bridge to attach to.",
+							Type:        schema.TypeString,
+							Optional:    true,
+							Computed:    true,
 						},
 					},
 				},
@@ -222,180 +255,209 @@ func resourceSystem() *schema.Resource {
 			},
 
 			"ipv6_default_device": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "IPv6 default device.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"kernel_options": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Kernel options. ex: `selinux=permissive`.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"kernel_options_post": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Kernel options (post install).",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"mgmt_classes": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: "For external configuration management.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 
 			"mgmt_parameters": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Parameters which will be handed to your management application (Must be a valid YAML dictionary).",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The name of the system.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 
 			"name_servers_search": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: "Name server search settings.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 
 			"name_servers": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: "Name servers.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 
 			"netboot_enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Computed: true,
+				Description: "(Re)install this machine at next boot.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"next_server": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The next_server option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"owners": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Description: "Owners list for authz_ownership.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
 
 			"power_address": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Power management address.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"power_id": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Usually a plug number or blade name if power type requires it.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"power_pass": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Power management password.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"power_type": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Power management type.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"power_user": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Power management user.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"profile": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "Parent profile.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 
 			"proxy": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Proxy URL.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"redhat_management_key": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Obsolete - removed in Cobbler 3.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"status": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "System status (development, testing, acceptance, production).",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"template_files": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "File mappings for built-in config management.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_auto_boot": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Auto boot virtual machines.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_file_size": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The virtual machine file size.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_cpus": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The number of virtual CPUs",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_type": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The type of virtual machine. Valid options are: xenpv, xenfv, qemu, kvm, vmware, openvz.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_path": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The virtual machine path.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_pxe_boot": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Computed: true,
+				Description: "Use PXE to build this virtual machine.",
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_ram": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The amount of RAM for the virtual machine.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"virt_disk_driver": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "The virtual machine disk driver.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}
