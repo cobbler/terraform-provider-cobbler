@@ -10,97 +10,112 @@ import (
 
 func resourceRepo() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceRepoCreate,
-		Read:   resourceRepoRead,
-		Update: resourceRepoUpdate,
-		Delete: resourceRepoDelete,
+		Description: "`cobbler_repo` manages a repo within Cobbler.",
+		Create:      resourceRepoCreate,
+		Read:        resourceRepoRead,
+		Update:      resourceRepoUpdate,
+		Delete:      resourceRepoDelete,
 
 		Schema: map[string]*schema.Schema{
 			"apt_components": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
+				Description: "List of Apt components such as main, restricted, universe. Applicable to apt breeds only.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Computed:    true,
 			},
 
 			"apt_dists": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
+				Description: "List of Apt distribution names such as bionic, bionic-updates. Applicable to apt breeds only.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Computed:    true,
 			},
 
 			"arch": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Computed: true,
+				Description: "The architecture of the repo. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				ForceNew:    true,
+				Computed:    true,
 			},
 
 			"breed": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The \"breed\" of distribution. Valid options are: rsync, rhn, yum, apt, and wget. These choices may vary depending on the version of Cobbler in use.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 
 			"comment": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Free form text description.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"createrepo_flags": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Flags to use with `createrepo`.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"environment": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Environment variables to use during repo command execution.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"keep_updated": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Computed: true,
+				Description: "Update the repo upon Cobbler sync. Valid values are true or false.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"mirror": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "Address of the repo to mirror.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 
 			"mirror_locally": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Computed: true,
+				Description: "Whether to copy the files locally or just references to the external files. Valid values are true or false.",
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "A name for the repo.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 
 			"owners": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
+				Description: "List of Owners for authz_ownership.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Computed:    true,
 			},
 
 			"proxy": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Proxy to use for downloading the repo. This argument does not work on older versions of Cobbler.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"rpm_list": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
+				Description: "List of specific RPMs to mirror.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Computed:    true,
 			},
 
 			//"yumopts": &schema.Schema{

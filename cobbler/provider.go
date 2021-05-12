@@ -10,37 +10,37 @@ func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			"url": {
+				Description: "The url to the Cobbler service. This can also be specified with the `COBBLER_URL` shell environment variable.",
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "Cobbler URL",
 				DefaultFunc: schema.EnvDefaultFunc("COBBLER_URL", nil),
 			},
 
 			"username": {
+				Description: "The username to the Cobbler service. This can also be specified with the `COBBLER_USERNAME` shell environment variable.",
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "The username for accessing Cobbler.",
 				DefaultFunc: schema.EnvDefaultFunc("COBBLER_USERNAME", nil),
 			},
 
 			"password": {
+				Description: "The password to the Cobbler service. This can also be specified with the `COBBLER_PASSWORD` shell environment variable.",
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "The password for accessing Cobbler.",
 				DefaultFunc: schema.EnvDefaultFunc("COBBLER_PASSWORD", nil),
 			},
 
 			"insecure": {
+				Description: "The url to the Cobbler service. This can also be specified with the `COBBLER_URL` shell environment variable.",
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Description: "Ignore SSL certificate warnings and errors.",
 				DefaultFunc: schema.EnvDefaultFunc("COBBLER_INSECURE", nil),
 			},
 
 			"cacert_file": {
+				Description: "The path or contents of an SSL CA certificate. This can also be specified with the `COBBLER_CACERT_FILE`shell environment variable.",
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "The path or contents of an SSL CA certificate",
 				DefaultFunc: schema.EnvDefaultFunc("COBBLER_CACERT_FILE", nil),
 			},
 		},

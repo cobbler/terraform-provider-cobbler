@@ -10,107 +10,124 @@ import (
 
 func resourceDistro() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceDistroCreate,
-		Read:   resourceDistroRead,
-		Update: resourceDistroUpdate,
-		Delete: resourceDistroDelete,
+		Description: "`cobbler_distro` manages a distribution within Cobbler.",
+		Create:      resourceDistroCreate,
+		Read:        resourceDistroRead,
+		Update:      resourceDistroUpdate,
+		Delete:      resourceDistroDelete,
 
 		Schema: map[string]*schema.Schema{
 			"arch": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Computed: true,
+				Description: "The architecture of the distro. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				ForceNew:    true,
+				Computed:    true,
 			},
 
 			"breed": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The \"breed\" of distribution. Valid options are: redhat, fedora, centos, scientific linux, suse, debian, and ubuntu. These choices may vary depending on the version of Cobbler in use.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 
 			"boot_files": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Computed: true,
+				Description: "Files copied into tftpboot beyond the kernel/initrd.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				ForceNew:    true,
+				Computed:    true,
 			},
 
 			"boot_loader": {
-				Type:     schema.TypeString,
-				Optional: true,
-				ForceNew: true,
-				Computed: true,
+				Description: " Must be either `grub` or `pxelinux`.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				ForceNew:    true,
+				Computed:    true,
 			},
 
 			"comment": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Free form text description.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"fetchable_files": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Templates for tftp or wget.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"kernel": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "Absolute path to kernel on filesystem. This must already exist prior to creating the distro.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 
 			"kernel_options": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Kernel options to use with the kernel.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"kernel_options_post": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Post install Kernel options to use with the kernel after installation.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"initrd": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "Absolute path to initrd on filesystem. This must already exist prior to creating the distro.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 
 			"mgmt_classes": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
+				Description: "Management classes for external config management.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Computed:    true,
 			},
 
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "A name for the distro.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 
 			"os_version": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The version of the distro you are creating. This varies with the version of Cobbler you are using. An updated signature list may need to be obtained in order to support a newer version. Example: `bionic`.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 
 			"owners": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
-				Computed: true,
+				Description: "Owners list for authz_ownership.",
+				Type:        schema.TypeList,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Computed:    true,
 			},
 
 			"redhat_management_key": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "Obsolete - removed in Cobbler 3.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 
 			"template_files": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Description: "File mappings for built-in config management.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 		},
 	}

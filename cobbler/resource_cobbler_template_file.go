@@ -10,21 +10,24 @@ import (
 
 func resourceTemplateFile() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceTemplateFileCreate,
-		Read:   resourceTemplateFileRead,
-		Update: resourceTemplateFileUpdate,
-		Delete: resourceTemplateFileDelete,
+		Description: "`cobbler_template_file` manages a template file within Cobbler.",
+		Create:      resourceTemplateFileCreate,
+		Read:        resourceTemplateFileRead,
+		Update:      resourceTemplateFileUpdate,
+		Delete:      resourceTemplateFileDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Description: "The name of the template file. This must be the name only, so without `/var/lib/cobbler/templates`.",
+				Type:        schema.TypeString,
+				Required:    true,
+				ForceNew:    true,
 			},
 
 			"body": {
-				Type:     schema.TypeString,
-				Required: true,
+				Description: "The body of the template file. May also point to a file: `body = file(\"my_template.ks\")`.",
+				Type:        schema.TypeString,
+				Required:    true,
 			},
 		},
 	}
