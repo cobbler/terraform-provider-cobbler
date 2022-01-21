@@ -21,7 +21,7 @@ func TestAccCobblerRepo_basic(t *testing.T) {
 			{
 				Config: testAccCobblerRepoBasic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCobblerCheckRepoExists(t, "cobbler_repo.foo", &repo),
+					testAccCobblerCheckRepoExists("cobbler_repo.foo", &repo),
 				),
 			},
 		},
@@ -39,13 +39,13 @@ func TestAccCobblerRepo_change(t *testing.T) {
 			{
 				Config: testAccCobblerRepoChange1,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCobblerCheckRepoExists(t, "cobbler_repo.foo", &repo),
+					testAccCobblerCheckRepoExists("cobbler_repo.foo", &repo),
 				),
 			},
 			{
 				Config: testAccCobblerRepoChange2,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCobblerCheckRepoExists(t, "cobbler_repo.foo", &repo),
+					testAccCobblerCheckRepoExists("cobbler_repo.foo", &repo),
 				),
 			},
 		},
@@ -68,7 +68,7 @@ func testAccCobblerCheckRepoDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCobblerCheckRepoExists(t *testing.T, n string, repo *cobbler.Repo) resource.TestCheckFunc {
+func testAccCobblerCheckRepoExists(n string, repo *cobbler.Repo) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -102,7 +102,7 @@ var testAccCobblerRepoBasic = `
     breed = "apt"
     arch = "x86_64"
     apt_components = ["main"]
-    apt_dists = ["bionic"]
+    apt_dists = ["focal"]
     mirror = "http://us.archive.ubuntu.com/ubuntu/"
   }`
 
@@ -113,7 +113,7 @@ var testAccCobblerRepoChange1 = `
     breed = "apt"
     arch = "x86_64"
     apt_components = ["main"]
-    apt_dists = ["bionic"]
+    apt_dists = ["focal"]
     mirror = "http://us.archive.ubuntu.com/ubuntu/"
   }`
 
@@ -124,6 +124,6 @@ var testAccCobblerRepoChange2 = `
     breed = "apt"
     arch = "x86_64"
     apt_components = ["main"]
-    apt_dists = ["bionic"]
+    apt_dists = ["focal"]
     mirror = "http://us.archive.ubuntu.com/ubuntu/"
   }`

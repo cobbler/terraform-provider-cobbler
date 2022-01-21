@@ -13,13 +13,13 @@ description: |-
 ## Example Usage
 
 ```terraform
-resource "cobbler_distro" "ubuntu-1804-x86_64" {
+resource "cobbler_distro" "Ubuntu-2004-x86_64" {
   name       = "foo"
   breed      = "ubuntu"
-  os_version = "bionic"
+  os_version = "focal"
   arch       = "x86_64"
-  kernel     = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-  initrd     = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+  kernel     = "/var/www/cobbler/distro_mirror/Ubuntu-20.04/install/netboot/ubuntu-installer/amd64/linux"
+  initrd     = "/var/www/cobbler/distro_mirror/Ubuntu-20.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
 }
 ```
 
@@ -32,13 +32,12 @@ resource "cobbler_distro" "ubuntu-1804-x86_64" {
 - **initrd** (String) Absolute path to initrd on filesystem. This must already exist prior to creating the distro.
 - **kernel** (String) Absolute path to kernel on filesystem. This must already exist prior to creating the distro.
 - **name** (String) A name for the distro.
-- **os_version** (String) The version of the distro you are creating. This varies with the version of Cobbler you are using. An updated signature list may need to be obtained in order to support a newer version. Example: `bionic`.
+- **os_version** (String) The version of the distro you are creating. This varies with the version of Cobbler you are using. An updated signature list may need to be obtained in order to support a newer version. Example: `focal`.
 
 ### Optional
 
 - **arch** (String) The architecture of the distro. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.
 - **boot_files** (String) Files copied into tftpboot beyond the kernel/initrd.
-- **boot_loader** (String) Must be either `grub` or `pxelinux`.
 - **comment** (String) Free form text description.
 - **fetchable_files** (String) Templates for tftp or wget.
 - **id** (String) The ID of this resource.
@@ -46,7 +45,6 @@ resource "cobbler_distro" "ubuntu-1804-x86_64" {
 - **kernel_options_post** (String) Post install Kernel options to use with the kernel after installation.
 - **mgmt_classes** (List of String) Management classes for external config management.
 - **owners** (List of String) Owners list for authz_ownership.
-- **redhat_management_key** (String) Obsolete - removed in Cobbler 3.
 - **template_files** (String) File mappings for built-in config management.
 
 

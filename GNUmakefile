@@ -2,6 +2,7 @@ TEST?=$$(go list ./... |grep -v 'vendor')
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
 WEBSITE_REPO=github.com/hashicorp/terraform-website
 PKG_NAME=cobbler
+COBBLER_SERVER_URL=http://localhost:8081/cobbler_api
 
 default: build
 
@@ -13,8 +14,13 @@ test: fmtcheck
 	echo $(TEST) | \
 		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 
-testacc: fmtcheck
-	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m
+#testacc: fmtcheck
+#	TF_ACC=1 go test $(TEST) -v $(TESTARGS) -timeout 120m
+# Run acceptance tests
+.PHONY: testacc
+testacc:
+	@COBBLER_VERSION=v3.3.0 sh -c "'./docker/start.sh' $(COBBLER_SERVER_URL)"
+	TF_ACC=1 COBBLER_URL=$(COBBLER_SERVER_URL) COBBLER_USERNAME=cobbler COBBLER_PASSWORD=cobbler go test -v -cover $(TEST)
 
 vet:
 	@echo "go vet ."

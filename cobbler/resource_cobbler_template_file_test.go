@@ -21,7 +21,7 @@ func TestAccCobblerTemplateFile_basic(t *testing.T) {
 			{
 				Config: testAccCobblerTemplateFileBasic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCobblerCheckTemplateFileExists(t, "cobbler_template_file.foo", &ks),
+					testAccCobblerCheckTemplateFileExists("cobbler_template_file.foo", &ks),
 				),
 			},
 		},
@@ -44,7 +44,7 @@ func testAccCobblerCheckTemplateFileDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCobblerCheckTemplateFileExists(t *testing.T, n string, ks *cobbler.TemplateFile) resource.TestCheckFunc {
+func testAccCobblerCheckTemplateFileExists(n string, ks *cobbler.TemplateFile) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {

@@ -2,12 +2,10 @@ package cobbler
 
 import (
 	"fmt"
-	"testing"
-
+	cobbler "github.com/cobbler/cobblerclient"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-
-	cobbler "github.com/cobbler/cobblerclient"
+	"testing"
 )
 
 func TestAccCobblerProfile_basic(t *testing.T) {
@@ -22,8 +20,8 @@ func TestAccCobblerProfile_basic(t *testing.T) {
 			{
 				Config: testAccCobblerProfileBasic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
-					testAccCobblerCheckProfileExists(t, "cobbler_profile.foo", &profile),
+					testAccCobblerCheckDistroExists("cobbler_distro.foo", &distro),
+					testAccCobblerCheckProfileExists("cobbler_profile.foo", &profile),
 				),
 			},
 		},
@@ -42,15 +40,15 @@ func TestAccCobblerProfile_change(t *testing.T) {
 			{
 				Config: testAccCobblerProfileChange1,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
-					testAccCobblerCheckProfileExists(t, "cobbler_profile.foo", &profile),
+					testAccCobblerCheckDistroExists("cobbler_distro.foo", &distro),
+					testAccCobblerCheckProfileExists("cobbler_profile.foo", &profile),
 				),
 			},
 			{
 				Config: testAccCobblerProfileChange2,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
-					testAccCobblerCheckProfileExists(t, "cobbler_profile.foo", &profile),
+					testAccCobblerCheckDistroExists("cobbler_distro.foo", &distro),
+					testAccCobblerCheckProfileExists("cobbler_profile.foo", &profile),
 				),
 			},
 		},
@@ -69,8 +67,8 @@ func TestAccCobblerProfile_withRepo(t *testing.T) {
 			{
 				Config: testAccCobblerProfileWithRepo,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
-					testAccCobblerCheckProfileExists(t, "cobbler_profile.foo", &profile),
+					testAccCobblerCheckDistroExists("cobbler_distro.foo", &distro),
+					testAccCobblerCheckProfileExists("cobbler_profile.foo", &profile),
 				),
 			},
 		},
@@ -93,7 +91,7 @@ func testAccCobblerCheckProfileDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCobblerCheckProfileExists(t *testing.T, n string, profile *cobbler.Profile) resource.TestCheckFunc {
+func testAccCobblerCheckProfileExists(n string, profile *cobbler.Profile) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
@@ -126,11 +124,10 @@ var testAccCobblerProfileBasic = `
 		name = "foo"
 		breed = "ubuntu"
 		comment = "No comment"
-		os_version = "bionic"
+		os_version = "focal"
 		arch = "x86_64"
-		boot_loader = "grub"
-		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
@@ -143,11 +140,10 @@ var testAccCobblerProfileChange1 = `
 		name = "foo"
 		comment = "I am a distro"
 		breed = "ubuntu"
-		os_version = "bionic"
+		os_version = "focal"
 		arch = "x86_64"
-		boot_loader = "grub"
-		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
@@ -161,11 +157,10 @@ var testAccCobblerProfileChange2 = `
 		name = "foo"
 		comment = "I am a distro again"
 		breed = "ubuntu"
-		os_version = "bionic"
+		os_version = "focal"
 		arch = "x86_64"
-		boot_loader = "grub"
-		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
@@ -179,16 +174,15 @@ var testAccCobblerProfileWithRepo = `
 		name = "foo"
 		comment = "I am a distro all over again"
 		breed = "ubuntu"
-		os_version = "bionic"
+		os_version = "focal"
 		arch = "x86_64"
-		boot_loader = "grub"
-		kernel = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/linux"
-		initrd = "/var/www/cobbler/distro_mirror/Ubuntu-18.04/install/netboot/ubuntu-installer/amd64/initrd.gz"
+		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
 	}
 
 	resource "cobbler_profile" "foo" {
 		name = "foo"
 		comment = "I am a profile again"
 		distro = cobbler_distro.foo.name
-		repos = ["Ubuntu-18.04-x86_64"]
+		repos = ["Ubuntu-20.04-x86_64"]
 	}`

@@ -29,27 +29,24 @@ func resourceSystem() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"autoinstall_meta": {
 				Description: "Automatic installation template metadata, formerly Kickstart metadata.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"boot_files": {
 				Description: "Files copied into tftpboot beyond the kernel/initrd.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
-			"boot_loader": {
-				Description: "Must be either `grub` or `pxelinux`.",
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-			},
+			//			"boot_loader": {
+			//				Description: "Must be either `grub` or `pxelinux`.",
+			//				Type:        schema.TypeString,
+			//				Optional:    true,
+			//				Computed:    true,
+			//			},
 
 			"comment": {
 				Description: "Free form text description.",
@@ -253,28 +250,24 @@ func resourceSystem() *schema.Resource {
 				},
 				Set: resourceSystemInterfaceHash,
 			},
-
 			"ipv6_default_device": {
 				Description: "IPv6 default device.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"kernel_options": {
 				Description: "Kernel options. ex: `selinux=permissive`.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"kernel_options_post": {
 				Description: "Kernel options (post install).",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"mgmt_classes": {
 				Description: "For external configuration management.",
 				Type:        schema.TypeList,
@@ -282,21 +275,18 @@ func resourceSystem() *schema.Resource {
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
-
 			"mgmt_parameters": {
 				Description: "Parameters which will be handed to your management application (Must be a valid YAML dictionary).",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"name": {
 				Description: "The name of the system.",
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 			},
-
 			"name_servers_search": {
 				Description: "Name server search settings.",
 				Type:        schema.TypeList,
@@ -304,7 +294,6 @@ func resourceSystem() *schema.Resource {
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
-
 			"name_servers": {
 				Description: "Name servers.",
 				Type:        schema.TypeList,
@@ -312,21 +301,24 @@ func resourceSystem() *schema.Resource {
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
-
 			"netboot_enabled": {
 				Description: "(Re)install this machine at next boot.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Computed:    true,
 			},
-
-			"next_server": {
-				Description: "The next_server option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.",
+			"next_server_v4": {
+				Description: "The next_server_v4 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
+			"next_server_v6": {
+				Description: "The next_server_v6 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+			},
 			"owners": {
 				Description: "Owners list for authz_ownership.",
 				Type:        schema.TypeList,
@@ -334,125 +326,101 @@ func resourceSystem() *schema.Resource {
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
-
 			"power_address": {
 				Description: "Power management address.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"power_id": {
 				Description: "Usually a plug number or blade name if power type requires it.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"power_pass": {
 				Description: "Power management password.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"power_type": {
 				Description: "Power management type.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"power_user": {
 				Description: "Power management user.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"profile": {
 				Description: "Parent profile.",
 				Type:        schema.TypeString,
 				Required:    true,
 			},
-
 			"proxy": {
 				Description: "Proxy URL.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
-			"redhat_management_key": {
-				Description: "Obsolete - removed in Cobbler 3.",
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-			},
-
 			"status": {
 				Description: "System status (development, testing, acceptance, production).",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"template_files": {
 				Description: "File mappings for built-in config management.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"virt_auto_boot": {
 				Description: "Auto boot virtual machines.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"virt_file_size": {
 				Description: "The virtual machine file size.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"virt_cpus": {
 				Description: "The number of virtual CPUs",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"virt_type": {
 				Description: "The type of virtual machine. Valid options are: xenpv, xenfv, qemu, kvm, vmware, openvz.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"virt_path": {
 				Description: "The virtual machine path.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"virt_pxe_boot": {
 				Description: "Use PXE to build this virtual machine.",
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"virt_ram": {
 				Description: "The amount of RAM for the virtual machine.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"virt_disk_driver": {
 				Description: "The virtual machine disk driver.",
 				Type:        schema.TypeString,
@@ -518,7 +486,7 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 
 	// Set all fields
 	d.Set("boot_files", system.BootFiles)
-	d.Set("boot_loader", system.BootLoader)
+	//d.Set("boot_loader", system.BootLoader)
 	d.Set("comment", system.Comment)
 	d.Set("enable_gpxe", system.EnableGPXE)
 	d.Set("fetchable_files", system.FetchableFiles)
@@ -529,16 +497,14 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("kernel_options", system.KernelOptions)
 	d.Set("kernel_options_post", system.KernelOptionsPost)
 	d.Set("autoinstall_meta", system.AutoinstallMeta)
-	//d.Set("ldap_enabled", system.LDAPEnabled)                         // Removed in Cobbler 3
-	//d.Set("ldap_type", system.LDAPType)                               // Removed in Cobbler 3
 	d.Set("mgmt_classes", system.MGMTClasses)
 	d.Set("mgmt_parameters", system.MGMTParameters)
-	//d.Set("monit_enabled", system.MonitEnabled)                       // Removed in Cobbler 3
 	d.Set("name", system.Name)
 	d.Set("name_servers_search", system.NameServersSearch)
 	d.Set("name_servers", system.NameServers)
 	d.Set("netboot_enabled", system.NetbootEnabled)
-	d.Set("next_server", system.NextServer)
+	d.Set("next_server_v4", system.NextServerv4)
+	d.Set("next_server_v6", system.NextServerv6)
 	d.Set("owners", system.Owners)
 	d.Set("power_address", system.PowerAddress)
 	d.Set("power_id", system.PowerID)
@@ -547,8 +513,6 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("power_user", system.PowerUser)
 	d.Set("profile", system.Profile)
 	d.Set("proxy", system.Proxy)
-	d.Set("redhat_management_key", system.RedHatManagementKey)
-	//d.Set("redhat_management_server", system.RedHatManagementServer)  // Removed in Cobbler 3
 	d.Set("status", system.Status)
 	d.Set("template_files", system.TemplateFiles)
 	d.Set("virt_auto_boot", system.VirtAutoBoot)
@@ -639,8 +603,7 @@ func resourceSystemUpdate(d *schema.ResourceData, meta interface{}) error {
 
 		for interfaceName, interfaceInfo := range oldIfaces {
 			if _, ok := newIfaces[interfaceName]; !ok {
-				// Interface does not exist in the new set,
-				// so it has been removed from terraform.
+				// Interface does not exist in the new set, so it has been removed from terraform.
 				log.Printf("[DEBUG] Cobbler System: Deleting Interface %#v: %#v", interfaceName, interfaceInfo)
 
 				if err := system.DeleteInterface(interfaceName); err != nil {
@@ -701,10 +664,10 @@ func buildSystem(d *schema.ResourceData) cobbler.System {
 	}
 
 	system := cobbler.System{
-		Autoinstall:       d.Get("autoinstall").(string),
-		AutoinstallMeta:   d.Get("autoinstall_meta").(string),
-		BootFiles:         d.Get("boot_files").(string),
-		BootLoader:        d.Get("boot_loader").(string),
+		Autoinstall:     d.Get("autoinstall").(string),
+		AutoinstallMeta: d.Get("autoinstall_meta").(string),
+		BootFiles:       d.Get("boot_files").(string),
+		//BootLoader:        d.Get("boot_loader").(string),
 		Comment:           d.Get("comment").(string),
 		EnableGPXE:        d.Get("enable_gpxe").(bool),
 		FetchableFiles:    d.Get("fetchable_files").(string),
@@ -714,36 +677,32 @@ func buildSystem(d *schema.ResourceData) cobbler.System {
 		IPv6DefaultDevice: d.Get("ipv6_default_device").(string),
 		KernelOptions:     d.Get("kernel_options").(string),
 		KernelOptionsPost: d.Get("kernel_options_post").(string),
-		//LDAPEnabled:             d.Get("ldap_enabled").(bool),               // Removed in Cobbler 3
-		//LDAPType:                d.Get("ldap_type").(string),                // Removed in Cobbler 3
-		MGMTClasses:    mgmtClasses,
-		MGMTParameters: d.Get("mgmt_parameters").(string),
-		//MonitEnabled:            d.Get("monit_enabled").(bool),              // Removed in Cobbler 3
-		Name:                d.Get("name").(string),
-		NameServersSearch:   nameServersSearch,
-		NameServers:         nameServers,
-		NetbootEnabled:      d.Get("netboot_enabled").(bool),
-		NextServer:          d.Get("next_server").(string),
-		Owners:              owners,
-		PowerAddress:        d.Get("power_address").(string),
-		PowerID:             d.Get("power_id").(string),
-		PowerPass:           d.Get("power_pass").(string),
-		PowerType:           d.Get("power_type").(string),
-		PowerUser:           d.Get("power_user").(string),
-		Profile:             d.Get("profile").(string),
-		Proxy:               d.Get("proxy").(string),
-		RedHatManagementKey: d.Get("redhat_management_key").(string),
-		//RedHatManagementServer:  d.Get("redhat_management_server").(string), // Removed in Cobbler 3
-		Status:         d.Get("status").(string),
-		TemplateFiles:  d.Get("template_files").(string),
-		VirtAutoBoot:   d.Get("virt_auto_boot").(string),
-		VirtFileSize:   d.Get("virt_file_size").(string),
-		VirtCPUs:       d.Get("virt_cpus").(string),
-		VirtType:       d.Get("virt_type").(string),
-		VirtPath:       d.Get("virt_path").(string),
-		VirtPXEBoot:    d.Get("virt_pxe_boot").(int),
-		VirtRAM:        d.Get("virt_ram").(string),
-		VirtDiskDriver: d.Get("virt_disk_driver").(string),
+		MGMTClasses:       mgmtClasses,
+		MGMTParameters:    d.Get("mgmt_parameters").(string),
+		Name:              d.Get("name").(string),
+		NameServersSearch: nameServersSearch,
+		NameServers:       nameServers,
+		NetbootEnabled:    d.Get("netboot_enabled").(bool),
+		NextServerv4:      d.Get("next_server_v4").(string),
+		NextServerv6:      d.Get("next_server_v6").(string),
+		Owners:            owners,
+		PowerAddress:      d.Get("power_address").(string),
+		PowerID:           d.Get("power_id").(string),
+		PowerPass:         d.Get("power_pass").(string),
+		PowerType:         d.Get("power_type").(string),
+		PowerUser:         d.Get("power_user").(string),
+		Profile:           d.Get("profile").(string),
+		Proxy:             d.Get("proxy").(string),
+		Status:            d.Get("status").(string),
+		TemplateFiles:     d.Get("template_files").(string),
+		VirtAutoBoot:      d.Get("virt_auto_boot").(string),
+		VirtFileSize:      d.Get("virt_file_size").(string),
+		VirtCPUs:          d.Get("virt_cpus").(string),
+		VirtType:          d.Get("virt_type").(string),
+		VirtPath:          d.Get("virt_path").(string),
+		VirtPXEBoot:       d.Get("virt_pxe_boot").(int),
+		VirtRAM:           d.Get("virt_ram").(string),
+		VirtDiskDriver:    d.Get("virt_disk_driver").(string),
 	}
 
 	return system

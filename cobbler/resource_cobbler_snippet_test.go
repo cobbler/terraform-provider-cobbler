@@ -21,7 +21,7 @@ func TestAccCobblerSnippet_basic(t *testing.T) {
 			{
 				Config: testAccCobblerSnippetBasic,
 				Check: resource.ComposeTestCheckFunc(
-					testAccCobblerCheckSnippetExists(t, "cobbler_snippet.foo", &snippet),
+					testAccCobblerCheckSnippetExists("cobbler_snippet.foo", &snippet),
 				),
 			},
 		},
@@ -44,7 +44,7 @@ func testAccCobblerCheckSnippetDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCobblerCheckSnippetExists(t *testing.T, n string, snippet *cobbler.Snippet) resource.TestCheckFunc {
+func testAccCobblerCheckSnippetExists(n string, snippet *cobbler.Snippet) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {

@@ -1,3 +1,15 @@
+## 3.0.0 (Jan 24, 2022)
+
+IMPROVEMENTS
+
+* Supports latest Cobbler: v3.3.x
+* Moved test harness to local docker container for easier\faster development
+* 
+
+BACKWARDS INCOMPATIBILITIES
+
+* Rewrites to support Cobbler 3.3.x (will break support for Cobbler 3.2.x and older (EOL)).
+
 ## 2.0.1 (April 30, 2020)
 
 BUG FIXES

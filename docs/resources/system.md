@@ -50,7 +50,6 @@ resource "cobbler_system" "my_system" {
 - **autoinstall** (String) Template remote kickstarts or preseeds.
 - **autoinstall_meta** (String) Automatic installation template metadata, formerly Kickstart metadata.
 - **boot_files** (String) Files copied into tftpboot beyond the kernel/initrd.
-- **boot_loader** (String) Must be either `grub` or `pxelinux`.
 - **comment** (String) Free form text description.
 - **enable_gpxe** (Boolean) Use gPXE instead of PXELINUX for advanced booting options.
 - **fetchable_files** (String) Templates for tftp or wget.
@@ -67,7 +66,8 @@ resource "cobbler_system" "my_system" {
 - **name_servers** (List of String) Name servers.
 - **name_servers_search** (List of String) Name server search settings.
 - **netboot_enabled** (Boolean) (Re)install this machine at next boot.
-- **next_server** (String) The next_server option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
+- **next_server_v4** (String) The next_server_v4 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
+- **next_server_v6** (String) The next_server_v6 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
 - **owners** (List of String) Owners list for authz_ownership.
 - **power_address** (String) Power management address.
 - **power_id** (String) Usually a plug number or blade name if power type requires it.
@@ -75,7 +75,6 @@ resource "cobbler_system" "my_system" {
 - **power_type** (String) Power management type.
 - **power_user** (String) Power management user.
 - **proxy** (String) Proxy URL.
-- **redhat_management_key** (String) Obsolete - removed in Cobbler 3.
 - **status** (String) System status (development, testing, acceptance, production).
 - **template_files** (String) File mappings for built-in config management.
 - **virt_auto_boot** (String) Auto boot virtual machines.

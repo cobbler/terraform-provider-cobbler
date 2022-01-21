@@ -23,7 +23,6 @@ func resourceTemplateFile() *schema.Resource {
 				Required:    true,
 				ForceNew:    true,
 			},
-
 			"body": {
 				Description: "The body of the template file. May also point to a file: `body = file(\"my_template.ks\")`.",
 				Type:        schema.TypeString,

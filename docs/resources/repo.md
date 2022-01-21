@@ -18,7 +18,7 @@ resource "cobbler_repo" "my_repo" {
   breed          = "apt"
   arch           = "x86_64"
   apt_components = ["main"]
-  apt_dists      = ["bionic"]
+  apt_dists      = ["focal"]
   mirror         = "http://us.archive.ubuntu.com/ubuntu/"
 }
 ```
@@ -35,7 +35,7 @@ resource "cobbler_repo" "my_repo" {
 ### Optional
 
 - **apt_components** (List of String) List of Apt components such as main, restricted, universe. Applicable to apt breeds only.
-- **apt_dists** (List of String) List of Apt distribution names such as bionic, bionic-updates. Applicable to apt breeds only.
+- **apt_dists** (List of String) List of Apt distribution names such as focal, focal-updates. Applicable to apt breeds only.
 - **arch** (String) The architecture of the repo. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.
 - **comment** (String) Free form text description.
 - **createrepo_flags** (String) Flags to use with `createrepo`.
