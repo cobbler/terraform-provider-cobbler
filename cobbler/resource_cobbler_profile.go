@@ -244,7 +244,6 @@ func resourceProfileRead(d *schema.ResourceData, meta interface{}) error {
 
 	// Retrieve the profile entry from Cobbler
 	profile, err := config.cobblerClient.GetProfile(d.Id())
-	log.Printf("[INFO] HELLO WORLD: %#v", profile)
 	if err != nil {
 		return fmt.Errorf("Cobbler Profile: Error Reading (%s): %s", d.Id(), err)
 	}
@@ -291,7 +290,6 @@ func resourceProfileUpdate(d *schema.ResourceData, meta interface{}) error {
 	profile := buildProfile(d, config)
 
 	// Attempt to update the profile with new information
-	log.Printf("[INFO] HELLO WORLD: %#v", profile)
 	log.Printf("[DEBUG] Cobbler Profile: Updating Profile (%s) with options: %+v", d.Id(), profile)
 	err := config.cobblerClient.UpdateProfile(&profile)
 	if err != nil {

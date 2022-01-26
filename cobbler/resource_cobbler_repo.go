@@ -218,15 +218,6 @@ func buildRepo(d *schema.ResourceData, meta interface{}) cobbler.Repo {
 		rpmList = append(rpmList, i.(string))
 	}
 
-	//yumOpts := make(map[string]interface{})
-	//y := d.Get("yum_opts")
-	//if y != nil {
-	//	m := y.(map[string]interface{})
-	//	for k, v := range m {
-	//		yumOpts[k] = v
-	//	}
-	//}
-
 	repo := cobbler.Repo{
 		AptComponents:   aptComponents,
 		AptDists:        aptDists,
@@ -234,15 +225,13 @@ func buildRepo(d *schema.ResourceData, meta interface{}) cobbler.Repo {
 		Breed:           d.Get("breed").(string),
 		Comment:         d.Get("comment").(string),
 		CreateRepoFlags: d.Get("createrepo_flags").(string),
-		//Environment:     d.Get("environment").(string),
-		KeepUpdated:   d.Get("keep_updated").(bool),
-		Mirror:        d.Get("mirror").(string),
-		MirrorLocally: d.Get("mirror_locally").(bool),
-		Name:          d.Get("name").(string),
-		Owners:        owners,
-		Proxy:         d.Get("proxy").(string),
-		RpmList:       rpmList,
-		//YumOpts:         yumOpts,
+		KeepUpdated:     d.Get("keep_updated").(bool),
+		Mirror:          d.Get("mirror").(string),
+		MirrorLocally:   d.Get("mirror_locally").(bool),
+		Name:            d.Get("name").(string),
+		Owners:          owners,
+		Proxy:           d.Get("proxy").(string),
+		RpmList:         rpmList,
 	}
 
 	return repo

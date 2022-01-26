@@ -166,6 +166,7 @@ var testAccCobblerSystemBasic = `
 		breed = "ubuntu"
 		os_version = "focal"
 		arch = "x86_64"
+        boot_loaders = ["ipxe"]
 		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
 		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
 	}
@@ -206,6 +207,7 @@ var testAccCobblerSystemMulti = `
 		breed = "ubuntu"
 		os_version = "focal"
 		arch = "x86_64"
+        boot_loaders = ["ipxe"]
 		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
 		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
 	}
@@ -240,6 +242,7 @@ var testAccCobblerSystemChange1 = `
 		breed = "ubuntu"
 		os_version = "focal"
 		arch = "x86_64"
+        boot_loaders = ["ipxe"]
 		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
 		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
 	}
@@ -280,6 +283,7 @@ var testAccCobblerSystemChange2 = `
 		breed = "ubuntu"
 		os_version = "focal"
 		arch = "x86_64"
+        boot_loaders = ["ipxe"]
 		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
 		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
 	}
@@ -320,6 +324,7 @@ var testAccCobblerSystemRemoveInterface1 = `
 		breed = "ubuntu"
 		os_version = "focal"
 		arch = "x86_64"
+        boot_loaders = ["ipxe"]
 		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
 		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
 	}
@@ -361,6 +366,7 @@ var testAccCobblerSystemRemoveInterface2 = `
 		breed = "ubuntu"
 		os_version = "focal"
 		arch = "x86_64"
+        boot_loaders = ["ipxe"]
 		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
 		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
 	}

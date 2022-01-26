@@ -52,8 +52,7 @@ func resourceTemplateFileCreate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceTemplateFileRead(d *schema.ResourceData, meta interface{}) error {
-	// Since all attributes are required and not computed,
-	// there's no reason to read.
+	// Since all attributes are required and not computed, there's no reason to read.
 	return nil
 }
 

@@ -14,11 +14,11 @@ Original code by [Joe Topjian](https://github.com/jtopjian).
 
 Full documentation can be found in the [`docs`](/docs) directory.
 
-### Terraform 0.13 and above
+### Installation
 
 You can use the provider via the [Terraform provider registry](https://registry.terraform.io/providers/cobbler/cobbler).
 
-### Terraform 0.12 or manual installation
+### Manual installation
 
 You can download a pre-built binary from the [releases](https://github.com/cobbler/terraform-provider-cobbler/releases/)
  page.\

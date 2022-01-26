@@ -93,6 +93,7 @@ var testAccCobblerDistroBasic = `
 		arch = "x86_64"
 		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
 		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
+		boot_loaders = ["ipxe"]
 	}`
 
 var testAccCobblerDistroChange1 = `

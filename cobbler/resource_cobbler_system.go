@@ -31,7 +31,8 @@ func resourceSystem() *schema.Resource {
 			},
 			"autoinstall_meta": {
 				Description: "Automatic installation template metadata, formerly Kickstart metadata.",
-				Type:        schema.TypeString,
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
 			},
@@ -41,12 +42,13 @@ func resourceSystem() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
-			//			"boot_loader": {
-			//				Description: "Must be either `grub` or `pxelinux`.",
-			//				Type:        schema.TypeString,
-			//				Optional:    true,
-			//				Computed:    true,
-			//			},
+			"boot_loaders": {
+				Description: "Must be either `grub`, `pxe`, or `ipxe`.",
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+				Computed:    true,
+			},
 
 			"comment": {
 				Description: "Free form text description.",
@@ -64,7 +66,8 @@ func resourceSystem() *schema.Resource {
 
 			"fetchable_files": {
 				Description: "Templates for tftp or wget.",
-				Type:        schema.TypeString,
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
 			},
@@ -110,70 +113,60 @@ func resourceSystem() *schema.Resource {
 							Computed:    true,
 							Elem:        &schema.Schema{Type: schema.TypeString},
 						},
-
 						"dhcp_tag": {
 							Description: "DHCP tag.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"dns_name": {
 							Description: "DNS name.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"bonding_opts": {
 							Description: "Options for bonded interfaces.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"bridge_opts": {
 							Description: "Options for bridge interfaces.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"gateway": {
 							Description: "Per-interface gateway.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"interface_type": {
 							Description: "The type of interface: na, master, slave, bond, bond_slave, bridge, bridge_slave, bonded_bridge_slave.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"interface_master": {
 							Description: "The master interface when slave.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"ip_address": {
 							Description: "The IP address of the interface.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"ipv6_address": {
 							Description: "The IPv6 address of the interface.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"ipv6_secondaries": {
 							Description: "IPv6 secondaries.",
 							Type:        schema.TypeList,
@@ -181,14 +174,12 @@ func resourceSystem() *schema.Resource {
 							Computed:    true,
 							Elem:        &schema.Schema{Type: schema.TypeString},
 						},
-
 						"ipv6_mtu": {
 							Description: "The MTU of the IPv6 address.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"ipv6_static_routes": {
 							Description: "Static routes for the IPv6 interface.",
 							Type:        schema.TypeList,
@@ -196,42 +187,36 @@ func resourceSystem() *schema.Resource {
 							Computed:    true,
 							Elem:        &schema.Schema{Type: schema.TypeString},
 						},
-
 						"ipv6_default_gateway": {
 							Description: "The default gateawy for the IPv6 address / interface.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"mac_address": {
 							Description: "The MAC address of the interface.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"management": {
 							Description: "Whether this interface is a management interface.",
 							Type:        schema.TypeBool,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"netmask": {
 							Description: "The IPv4 netmask of the interface.",
 							Type:        schema.TypeString,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"static": {
 							Description: "Whether the interface should be static or DHCP.",
 							Type:        schema.TypeBool,
 							Optional:    true,
 							Computed:    true,
 						},
-
 						"static_routes": {
 							Description: "Static routes for the interface.",
 							Type:        schema.TypeList,
@@ -239,7 +224,6 @@ func resourceSystem() *schema.Resource {
 							Computed:    true,
 							Elem:        &schema.Schema{Type: schema.TypeString},
 						},
-
 						"virt_bridge": {
 							Description: "The virtual bridge to attach to.",
 							Type:        schema.TypeString,
@@ -258,13 +242,15 @@ func resourceSystem() *schema.Resource {
 			},
 			"kernel_options": {
 				Description: "Kernel options. ex: `selinux=permissive`.",
-				Type:        schema.TypeString,
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
 			},
 			"kernel_options_post": {
 				Description: "Kernel options (post install).",
-				Type:        schema.TypeString,
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
 			},
@@ -375,7 +361,8 @@ func resourceSystem() *schema.Resource {
 			},
 			"template_files": {
 				Description: "File mappings for built-in config management.",
-				Type:        schema.TypeString,
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
 			},
@@ -486,7 +473,7 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 
 	// Set all fields
 	d.Set("boot_files", system.BootFiles)
-	//d.Set("boot_loader", system.BootLoader)
+	d.Set("boot_loaders", system.BootLoaders)
 	d.Set("comment", system.Comment)
 	d.Set("enable_gpxe", system.EnableGPXE)
 	d.Set("fetchable_files", system.FetchableFiles)
@@ -643,40 +630,61 @@ func resourceSystemDelete(d *schema.ResourceData, meta interface{}) error {
 
 // buildSystem builds a cobblerclient.System out of the Terraform attributes.
 func buildSystem(d *schema.ResourceData) cobbler.System {
+	autoinstallMeta := []string{}
+	for _, i := range d.Get("autoinstall_meta").([]interface{}) {
+		autoinstallMeta = append(autoinstallMeta, i.(string))
+	}
+	bootLoaders := []string{}
+	for _, i := range d.Get("boot_loaders").([]interface{}) {
+		bootLoaders = append(bootLoaders, i.(string))
+	}
+	fetchableFiles := []string{}
+	for _, i := range d.Get("fetchable_files").([]interface{}) {
+		fetchableFiles = append(fetchableFiles, i.(string))
+	}
+	kernelOptions := []string{}
+	for _, i := range d.Get("kernel_options").([]interface{}) {
+		kernelOptions = append(kernelOptions, i.(string))
+	}
+	kernelOptionsPost := []string{}
+	for _, i := range d.Get("kernel_options_post").([]interface{}) {
+		kernelOptionsPost = append(kernelOptionsPost, i.(string))
+	}
 	mgmtClasses := []string{}
 	for _, i := range d.Get("mgmt_classes").([]interface{}) {
 		mgmtClasses = append(mgmtClasses, i.(string))
 	}
-
 	nameServersSearch := []string{}
 	for _, i := range d.Get("name_servers_search").([]interface{}) {
 		nameServersSearch = append(nameServersSearch, i.(string))
 	}
-
 	nameServers := []string{}
 	for _, i := range d.Get("name_servers").([]interface{}) {
 		nameServers = append(nameServers, i.(string))
 	}
-
 	owners := []string{}
 	for _, i := range d.Get("owners").([]interface{}) {
 		owners = append(owners, i.(string))
 	}
+	templateFiles := []string{}
+	for _, i := range d.Get("template_files").([]interface{}) {
+		templateFiles = append(templateFiles, i.(string))
+	}
 
 	system := cobbler.System{
-		Autoinstall:     d.Get("autoinstall").(string),
-		AutoinstallMeta: d.Get("autoinstall_meta").(string),
-		BootFiles:       d.Get("boot_files").(string),
-		//BootLoader:        d.Get("boot_loader").(string),
+		Autoinstall:       d.Get("autoinstall").(string),
+		AutoinstallMeta:   autoinstallMeta,
+		BootFiles:         d.Get("boot_files").(string),
+		BootLoaders:       bootLoaders,
 		Comment:           d.Get("comment").(string),
 		EnableGPXE:        d.Get("enable_gpxe").(bool),
-		FetchableFiles:    d.Get("fetchable_files").(string),
+		FetchableFiles:    fetchableFiles,
 		Gateway:           d.Get("gateway").(string),
 		Hostname:          d.Get("hostname").(string),
 		Image:             d.Get("image").(string),
 		IPv6DefaultDevice: d.Get("ipv6_default_device").(string),
-		KernelOptions:     d.Get("kernel_options").(string),
-		KernelOptionsPost: d.Get("kernel_options_post").(string),
+		KernelOptions:     kernelOptions,
+		KernelOptionsPost: kernelOptionsPost,
 		MGMTClasses:       mgmtClasses,
 		MGMTParameters:    d.Get("mgmt_parameters").(string),
 		Name:              d.Get("name").(string),
@@ -694,7 +702,7 @@ func buildSystem(d *schema.ResourceData) cobbler.System {
 		Profile:           d.Get("profile").(string),
 		Proxy:             d.Get("proxy").(string),
 		Status:            d.Get("status").(string),
-		TemplateFiles:     d.Get("template_files").(string),
+		TemplateFiles:     templateFiles,
 		VirtAutoBoot:      d.Get("virt_auto_boot").(string),
 		VirtFileSize:      d.Get("virt_file_size").(string),
 		VirtCPUs:          d.Get("virt_cpus").(string),
@@ -774,88 +782,68 @@ func resourceSystemInterfaceHash(v interface{}) int {
 			buf.WriteString(fmt.Sprintf("%v-", x.(string)))
 		}
 	}
-
 	if v, ok := m["dhcp_tag"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["dns_name"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["bonding_opts"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["bridge_opts"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["gateway"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["interface_type"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["interface_master"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["ip_address"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["ipv6_address"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["ipv6_secondaries"]; ok {
 		for _, x := range v.([]interface{}) {
 			buf.WriteString(fmt.Sprintf("%v-", x.(string)))
 		}
 	}
-
 	if v, ok := m["ipv6_mtu"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["ipv6_static_routes"]; ok {
 		for _, x := range v.([]interface{}) {
 			buf.WriteString(fmt.Sprintf("%v-", x.(string)))
 		}
 	}
-
 	if v, ok := m["ipv6_default_gateway"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["mac_address"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["management"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(bool)))
 	}
-
 	if v, ok := m["netmask"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	if v, ok := m["static"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(bool)))
 	}
-
 	if v, ok := m["static_Routes"]; ok {
 		for _, x := range v.([]interface{}) {
 			buf.WriteString(fmt.Sprintf("%v-", x.(string)))
 		}
 	}
-
 	if v, ok := m["virt_bridge"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-
 	return hashcode.String(buf.String())
 }

@@ -38,14 +38,14 @@ func resourceDistro() *schema.Resource {
 				ForceNew:    true,
 				Computed:    true,
 			},
-			//			"boot_loader": {
-			//				Description: "Must be either 'grub', 'pxe', or 'ipxe'.",
-			//				Type:        schema.TypeString,
-			//				Optional:    true,
-			//				ForceNew:    true,
-			//				Computed:    true,
-			//			},
-
+			"boot_loaders": {
+				Description: "Must be either 'grub', 'pxe', or 'ipxe'.",
+				Type:        schema.TypeList,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Optional:    true,
+				ForceNew:    true,
+				Computed:    true,
+			},
 			"comment": {
 				Description: "Free form text description.",
 				Type:        schema.TypeString,
@@ -149,7 +149,7 @@ func resourceDistroRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("arch", distro.Arch)
 	d.Set("breed", distro.Breed)
 	d.Set("boot_files", distro.BootFiles)
-	//d.Set("boot_loader", distro.BootLoader)
+	d.Set("boot_loaders", distro.BootLoaders)
 	d.Set("comment", distro.Comment)
 	d.Set("fetchable_files", distro.FetchableFiles)
 	d.Set("initrd", distro.Initrd)
@@ -207,6 +207,10 @@ func buildDistro(d *schema.ResourceData, meta interface{}) cobbler.Distro {
 	for _, i := range d.Get("boot_files").([]interface{}) {
 		bootFiles = append(bootFiles, i.(string))
 	}
+	bootLoaders := []string{}
+	for _, i := range d.Get("boot_loaders").([]interface{}) {
+		bootLoaders = append(bootLoaders, i.(string))
+	}
 	fetchableFiles := []string{}
 	for _, i := range d.Get("fetchable_files").([]interface{}) {
 		fetchableFiles = append(fetchableFiles, i.(string))
@@ -225,10 +229,10 @@ func buildDistro(d *schema.ResourceData, meta interface{}) cobbler.Distro {
 	}
 
 	distro := cobbler.Distro{
-		Arch:      d.Get("arch").(string),
-		Breed:     d.Get("breed").(string),
-		BootFiles: bootFiles,
-		//BootLoader:          d.Get("boot_loader").(string),
+		Arch:              d.Get("arch").(string),
+		Breed:             d.Get("breed").(string),
+		BootFiles:         bootFiles,
+		BootLoaders:       bootLoaders,
 		Comment:           d.Get("comment").(string),
 		FetchableFiles:    fetchableFiles,
 		Kernel:            d.Get("kernel").(string),

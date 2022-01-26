@@ -33,12 +33,10 @@ func testAccCobblerPreCheck(t *testing.T) {
 	if v == "" {
 		t.Fatal("COBBLER_USERNAME must be set for acceptance tests.")
 	}
-
 	v = os.Getenv("COBBLER_PASSWORD")
 	if v == "" {
 		t.Fatal("COBBLER_PASSWORD must be set for acceptance tests.")
 	}
-
 	v = os.Getenv("COBBLER_URL")
 	if v == "" {
 		t.Fatal("COBBLER_URL must be set for acceptance tests.")
