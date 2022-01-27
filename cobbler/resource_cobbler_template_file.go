@@ -23,7 +23,6 @@ func resourceTemplateFile() *schema.Resource {
 				Required:    true,
 				ForceNew:    true,
 			},
-
 			"body": {
 				Description: "The body of the template file. May also point to a file: `body = file(\"my_template.ks\")`.",
 				Type:        schema.TypeString,
@@ -53,8 +52,7 @@ func resourceTemplateFileCreate(d *schema.ResourceData, meta interface{}) error 
 }
 
 func resourceTemplateFileRead(d *schema.ResourceData, meta interface{}) error {
-	// Since all attributes are required and not computed,
-	// there's no reason to read.
+	// Since all attributes are required and not computed, there's no reason to read.
 	return nil
 }
 

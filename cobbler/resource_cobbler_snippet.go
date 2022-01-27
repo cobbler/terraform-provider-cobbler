@@ -23,7 +23,6 @@ func resourceSnippet() *schema.Resource {
 				Required:    true,
 				ForceNew:    true,
 			},
-
 			"body": {
 				Description: "The body of the snippet. May also point to a file: `body = file(\"my_snippet\")`.",
 				Type:        schema.TypeString,

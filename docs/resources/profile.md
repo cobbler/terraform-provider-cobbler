@@ -15,7 +15,7 @@ description: |-
 ```terraform
 resource "cobbler_profile" "my_profile" {
   name        = "my_profile"
-  distro      = "ubuntu-1804-x86_64"
+  distro      = "Ubuntu-2004-x86_64"
   autoinstall = "default.ks"
 }
 ```
@@ -45,11 +45,11 @@ resource "cobbler_profile" "my_profile" {
 - **mgmt_parameters** (String) Parameters which will be handed to your management application (Must be a valid YAML dictionary).
 - **name_servers** (List of String) Name servers.
 - **name_servers_search** (List of String) Name server search settings.
-- **next_server** (String) The next_server option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
+- **next_server_v4** (String) The next_server_v4 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
+- **next_server_v6** (String) The next_server_v4 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
 - **owners** (List of String) Owners list for authz_ownership.
 - **parent** (String) The parent this profile inherits settings from.
 - **proxy** (String) Proxy URL.
-- **redhat_management_key** (String) Obsolete - removed in Cobbler 3.
 - **repos** (List of String) Repos to auto-assign to this profile.
 - **server** (String) The server-override for the profile.
 - **template_files** (String) File mappings for built-in config management.

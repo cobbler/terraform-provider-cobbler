@@ -8,18 +8,17 @@ Original code by [Joe Topjian](https://github.com/jtopjian).
 ## Prerequisites
 
 - [Terraform](https://terraform.io), 0.14 and above
-- [Cobbler](https://cobbler.github.io/), release 3.2.0 (or higher), with **caching disabled**.\
-   Set `cache_enabled: 0` in file `/etc/cobbler/settings`.
+- [Cobbler](https://cobbler.github.io/), release 3.3.0 (or higher)
 
 ## Using the Provider
 
 Full documentation can be found in the [`docs`](/docs) directory.
 
-### Terraform 0.13 and above
+### Installation
 
 You can use the provider via the [Terraform provider registry](https://registry.terraform.io/providers/cobbler/cobbler).
 
-### Terraform 0.12 or manual installation
+### Manual installation
 
 You can download a pre-built binary from the [releases](https://github.com/cobbler/terraform-provider-cobbler/releases/)
  page.\
@@ -42,7 +41,7 @@ Make sure the file `variables.tf` contains the right version in the provider blo
 
 ```hcl
 provider "cobbler" {
-  version  = "~> 2.0.3"
+  version  = "~> 3.0.0"
   username = var.cobbler_username
   password = var.cobbler_password
   url      = var.cobbler_url
@@ -52,3 +51,9 @@ provider "cobbler" {
 ### Development
 
 If you want to build from source, you can simply use `make` in the root of the repository.
+#### Testing
+
+To run the acceptance tests, type `make testacc`.  You will need [docker](https://docs.docker.com/get-docker/), 
+[docker-compose](https://docs.docker.com/compose/install/) and xorriso installed.  Xorriso can be installed using:
+`sudo apt-get install -y xorriso`, `sudo yum install xorriso -y`, or `sudo zypper install -y xorriso` depending on your
+distro.  The Ubuntu 20.04 ISO will be downloaded idempotently to test importing a distro, this is < 1GB.  

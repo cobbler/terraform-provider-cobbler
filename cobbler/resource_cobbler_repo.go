@@ -24,15 +24,13 @@ func resourceRepo() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Computed:    true,
 			},
-
 			"apt_dists": {
-				Description: "List of Apt distribution names such as bionic, bionic-updates. Applicable to apt breeds only.",
+				Description: "List of Apt distribution names such as focal, focal-updates. Applicable to apt breeds only.",
 				Type:        schema.TypeList,
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Computed:    true,
 			},
-
 			"arch": {
 				Description: "The architecture of the repo. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.",
 				Type:        schema.TypeString,
@@ -40,61 +38,52 @@ func resourceRepo() *schema.Resource {
 				ForceNew:    true,
 				Computed:    true,
 			},
-
 			"breed": {
 				Description: "The \"breed\" of distribution. Valid options are: rsync, rhn, yum, apt, and wget. These choices may vary depending on the version of Cobbler in use.",
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 			},
-
 			"comment": {
 				Description: "Free form text description.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"createrepo_flags": {
 				Description: "Flags to use with `createrepo`.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"environment": {
 				Description: "Environment variables to use during repo command execution.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"keep_updated": {
 				Description: "Update the repo upon Cobbler sync. Valid values are true or false.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"mirror": {
 				Description: "Address of the repo to mirror.",
 				Type:        schema.TypeString,
 				Required:    true,
 			},
-
 			"mirror_locally": {
 				Description: "Whether to copy the files locally or just references to the external files. Valid values are true or false.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"name": {
 				Description: "A name for the repo.",
 				Type:        schema.TypeString,
 				Required:    true,
 			},
-
 			"owners": {
 				Description: "List of Owners for authz_ownership.",
 				Type:        schema.TypeList,
@@ -102,14 +91,12 @@ func resourceRepo() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Computed:    true,
 			},
-
 			"proxy": {
 				Description: "Proxy to use for downloading the repo. This argument does not work on older versions of Cobbler.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"rpm_list": {
 				Description: "List of specific RPMs to mirror.",
 				Type:        schema.TypeList,
@@ -117,12 +104,6 @@ func resourceRepo() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Computed:    true,
 			},
-
-			//"yumopts": &schema.Schema{
-			//	Type:     schema.TypeMap,
-			//	Optional: true,
-			//	Computed: true,
-			//},
 		},
 	}
 }
@@ -159,13 +140,11 @@ func resourceRepoRead(d *schema.ResourceData, meta interface{}) error {
 	d.Set("breed", repo.Breed)
 	d.Set("comment", repo.Comment)
 	d.Set("createrepo_flags", repo.CreateRepoFlags)
-	//d.Set("environment", repo.Environment)
 	d.Set("keep_updated", repo.KeepUpdated)
 	d.Set("mirror", repo.Mirror)
 	d.Set("mirror_locally", repo.MirrorLocally)
 	d.Set("name", repo.Name)
 	d.Set("proxy", repo.Proxy)
-	//d.Set("yumopts", repo.YumOpts)
 
 	err = d.Set("apt_components", repo.AptComponents)
 	if err != nil {
@@ -239,15 +218,6 @@ func buildRepo(d *schema.ResourceData, meta interface{}) cobbler.Repo {
 		rpmList = append(rpmList, i.(string))
 	}
 
-	//yumOpts := make(map[string]interface{})
-	//y := d.Get("yum_opts")
-	//if y != nil {
-	//	m := y.(map[string]interface{})
-	//	for k, v := range m {
-	//		yumOpts[k] = v
-	//	}
-	//}
-
 	repo := cobbler.Repo{
 		AptComponents:   aptComponents,
 		AptDists:        aptDists,
@@ -255,15 +225,13 @@ func buildRepo(d *schema.ResourceData, meta interface{}) cobbler.Repo {
 		Breed:           d.Get("breed").(string),
 		Comment:         d.Get("comment").(string),
 		CreateRepoFlags: d.Get("createrepo_flags").(string),
-		//Environment:     d.Get("environment").(string),
-		KeepUpdated:   d.Get("keep_updated").(bool),
-		Mirror:        d.Get("mirror").(string),
-		MirrorLocally: d.Get("mirror_locally").(bool),
-		Name:          d.Get("name").(string),
-		Owners:        owners,
-		Proxy:         d.Get("proxy").(string),
-		RpmList:       rpmList,
-		//YumOpts:         yumOpts,
+		KeepUpdated:     d.Get("keep_updated").(bool),
+		Mirror:          d.Get("mirror").(string),
+		MirrorLocally:   d.Get("mirror_locally").(bool),
+		Name:            d.Get("name").(string),
+		Owners:          owners,
+		Proxy:           d.Get("proxy").(string),
+		RpmList:         rpmList,
 	}
 
 	return repo

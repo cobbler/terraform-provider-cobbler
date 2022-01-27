@@ -1,3 +1,18 @@
+## 3.0.0 (Jan 27, 2022)
+
+IMPROVEMENTS
+
+* Supports Cobbler: v3.3.x
+* Moved test harness to local docker container for easier\faster development
+
+BACKWARDS INCOMPATIBILITIES
+
+* Rewrites to support Cobbler 3.3.x (will break support for Cobbler 3.2.x and older (EOL)).
+* `next_server` attribute is now either `next_server_v4` or `next_server_v6`
+* `boot_loader` string attribute is renamed to `boot_loaders` and changed from a string to a list
+* The following string attributes are now lists: `fetchable_files`, `kernel_options`, `kernel_options_post`, 
+`template_files`, `autoinstall_meta`, and `repos`
+
 ## 2.0.1 (April 30, 2020)
 
 BUG FIXES
