@@ -3,6 +3,7 @@ package cobbler
 import (
 	"bytes"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"log"
 	"strings"
 	"sync"
@@ -144,10 +145,11 @@ func resourceSystem() *schema.Resource {
 							Computed:    true,
 						},
 						"interface_type": {
-							Description: "The type of interface: na, master, slave, bond, bond_slave, bridge, bridge_slave, bonded_bridge_slave.",
-							Type:        schema.TypeString,
-							Optional:    true,
-							Computed:    true,
+							Description:  "The type of interface: na, master, slave, bond, bond_slave, bridge, bridge_slave, bonded_bridge_slave, infiniband, bmc",
+							Type:         schema.TypeString,
+							Optional:     true,
+							Default:      "na",
+							ValidateFunc: validation.StringInSlice([]string{"na", "master", "slave", "bond", "bond_slave", "bridge", "bridge_slave", "bonded_bridge_slave", "infiniband", "bmc"}, false),
 						},
 						"interface_master": {
 							Description: "The master interface when slave.",
