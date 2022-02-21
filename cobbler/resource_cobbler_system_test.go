@@ -84,37 +84,35 @@ func TestAccCobblerSystem_change(t *testing.T) {
 	})
 }
 
-//func TestAccCobblerSystem_removeInterface(t *testing.T) {
-//	var distro cobbler.Distro
-//	var profile cobbler.Profile
-//	var system cobbler.System
-//
-//	resource.Test(t, resource.TestCase{
-//		PreCheck:     func() { testAccCobblerPreCheck(t) },
-//		Providers:    testAccCobblerProviders,
-//		CheckDestroy: testAccCobblerCheckSystemDestroy,
-//		Steps: []resource.TestStep{
-//			{
-//				Config: testAccCobblerSystemRemoveInterface1,
-//				Check: resource.ComposeTestCheckFunc(
-//					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
-//					testAccCobblerCheckProfileExists(t, "cobbler_profile.foo", &profile),
-//					testAccCobblerCheckSystemExists(t, "cobbler_system.foo", &system),
-//					resource.TestCheckResourceAttr(
-//						"cobbler_system.foo", "interface.586365610.management", "true"),
-//				),
-//			},
-//			{
-//				Config: testAccCobblerSystemRemoveInterface2,
-//				Check: resource.ComposeTestCheckFunc(
-//					testAccCobblerCheckDistroExists(t, "cobbler_distro.foo", &distro),
-//					testAccCobblerCheckProfileExists(t, "cobbler_profile.foo", &profile),
-//					testAccCobblerCheckSystemExists(t, "cobbler_system.foo", &system),
-//				),
-//			},
-//		},
-//	})
-//}
+func TestAccCobblerSystem_removeInterface(t *testing.T) {
+	var distro cobbler.Distro
+	var profile cobbler.Profile
+	var system cobbler.System
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccCobblerPreCheck(t) },
+		Providers:    testAccCobblerProviders,
+		CheckDestroy: testAccCobblerCheckSystemDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCobblerSystemRemoveInterface1,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCobblerCheckDistroExists("cobbler_distro.foo", &distro),
+					testAccCobblerCheckProfileExists("cobbler_profile.foo", &profile),
+					testAccCobblerCheckSystemExists("cobbler_system.foo", &system),
+				),
+			},
+			{
+				Config: testAccCobblerSystemRemoveInterface2,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCobblerCheckDistroExists("cobbler_distro.foo", &distro),
+					testAccCobblerCheckProfileExists("cobbler_profile.foo", &profile),
+					testAccCobblerCheckSystemExists("cobbler_system.foo", &system),
+				),
+			},
+		},
+	})
+}
 
 func testAccCobblerCheckSystemDestroy(s *terraform.State) error {
 	config := testAccCobblerProvider.Meta().(*Config)

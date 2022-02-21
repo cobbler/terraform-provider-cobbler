@@ -102,7 +102,7 @@ Optional:
 - **dns_name** (String) DNS name.
 - **gateway** (String) Per-interface gateway.
 - **interface_master** (String) The master interface when slave.
-- **interface_type** (String) The type of interface: na, master, slave, bond, bond_slave, bridge, bridge_slave, bonded_bridge_slave.
+- **interface_type** (String) The type of interface: na, master, slave, bond, bond_slave, bridge, bridge_slave, bonded_bridge_slave, infiniband, bmc.  Defaults to na.
 - **ip_address** (String) The IP address of the interface.
 - **ipv6_address** (String) The IPv6 address of the interface.
 - **ipv6_default_gateway** (String) The default gateawy for the IPv6 address / interface.
