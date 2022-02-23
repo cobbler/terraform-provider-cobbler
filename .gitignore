@@ -22,7 +22,6 @@ website/node_modules
 .idea
 *.iml
 *.test
-*.iml
 
 website/vendor
 
@@ -34,3 +33,4 @@ terraform-provider-cobbler
 
 debug
 dist/
+vendor/
