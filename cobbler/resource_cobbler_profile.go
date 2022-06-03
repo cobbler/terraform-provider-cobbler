@@ -342,11 +342,11 @@ func buildProfile(d *schema.ResourceData, meta interface{}) cobbler.Profile {
 	}
 	kernelOptions := []string{}
 	for _, i := range d.Get("kernel_options").([]interface{}) {
-		kernelOptions = append(owners, i.(string))
+		kernelOptions = append(kernelOptions, i.(string))
 	}
 	kernelOptionsPost := []string{}
 	for _, i := range d.Get("kernel_options_post").([]interface{}) {
-		kernelOptionsPost = append(owners, i.(string))
+		kernelOptionsPost = append(kernelOptionsPost, i.(string))
 	}
 	templateFiles := []string{}
 	for _, i := range d.Get("template_files").([]interface{}) {
