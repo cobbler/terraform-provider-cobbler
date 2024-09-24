@@ -44,7 +44,7 @@ else
 fi
 
 docker build -f ./docker/cobbler_source/docker/develop/develop.dockerfile -t cobbler-dev .
-docker-compose -f docker/docker-compose.yml up -d
+docker compose -f docker/docker-compose.yml up -d
 
 SERVER_URL=$1
 printf "### Waiting for Cobbler to become available on ${SERVER_URL} \n\n"
@@ -56,7 +56,7 @@ until $(curl --connect-timeout 1 --output /dev/null --silent ${SERVER_URL}); do
   if [ ${attempt_counter} -eq ${max_attempts} ];then
     echo "Max attempts reached"
     # Debug logs
-    docker-compose -f ./docker/docker-compose.yml logs
+    docker compose -f ./docker/docker-compose.yml logs
     exit 1
   fi
 
@@ -64,4 +64,7 @@ until $(curl --connect-timeout 1 --output /dev/null --silent ${SERVER_URL}); do
   sleep 5
 done
 
-docker-compose -f docker/docker-compose.yml logs
+# Sleep 10 seconds to let the "cobbler import" succeed
+sleep 10
+
+docker compose -f docker/docker-compose.yml logs
