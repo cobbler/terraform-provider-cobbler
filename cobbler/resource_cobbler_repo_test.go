@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 
 	cobbler "github.com/cobbler/cobblerclient"
 )
@@ -14,9 +14,9 @@ func TestAccCobblerRepo_basic(t *testing.T) {
 	var repo cobbler.Repo
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckRepoDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckRepoDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerRepoBasic,
@@ -32,9 +32,9 @@ func TestAccCobblerRepo_change(t *testing.T) {
 	var repo cobbler.Repo
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckRepoDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckRepoDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerRepoChange1,
@@ -53,14 +53,12 @@ func TestAccCobblerRepo_change(t *testing.T) {
 }
 
 func testAccCobblerCheckRepoDestroy(s *terraform.State) error {
-	config := testAccCobblerProvider.Meta().(*Config)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cobbler_repo" {
 			continue
 		}
 
-		if _, err := config.cobblerClient.GetRepo(rs.Primary.ID); err == nil {
+		if _, err := cobblerApiClient.GetRepo(rs.Primary.ID); err == nil {
 			return fmt.Errorf("Repo still exists")
 		}
 	}
@@ -79,9 +77,7 @@ func testAccCobblerCheckRepoExists(n string, repo *cobbler.Repo) resource.TestCh
 			return fmt.Errorf("No ID is set")
 		}
 
-		config := testAccCobblerProvider.Meta().(*Config)
-
-		found, err := config.cobblerClient.GetRepo(rs.Primary.ID)
+		found, err := cobblerApiClient.GetRepo(rs.Primary.ID)
 		if err != nil {
 			return err
 		}

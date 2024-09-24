@@ -1,31 +1,39 @@
 package cobbler
 
 import (
+	cobbler "github.com/cobbler/cobblerclient"
+	"net/http"
 	"os"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-var testAccCobblerProviders map[string]terraform.ResourceProvider
-var testAccCobblerProvider *schema.Provider
+var cobblerApiClient cobbler.Client
+var testAccProviderFactories = map[string]func() (*schema.Provider, error){
+	"cobbler": func() (*schema.Provider, error) {
+		return New("dev")(), nil
+	},
+}
 
 func init() {
-	testAccCobblerProvider = Provider().(*schema.Provider)
-	testAccCobblerProviders = map[string]terraform.ResourceProvider{
-		"cobbler": testAccCobblerProvider,
+	cobblerApiClient = cobbler.NewClient(&http.Client{}, cobbler.ClientConfig{
+		URL:      os.Getenv("COBBLER_URL"),
+		Username: os.Getenv("COBBLER_USERNAME"),
+		Password: os.Getenv("COBBLER_PASSWORD"),
+	})
+	_, _ = cobblerApiClient.Login()
+	testAccProviderFactories = map[string]func() (*schema.Provider, error){
+		"cobbler": func() (*schema.Provider, error) {
+			return New("dev")(), nil
+		},
 	}
 }
 
 func TestProvider(t *testing.T) {
-	if err := Provider().(*schema.Provider).InternalValidate(); err != nil {
+	if err := New("dev")().InternalValidate(); err != nil {
 		t.Fatalf("err: %s", err)
 	}
-}
-
-func TestProvider_impl(t *testing.T) {
-	var _ terraform.ResourceProvider = Provider()
 }
 
 func testAccCobblerPreCheck(t *testing.T) {

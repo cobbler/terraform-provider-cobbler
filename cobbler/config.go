@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/pathorcontents"
-
 	cobbler "github.com/cobbler/cobblerclient"
 )
 
@@ -31,7 +29,7 @@ func (c *Config) loadAndValidate() error {
 
 	tlsConfig := &tls.Config{}
 	if c.CACertFile != "" {
-		caCert, _, err := pathorcontents.Read(c.CACertFile)
+		caCert, _, err := Read(c.CACertFile)
 		if err != nil {
 			return fmt.Errorf("Error reading CA Cert: %s", err)
 		}

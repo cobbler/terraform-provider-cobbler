@@ -3,14 +3,13 @@ package cobbler
 import (
 	"bytes"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"log"
 	"strings"
 	"sync"
 
 	cobbler "github.com/cobbler/cobblerclient"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/hashcode"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 var systemSyncLock sync.Mutex
@@ -145,11 +144,12 @@ func resourceSystem() *schema.Resource {
 							Computed:    true,
 						},
 						"interface_type": {
-							Description:  "The type of interface: na, master, slave, bond, bond_slave, bridge, bridge_slave, bonded_bridge_slave, infiniband, bmc",
+							// TODO: Update list of interface types
+							Description:  "The type of interface: NA, master, slave, bond, bond_slave, bridge, bridge_slave, bonded_bridge_slave, infiniband, bmc",
 							Type:         schema.TypeString,
 							Optional:     true,
-							Default:      "na",
-							ValidateFunc: validation.StringInSlice([]string{"na", "master", "slave", "bond", "bond_slave", "bridge", "bridge_slave", "bonded_bridge_slave", "infiniband", "bmc"}, false),
+							Default:      "NA",
+							ValidateFunc: validation.StringInSlice([]string{"NA", "master", "slave", "bond", "bond_slave", "bridge", "bridge_slave", "bonded_bridge_slave", "infiniband", "bmc"}, false),
 						},
 						"interface_master": {
 							Description: "The master interface when slave.",
@@ -460,6 +460,7 @@ func resourceSystemCreate(d *schema.ResourceData, meta interface{}) error {
 
 func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
+	log.Printf("[DEBUG] Reading Cobbler system %s\n", d.Id())
 
 	// Retrieve the system entry from Cobbler
 	system, err := config.cobblerClient.GetSystem(d.Id())
@@ -522,6 +523,7 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 	// Build a generic map array with the interface attributes
 	var systemInterfaces []map[string]interface{}
 	for interfaceName, interfaceInfo := range allInterfaces {
+		log.Printf("[DEBUG] Cobbler System Interface %#v: %#v", interfaceName, interfaceInfo)
 		iface := make(map[string]interface{})
 		iface["name"] = interfaceName
 		iface["cnames"] = interfaceInfo.CNAMEs
@@ -542,12 +544,15 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 		iface["management"] = interfaceInfo.Management
 		iface["netmask"] = interfaceInfo.Netmask
 		iface["static"] = interfaceInfo.Static
-		iface["static_Routes"] = interfaceInfo.StaticRoutes
+		iface["static_routes"] = interfaceInfo.StaticRoutes
 		iface["virt_bridge"] = interfaceInfo.VirtBridge
 		systemInterfaces = append(systemInterfaces, iface)
 	}
 
-	d.Set("interface", systemInterfaces)
+	err = d.Set("interface", systemInterfaces)
+	if err != nil {
+		return fmt.Errorf("Cobbler System %s: Error appending interface to : %s", system.Name, err)
+	}
 
 	return nil
 }
@@ -779,73 +784,11 @@ func resourceSystemInterfaceHash(v interface{}) int {
 
 	buf.WriteString(fmt.Sprintf("%s", m["name"].(string)))
 
-	if v, ok := m["cnames"]; ok {
-		for _, x := range v.([]interface{}) {
-			buf.WriteString(fmt.Sprintf("%v-", x.(string)))
-		}
-	}
-	if v, ok := m["dhcp_tag"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	if v, ok := m["dns_name"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	if v, ok := m["bonding_opts"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	if v, ok := m["bridge_opts"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	if v, ok := m["gateway"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	if v, ok := m["interface_type"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	if v, ok := m["interface_master"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	if v, ok := m["ip_address"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	if v, ok := m["ipv6_address"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	if v, ok := m["ipv6_secondaries"]; ok {
-		for _, x := range v.([]interface{}) {
-			buf.WriteString(fmt.Sprintf("%v-", x.(string)))
-		}
-	}
-	if v, ok := m["ipv6_mtu"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	if v, ok := m["ipv6_static_routes"]; ok {
-		for _, x := range v.([]interface{}) {
-			buf.WriteString(fmt.Sprintf("%v-", x.(string)))
-		}
-	}
-	if v, ok := m["ipv6_default_gateway"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
 	if v, ok := m["mac_address"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
 	}
-	if v, ok := m["management"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(bool)))
-	}
-	if v, ok := m["netmask"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	if v, ok := m["static"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(bool)))
-	}
-	if v, ok := m["static_Routes"]; ok {
-		for _, x := range v.([]interface{}) {
-			buf.WriteString(fmt.Sprintf("%v-", x.(string)))
-		}
-	}
-	if v, ok := m["virt_bridge"]; ok {
-		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
-	}
-	return hashcode.String(buf.String())
+
+	hash := String(buf.String())
+	log.Printf("[DEBUG] Interface %s: Calculated hash %v", m["name"].(string), hash)
+	return hash
 }
