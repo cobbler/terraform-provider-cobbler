@@ -231,6 +231,7 @@ func resourceProfileCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Cobbler Profile: Create Options: %#v", profile)
 	newProfile, err := config.cobblerClient.CreateProfile(profile)
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Profile: Error Creating: %s", err)
 	}
 
@@ -245,6 +246,7 @@ func resourceProfileRead(d *schema.ResourceData, meta interface{}) error {
 	// Retrieve the profile entry from Cobbler
 	profile, err := config.cobblerClient.GetProfile(d.Id())
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Profile: Error Reading (%s): %s", d.Id(), err)
 	}
 
@@ -293,6 +295,7 @@ func resourceProfileUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Cobbler Profile: Updating Profile (%s) with options: %+v", d.Id(), profile)
 	err := config.cobblerClient.UpdateProfile(&profile)
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Profile: Error Updating (%s): %s", d.Id(), err)
 	}
 
@@ -304,6 +307,7 @@ func resourceProfileDelete(d *schema.ResourceData, meta interface{}) error {
 
 	// Attempt to delete the profile
 	if err := config.cobblerClient.DeleteProfile(d.Id()); err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Profile: Error Deleting (%s): %s", d.Id(), err)
 	}
 

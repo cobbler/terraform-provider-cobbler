@@ -433,6 +433,7 @@ func resourceSystemCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Cobbler System: Create Options: %#v", system)
 	newSystem, err := config.cobblerClient.CreateSystem(system)
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler System: Error Creating: %s", err)
 	}
 
@@ -443,6 +444,7 @@ func resourceSystemCreate(d *schema.ResourceData, meta interface{}) error {
 	for interfaceName, interfaceInfo := range interfaces {
 		log.Printf("[DEBUG] Cobbler System Interface %#v: %#v", interfaceName, interfaceInfo)
 		if err := newSystem.CreateInterface(interfaceName, interfaceInfo); err != nil {
+			//goland:noinspection GoErrorStringFormat
 			return fmt.Errorf("Cobbler System: Error adding Interface %s to %s: %s", interfaceName, newSystem.Name, err)
 		}
 	}
@@ -452,6 +454,7 @@ func resourceSystemCreate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] Cobbler System: syncing system")
 	if err := config.cobblerClient.Sync(); err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler System: Error syncing system: %s", err)
 	}
 
@@ -471,6 +474,7 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 			return nil
 		}
 
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler System: Error Reading (%s): %s", d.Id(), err)
 	}
 
@@ -517,6 +521,7 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 	// Get all interfaces that the System has
 	allInterfaces, err := system.GetInterfaces()
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler System %s: Error getting interfaces: %s", system.Name, err)
 	}
 
@@ -551,6 +556,7 @@ func resourceSystemRead(d *schema.ResourceData, meta interface{}) error {
 
 	err = d.Set("interface", systemInterfaces)
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler System %s: Error appending interface to : %s", system.Name, err)
 	}
 
@@ -566,13 +572,14 @@ func resourceSystemUpdate(d *schema.ResourceData, meta interface{}) error {
 	// Retrieve the existing system entry from Cobbler
 	system, err := config.cobblerClient.GetSystem(d.Id())
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler System: Error Reading (%s): %s", d.Id(), err)
 	}
 
 	// Get a list of the old interfaces
 	currentInterfaces, err := system.GetInterfaces()
 	if err != nil {
-		return fmt.Errorf("Error getting interfaces: %s", err)
+		return fmt.Errorf("error getting interfaces: %s", err)
 	}
 	log.Printf("[DEBUG] Cobbler System Interfaces: %#v", currentInterfaces)
 
@@ -583,6 +590,7 @@ func resourceSystemUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Cobbler System: Updating System (%s) with options: %+v", d.Id(), system)
 	err = config.cobblerClient.UpdateSystem(&newSystem)
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler System: Error Updating (%s): %s", d.Id(), err)
 	}
 
@@ -601,6 +609,7 @@ func resourceSystemUpdate(d *schema.ResourceData, meta interface{}) error {
 				log.Printf("[DEBUG] Cobbler System: Deleting Interface %#v: %#v", interfaceName, interfaceInfo)
 
 				if err := system.DeleteInterface(interfaceName); err != nil {
+					//goland:noinspection GoErrorStringFormat
 					return fmt.Errorf("Cobbler System: Error deleting Interface %s to %s: %s", interfaceName, system.Name, err)
 				}
 			}
@@ -611,6 +620,7 @@ func resourceSystemUpdate(d *schema.ResourceData, meta interface{}) error {
 			log.Printf("[DEBUG] Cobbler System: New Interface %#v: %#v", interfaceName, interfaceInfo)
 
 			if err := system.CreateInterface(interfaceName, interfaceInfo); err != nil {
+				//goland:noinspection GoErrorStringFormat
 				return fmt.Errorf("Cobbler System: Error adding Interface %s to %s: %s", interfaceName, system.Name, err)
 			}
 		}
@@ -618,6 +628,7 @@ func resourceSystemUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	log.Printf("[DEBUG] Cobbler System: syncing system")
 	if err := config.cobblerClient.Sync(); err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler System: Error syncing system: %s", err)
 	}
 
@@ -629,6 +640,7 @@ func resourceSystemDelete(d *schema.ResourceData, meta interface{}) error {
 
 	// Attempt to delete the system
 	if err := config.cobblerClient.DeleteSystem(d.Id()); err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler System: Error Deleting (%s): %s", d.Id(), err)
 	}
 

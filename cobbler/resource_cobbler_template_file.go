@@ -43,6 +43,7 @@ func resourceTemplateFileCreate(d *schema.ResourceData, meta interface{}) error 
 	log.Printf("[DEBUG] Cobbler TemplateFile: Create Options: %#v", ks)
 
 	if err := config.cobblerClient.CreateTemplateFile(ks); err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler TemplateFile: Error Creating: %s", err)
 	}
 
@@ -67,6 +68,7 @@ func resourceTemplateFileUpdate(d *schema.ResourceData, meta interface{}) error 
 	log.Printf("[DEBUG] Cobbler TemplateFile: Updating Template (%s) with options: %+v", d.Id(), ks)
 
 	if err := config.cobblerClient.CreateTemplateFile(ks); err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler TemplateFile: Error Updating (%s): %s", d.Id(), err)
 	}
 
@@ -77,6 +79,7 @@ func resourceTemplateFileDelete(d *schema.ResourceData, meta interface{}) error 
 	config := meta.(*Config)
 
 	if err := config.cobblerClient.DeleteTemplateFile(d.Id()); err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler TemplateFile: Error Deleting (%s): %s", d.Id(), err)
 	}
 

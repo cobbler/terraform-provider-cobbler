@@ -35,7 +35,7 @@ func testAccCobblerCheckTemplateFileDestroy(s *terraform.State) error {
 		}
 
 		if _, err := cobblerApiClient.GetTemplateFile(rs.Primary.ID); err == nil {
-			return fmt.Errorf("Template File still exists")
+			return fmt.Errorf("template file still exists")
 		}
 	}
 
@@ -46,11 +46,11 @@ func testAccCobblerCheckTemplateFileExists(n string, ks *cobbler.TemplateFile) r
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No ID is set")
+			return fmt.Errorf("no ID is set")
 		}
 
 		found, err := cobblerApiClient.GetTemplateFile(rs.Primary.ID)
@@ -59,7 +59,7 @@ func testAccCobblerCheckTemplateFileExists(n string, ks *cobbler.TemplateFile) r
 		}
 
 		if found.Name != rs.Primary.ID {
-			return fmt.Errorf("Template File not found")
+			return fmt.Errorf("template file not found")
 		}
 
 		*ks = *found

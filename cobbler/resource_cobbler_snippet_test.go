@@ -35,6 +35,7 @@ func testAccCobblerCheckSnippetDestroy(s *terraform.State) error {
 		}
 
 		if _, err := cobblerApiClient.GetSnippet(rs.Primary.ID); err == nil {
+			//goland:noinspection GoErrorStringFormat
 			return fmt.Errorf("Snippet still exists")
 		}
 	}
@@ -46,11 +47,11 @@ func testAccCobblerCheckSnippetExists(n string, snippet *cobbler.Snippet) resour
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No ID is set")
+			return fmt.Errorf("no ID is set")
 		}
 
 		found, err := cobblerApiClient.GetSnippet(rs.Primary.ID)
@@ -59,6 +60,7 @@ func testAccCobblerCheckSnippetExists(n string, snippet *cobbler.Snippet) resour
 		}
 
 		if found.Name != rs.Primary.ID {
+			//goland:noinspection GoErrorStringFormat
 			return fmt.Errorf("Snippet not found")
 		}
 

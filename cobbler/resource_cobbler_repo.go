@@ -118,6 +118,7 @@ func resourceRepoCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Cobbler Repo: Create Options: %#v", repo)
 	newRepo, err := config.cobblerClient.CreateRepo(repo)
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Repo: Error Creating: %s", err)
 	}
 
@@ -132,6 +133,7 @@ func resourceRepoRead(d *schema.ResourceData, meta interface{}) error {
 	// Retrieve the repo from cobbler
 	repo, err := config.cobblerClient.GetRepo(d.Id())
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Repo: Error Reading (%s): %s", d.Id(), err)
 	}
 
@@ -179,6 +181,7 @@ func resourceRepoUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Cobbler Repo: Updating Repo (%s) with options: %+v", d.Id(), repo)
 	err := config.cobblerClient.UpdateRepo(&repo)
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Repo: Error Updating (%s): %s", d.Id(), err)
 	}
 
@@ -190,6 +193,7 @@ func resourceRepoDelete(d *schema.ResourceData, meta interface{}) error {
 
 	// Attempt to delete the repo
 	if err := config.cobblerClient.DeleteRepo(d.Id()); err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Repo: Error Deleting (%s): %s", d.Id(), err)
 	}
 

@@ -128,6 +128,7 @@ func resourceDistroCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Cobbler Distro: Create Options: %#v", distro)
 	newDistro, err := config.cobblerClient.CreateDistro(distro)
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Distro: Error Creating: %s", err)
 	}
 
@@ -142,6 +143,7 @@ func resourceDistroRead(d *schema.ResourceData, meta interface{}) error {
 	// Retrieve the distro from cobbler
 	distro, err := config.cobblerClient.GetDistro(d.Id())
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Distro: Error Reading (%s): %s", d.Id(), err)
 	}
 
@@ -175,6 +177,7 @@ func resourceDistroUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Cobbler Distro: Updating Distro (%s) with options: %+v", d.Id(), distro)
 	err := config.cobblerClient.UpdateDistro(&distro)
 	if err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Distro: Error Updating (%s): %s", d.Id(), err)
 	}
 
@@ -186,6 +189,7 @@ func resourceDistroDelete(d *schema.ResourceData, meta interface{}) error {
 
 	// Attempt to delete the distro
 	if err := config.cobblerClient.DeleteDistro(d.Id()); err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Distro: Error Deleting (%s): %s", d.Id(), err)
 	}
 

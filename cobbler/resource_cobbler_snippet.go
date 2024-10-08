@@ -43,6 +43,7 @@ func resourceSnippetCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Cobbler Snippet: Create Options: %#v", snippet)
 
 	if err := config.cobblerClient.CreateSnippet(snippet); err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Snippet: Error Creating: %s", err)
 	}
 
@@ -68,6 +69,7 @@ func resourceSnippetUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Cobbler Snippet: Updating Snippet (%s) with options: %+v", d.Id(), snippet)
 
 	if err := config.cobblerClient.CreateSnippet(snippet); err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Snippet: Error Updating (%s): %s", d.Id(), err)
 	}
 
@@ -78,6 +80,7 @@ func resourceSnippetDelete(d *schema.ResourceData, meta interface{}) error {
 	config := meta.(*Config)
 
 	if err := config.cobblerClient.DeleteSnippet(d.Id()); err != nil {
+		//goland:noinspection GoErrorStringFormat
 		return fmt.Errorf("Cobbler Snippet: Error Deleting (%s): %s", d.Id(), err)
 	}
 
