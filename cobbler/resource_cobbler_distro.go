@@ -1,7 +1,8 @@
 package cobbler
 
 import (
-	"fmt"
+	"context"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"log"
 
 	cobbler "github.com/cobbler/cobblerclient"
@@ -10,11 +11,11 @@ import (
 
 func resourceDistro() *schema.Resource {
 	return &schema.Resource{
-		Description: "`cobbler_distro` manages a distribution within Cobbler.",
-		Create:      resourceDistroCreate,
-		Read:        resourceDistroRead,
-		Update:      resourceDistroUpdate,
-		Delete:      resourceDistroDelete,
+		Description:   "`cobbler_distro` manages a distribution within Cobbler.",
+		CreateContext: resourceDistroCreate,
+		ReadContext:   resourceDistroRead,
+		UpdateContext: resourceDistroUpdate,
+		DeleteContext: resourceDistroDelete,
 
 		Schema: map[string]*schema.Schema{
 			"arch": {
@@ -118,7 +119,7 @@ func resourceDistro() *schema.Resource {
 	}
 }
 
-func resourceDistroCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceDistroCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	// Create a cobblerclient.Distro
@@ -128,23 +129,22 @@ func resourceDistroCreate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Cobbler Distro: Create Options: %#v", distro)
 	newDistro, err := config.cobblerClient.CreateDistro(distro)
 	if err != nil {
-		//goland:noinspection GoErrorStringFormat
-		return fmt.Errorf("Cobbler Distro: Error Creating: %s", err)
+		return diag.Errorf("Cobbler Distro: Error Creating: %s", err)
 	}
 
 	d.SetId(newDistro.Name)
 
-	return resourceDistroRead(d, meta)
+	return resourceDistroRead(ctx, d, meta)
 }
 
-func resourceDistroRead(d *schema.ResourceData, meta interface{}) error {
+func resourceDistroRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	// Retrieve the distro from cobbler
 	distro, err := config.cobblerClient.GetDistro(d.Id())
 	if err != nil {
 		//goland:noinspection GoErrorStringFormat
-		return fmt.Errorf("Cobbler Distro: Error Reading (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler Distro: Error Reading (%s): %s", d.Id(), err)
 	}
 
 	// Set all fields
@@ -167,7 +167,7 @@ func resourceDistroRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceDistroUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceDistroUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	// create a cobblerclient.Distro
@@ -178,19 +178,18 @@ func resourceDistroUpdate(d *schema.ResourceData, meta interface{}) error {
 	err := config.cobblerClient.UpdateDistro(&distro)
 	if err != nil {
 		//goland:noinspection GoErrorStringFormat
-		return fmt.Errorf("Cobbler Distro: Error Updating (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler Distro: Error Updating (%s): %s", d.Id(), err)
 	}
 
-	return resourceDistroRead(d, meta)
+	return resourceDistroRead(ctx, d, meta)
 }
 
-func resourceDistroDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceDistroDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	// Attempt to delete the distro
 	if err := config.cobblerClient.DeleteDistro(d.Id()); err != nil {
-		//goland:noinspection GoErrorStringFormat
-		return fmt.Errorf("Cobbler Distro: Error Deleting (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler Distro: Error Deleting (%s): %s", d.Id(), err)
 	}
 
 	return nil

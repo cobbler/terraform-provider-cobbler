@@ -1,7 +1,8 @@
 package cobbler
 
 import (
-	"fmt"
+	"context"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"log"
 
 	cobbler "github.com/cobbler/cobblerclient"
@@ -10,11 +11,11 @@ import (
 
 func resourceRepo() *schema.Resource {
 	return &schema.Resource{
-		Description: "`cobbler_repo` manages a repo within Cobbler.",
-		Create:      resourceRepoCreate,
-		Read:        resourceRepoRead,
-		Update:      resourceRepoUpdate,
-		Delete:      resourceRepoDelete,
+		Description:   "`cobbler_repo` manages a repo within Cobbler.",
+		CreateContext: resourceRepoCreate,
+		ReadContext:   resourceRepoRead,
+		UpdateContext: resourceRepoUpdate,
+		DeleteContext: resourceRepoDelete,
 
 		Schema: map[string]*schema.Schema{
 			"apt_components": {
@@ -108,33 +109,31 @@ func resourceRepo() *schema.Resource {
 	}
 }
 
-func resourceRepoCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceRepoCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	// Create a cobblerclient.Repo
 	repo := buildRepo(d, config)
 
-	// Attempte to create the Repo
+	// Attempt to create the Repo
 	log.Printf("[DEBUG] Cobbler Repo: Create Options: %#v", repo)
 	newRepo, err := config.cobblerClient.CreateRepo(repo)
 	if err != nil {
-		//goland:noinspection GoErrorStringFormat
-		return fmt.Errorf("Cobbler Repo: Error Creating: %s", err)
+		return diag.Errorf("Cobbler Repo: Error Creating: %s", err)
 	}
 
 	d.SetId(newRepo.Name)
 
-	return resourceRepoRead(d, meta)
+	return resourceRepoRead(ctx, d, meta)
 }
 
-func resourceRepoRead(d *schema.ResourceData, meta interface{}) error {
+func resourceRepoRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	// Retrieve the repo from cobbler
 	repo, err := config.cobblerClient.GetRepo(d.Id())
 	if err != nil {
-		//goland:noinspection GoErrorStringFormat
-		return fmt.Errorf("Cobbler Repo: Error Reading (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler Repo: Error Reading (%s): %s", d.Id(), err)
 	}
 
 	// Set all fields
@@ -171,7 +170,7 @@ func resourceRepoRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceRepoUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceRepoUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	// create a cobblerclient.Repo
@@ -181,20 +180,18 @@ func resourceRepoUpdate(d *schema.ResourceData, meta interface{}) error {
 	log.Printf("[DEBUG] Cobbler Repo: Updating Repo (%s) with options: %+v", d.Id(), repo)
 	err := config.cobblerClient.UpdateRepo(&repo)
 	if err != nil {
-		//goland:noinspection GoErrorStringFormat
-		return fmt.Errorf("Cobbler Repo: Error Updating (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler Repo: Error Updating (%s): %s", d.Id(), err)
 	}
 
-	return resourceRepoRead(d, meta)
+	return resourceRepoRead(ctx, d, meta)
 }
 
-func resourceRepoDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceRepoDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	// Attempt to delete the repo
 	if err := config.cobblerClient.DeleteRepo(d.Id()); err != nil {
-		//goland:noinspection GoErrorStringFormat
-		return fmt.Errorf("Cobbler Repo: Error Deleting (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler Repo: Error Deleting (%s): %s", d.Id(), err)
 	}
 
 	return nil

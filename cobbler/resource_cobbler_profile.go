@@ -1,19 +1,20 @@
 package cobbler
 
 import (
-	"fmt"
+	"context"
 	cobbler "github.com/cobbler/cobblerclient"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"log"
 )
 
 func resourceProfile() *schema.Resource {
 	return &schema.Resource{
-		Description: "`cobbler_profile` manages a profile within Cobbler.",
-		Create:      resourceProfileCreate,
-		Read:        resourceProfileRead,
-		Update:      resourceProfileUpdate,
-		Delete:      resourceProfileDelete,
+		Description:   "`cobbler_profile` manages a profile within Cobbler.",
+		CreateContext: resourceProfileCreate,
+		ReadContext:   resourceProfileRead,
+		UpdateContext: resourceProfileUpdate,
+		DeleteContext: resourceProfileDelete,
 
 		Schema: map[string]*schema.Schema{
 			"autoinstall": {
@@ -221,7 +222,7 @@ func resourceProfile() *schema.Resource {
 	}
 }
 
-func resourceProfileCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceProfileCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	// Create a cobblerclient.Profile struct
@@ -232,22 +233,22 @@ func resourceProfileCreate(d *schema.ResourceData, meta interface{}) error {
 	newProfile, err := config.cobblerClient.CreateProfile(profile)
 	if err != nil {
 		//goland:noinspection GoErrorStringFormat
-		return fmt.Errorf("Cobbler Profile: Error Creating: %s", err)
+		return diag.Errorf("Cobbler Profile: Error Creating: %s", err)
 	}
 
 	d.SetId(newProfile.Name)
 
-	return resourceProfileRead(d, meta)
+	return resourceProfileRead(ctx, d, meta)
 }
 
-func resourceProfileRead(d *schema.ResourceData, meta interface{}) error {
+func resourceProfileRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	// Retrieve the profile entry from Cobbler
 	profile, err := config.cobblerClient.GetProfile(d.Id())
 	if err != nil {
 		//goland:noinspection GoErrorStringFormat
-		return fmt.Errorf("Cobbler Profile: Error Reading (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler Profile: Error Reading (%s): %s", d.Id(), err)
 	}
 
 	// Set all fields
@@ -285,7 +286,7 @@ func resourceProfileRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceProfileUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceProfileUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	// Create a cobblerclient.Profile struct
@@ -296,19 +297,18 @@ func resourceProfileUpdate(d *schema.ResourceData, meta interface{}) error {
 	err := config.cobblerClient.UpdateProfile(&profile)
 	if err != nil {
 		//goland:noinspection GoErrorStringFormat
-		return fmt.Errorf("Cobbler Profile: Error Updating (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler Profile: Error Updating (%s): %s", d.Id(), err)
 	}
 
-	return resourceProfileRead(d, meta)
+	return resourceProfileRead(ctx, d, meta)
 }
 
-func resourceProfileDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceProfileDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	// Attempt to delete the profile
 	if err := config.cobblerClient.DeleteProfile(d.Id()); err != nil {
-		//goland:noinspection GoErrorStringFormat
-		return fmt.Errorf("Cobbler Profile: Error Deleting (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler Profile: Error Deleting (%s): %s", d.Id(), err)
 	}
 
 	return nil
