@@ -3,8 +3,8 @@ package cobbler
 import (
 	"fmt"
 	cobbler "github.com/cobbler/cobblerclient"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"testing"
 )
 
@@ -13,9 +13,9 @@ func TestAccCobblerProfile_basic(t *testing.T) {
 	var profile cobbler.Profile
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckProfileDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckProfileDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerProfileBasic,
@@ -33,9 +33,9 @@ func TestAccCobblerProfile_change(t *testing.T) {
 	var profile cobbler.Profile
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckProfileDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckProfileDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerProfileChange1,
@@ -60,9 +60,9 @@ func TestAccCobblerProfile_withRepo(t *testing.T) {
 	var profile cobbler.Profile
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckProfileDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckProfileDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerProfileWithRepo,
@@ -76,14 +76,12 @@ func TestAccCobblerProfile_withRepo(t *testing.T) {
 }
 
 func testAccCobblerCheckProfileDestroy(s *terraform.State) error {
-	config := testAccCobblerProvider.Meta().(*Config)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cobbler_profile" {
 			continue
 		}
 
-		if _, err := config.cobblerClient.GetProfile(rs.Primary.ID); err == nil {
+		if _, err := cobblerApiClient.GetProfile(rs.Primary.ID); err == nil {
 			return fmt.Errorf("Profile still exists")
 		}
 	}
@@ -102,9 +100,7 @@ func testAccCobblerCheckProfileExists(n string, profile *cobbler.Profile) resour
 			return fmt.Errorf("No ID is set")
 		}
 
-		config := testAccCobblerProvider.Meta().(*Config)
-
-		found, err := config.cobblerClient.GetProfile(rs.Primary.ID)
+		found, err := cobblerApiClient.GetProfile(rs.Primary.ID)
 		if err != nil {
 			return err
 		}

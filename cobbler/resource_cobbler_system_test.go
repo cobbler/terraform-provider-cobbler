@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 
 	cobbler "github.com/cobbler/cobblerclient"
 )
@@ -16,9 +16,9 @@ func TestAccCobblerSystem_basic(t *testing.T) {
 	var system cobbler.System
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckSystemDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckSystemDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerSystemBasic,
@@ -38,9 +38,9 @@ func TestAccCobblerSystem_multi(t *testing.T) {
 	var system cobbler.System
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckSystemDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckSystemDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerSystemMulti,
@@ -60,9 +60,9 @@ func TestAccCobblerSystem_change(t *testing.T) {
 	var system cobbler.System
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckSystemDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckSystemDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerSystemChange1,
@@ -90,9 +90,9 @@ func TestAccCobblerSystem_removeInterface(t *testing.T) {
 	var system cobbler.System
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckSystemDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckSystemDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerSystemRemoveInterface1,
@@ -115,14 +115,12 @@ func TestAccCobblerSystem_removeInterface(t *testing.T) {
 }
 
 func testAccCobblerCheckSystemDestroy(s *terraform.State) error {
-	config := testAccCobblerProvider.Meta().(*Config)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cobbler_system" {
 			continue
 		}
 
-		if _, err := config.cobblerClient.GetSystem(rs.Primary.ID); err == nil {
+		if _, err := cobblerApiClient.GetSystem(rs.Primary.ID); err == nil {
 			return fmt.Errorf("System still exists")
 		}
 	}
@@ -141,9 +139,7 @@ func testAccCobblerCheckSystemExists(n string, system *cobbler.System) resource.
 			return fmt.Errorf("No ID is set")
 		}
 
-		config := testAccCobblerProvider.Meta().(*Config)
-
-		found, err := config.cobblerClient.GetSystem(rs.Primary.ID)
+		found, err := cobblerApiClient.GetSystem(rs.Primary.ID)
 		if err != nil {
 			return err
 		}
@@ -180,6 +176,10 @@ var testAccCobblerSystemBasic = `
 		name_servers = ["8.8.8.8", "8.8.4.4"]
 		comment = "I'm a system"
 		power_id = "foo"
+
+		interface {
+			name = "default"
+		}
 
 		interface {
 			name = "eth0"
@@ -224,6 +224,10 @@ var testAccCobblerSystemMulti = `
 		power_id = "foo"
 
 		interface {
+			name = "default"
+		}
+
+		interface {
 			name = "eth0"
 			mac_address = "aa:bb:cc:dd:ee:${format("%d", count.index)}"
 		}
@@ -256,6 +260,10 @@ var testAccCobblerSystemChange1 = `
 		name_servers = ["8.8.8.8", "8.8.4.4"]
 		comment = "I'm a system"
 		power_id = "foo"
+
+		interface {
+			name = "default"
+		}
 
 		interface {
 			name = "eth0"
@@ -299,6 +307,10 @@ var testAccCobblerSystemChange2 = `
 		power_id = "foo"
 
 		interface {
+			name = "default"
+		}
+
+		interface {
 			name = "eth0"
 			mac_address = "aa:bb:cc:dd:ee:ff"
 			static = true
@@ -340,6 +352,10 @@ var testAccCobblerSystemRemoveInterface1 = `
 		power_id = "foo"
 
 		interface {
+			name = "default"
+		}
+
+		interface {
 			name = "eth0"
 			mac_address = "aa:bb:cc:dd:ee:ff"
 			static = true
@@ -379,6 +395,10 @@ var testAccCobblerSystemRemoveInterface2 = `
 		profile = "${cobbler_profile.foo.name}"
 		name_servers = ["8.8.8.8", "8.8.4.4"]
 		power_id = "foo"
+
+		interface {
+			name = "default"
+		}
 
 		interface {
 			name = "eth0"

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 
 	cobbler "github.com/cobbler/cobblerclient"
 )
@@ -14,9 +14,9 @@ func TestAccCobblerTemplateFile_basic(t *testing.T) {
 	var ks cobbler.TemplateFile
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckTemplateFileDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckTemplateFileDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerTemplateFileBasic,
@@ -29,14 +29,12 @@ func TestAccCobblerTemplateFile_basic(t *testing.T) {
 }
 
 func testAccCobblerCheckTemplateFileDestroy(s *terraform.State) error {
-	config := testAccCobblerProvider.Meta().(*Config)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cobbler_template_file" {
 			continue
 		}
 
-		if _, err := config.cobblerClient.GetTemplateFile(rs.Primary.ID); err == nil {
+		if _, err := cobblerApiClient.GetTemplateFile(rs.Primary.ID); err == nil {
 			return fmt.Errorf("Template File still exists")
 		}
 	}
@@ -55,9 +53,7 @@ func testAccCobblerCheckTemplateFileExists(n string, ks *cobbler.TemplateFile) r
 			return fmt.Errorf("No ID is set")
 		}
 
-		config := testAccCobblerProvider.Meta().(*Config)
-
-		found, err := config.cobblerClient.GetTemplateFile(rs.Primary.ID)
+		found, err := cobblerApiClient.GetTemplateFile(rs.Primary.ID)
 		if err != nil {
 			return err
 		}

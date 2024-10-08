@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 
 	cobbler "github.com/cobbler/cobblerclient"
 )
@@ -14,9 +14,9 @@ func TestAccCobblerSnippet_basic(t *testing.T) {
 	var snippet cobbler.Snippet
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckSnippetDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckSnippetDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerSnippetBasic,
@@ -29,14 +29,12 @@ func TestAccCobblerSnippet_basic(t *testing.T) {
 }
 
 func testAccCobblerCheckSnippetDestroy(s *terraform.State) error {
-	config := testAccCobblerProvider.Meta().(*Config)
-
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cobbler_snippet" {
 			continue
 		}
 
-		if _, err := config.cobblerClient.GetSnippet(rs.Primary.ID); err == nil {
+		if _, err := cobblerApiClient.GetSnippet(rs.Primary.ID); err == nil {
 			return fmt.Errorf("Snippet still exists")
 		}
 	}
@@ -55,9 +53,7 @@ func testAccCobblerCheckSnippetExists(n string, snippet *cobbler.Snippet) resour
 			return fmt.Errorf("No ID is set")
 		}
 
-		config := testAccCobblerProvider.Meta().(*Config)
-
-		found, err := config.cobblerClient.GetSnippet(rs.Primary.ID)
+		found, err := cobblerApiClient.GetSnippet(rs.Primary.ID)
 		if err != nil {
 			return err
 		}

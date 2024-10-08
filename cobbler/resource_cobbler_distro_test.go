@@ -3,8 +3,8 @@ package cobbler
 import (
 	"fmt"
 	cobbler "github.com/cobbler/cobblerclient"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/terraform"
 	"testing"
 )
 
@@ -12,9 +12,9 @@ func TestAccCobblerDistro_basic(t *testing.T) {
 	var distro cobbler.Distro
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckDistroDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckDistroDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerDistroBasic,
@@ -30,9 +30,9 @@ func TestAccCobblerDistro_change(t *testing.T) {
 	var distro cobbler.Distro
 
 	resource.Test(t, resource.TestCase{
-		PreCheck:     func() { testAccCobblerPreCheck(t) },
-		Providers:    testAccCobblerProviders,
-		CheckDestroy: testAccCobblerCheckDistroDestroy,
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckDistroDestroy,
 		Steps: []resource.TestStep{
 			{
 				Config: testAccCobblerDistroChange1,
@@ -51,12 +51,11 @@ func TestAccCobblerDistro_change(t *testing.T) {
 }
 
 func testAccCobblerCheckDistroDestroy(s *terraform.State) error {
-	config := testAccCobblerProvider.Meta().(*Config)
 	for _, rs := range s.RootModule().Resources {
 		if rs.Type != "cobbler_distro" {
 			continue
 		}
-		if _, err := config.cobblerClient.GetDistro(rs.Primary.ID); err == nil {
+		if _, err := cobblerApiClient.GetDistro(rs.Primary.ID); err == nil {
 			return fmt.Errorf("Distro still exists")
 		}
 	}
@@ -72,8 +71,7 @@ func testAccCobblerCheckDistroExists(n string, distro *cobbler.Distro) resource.
 		if rs.Primary.ID == "" {
 			return fmt.Errorf("No ID is set")
 		}
-		config := testAccCobblerProvider.Meta().(*Config)
-		found, err := config.cobblerClient.GetDistro(rs.Primary.ID)
+		found, err := cobblerApiClient.GetDistro(rs.Primary.ID)
 		if err != nil {
 			return err
 		}

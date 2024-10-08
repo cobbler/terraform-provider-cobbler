@@ -1,34 +1,27 @@
-run:
-  deadline: 5m
+# Visit https://golangci-lint.run/ for usage documentation
+# and information on other useful linters
+issues:
+  max-per-linter: 0
+  max-same-issues: 0
 
 linters:
-  fast: false
   disable-all: true
   enable:
-    - asciicheck
-    - bodyclose
-    - deadcode
-    - depguard
-    - dogsled
-    - exhaustive
+    - durationcheck
+    - errcheck
     - exportloopref
+    - forcetypeassert
     - godot
     - gofmt
-    - goheader
-    - goimports
-    - golint
-    - govet
+    - gosimple
+    - ineffassign
+    - makezero
     - misspell
-    - nakedret
-    - nolintlint
-    - rowserrcheck
+    - nilerr
+    - predeclared
     - staticcheck
-    - structcheck
-    - typecheck
+    - tenv
     - unconvert
+    - unparam
     - unused
-    - varcheck
-    - whitespace
-
-service:
-  golangci-lint-version: 1.32.x # use the fixed version to not introduce new linters unexpectedly
+    - govet
