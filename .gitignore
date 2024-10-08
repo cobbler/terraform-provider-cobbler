@@ -34,3 +34,6 @@ terraform-provider-cobbler
 debug
 dist/
 vendor/
+docker/cobbler_source/
+extracted_iso_image/
+*.iso
