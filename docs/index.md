@@ -40,11 +40,11 @@ provider "cobbler" {
 
 ### Required
 
-- **password** (String) The password to the Cobbler service. This can also be specified with the `COBBLER_PASSWORD` shell environment variable.
-- **url** (String) The url to the Cobbler service. This can also be specified with the `COBBLER_URL` shell environment variable.
-- **username** (String) The username to the Cobbler service. This can also be specified with the `COBBLER_USERNAME` shell environment variable.
+- `password` (String) The password to the Cobbler service. This can also be specified with the `COBBLER_PASSWORD` shell environment variable.
+- `url` (String) The url to the Cobbler service. This can also be specified with the `COBBLER_URL` shell environment variable.
+- `username` (String) The username to the Cobbler service. This can also be specified with the `COBBLER_USERNAME` shell environment variable.
 
 ### Optional
 
-- **cacert_file** (String) The path or contents of an SSL CA certificate. This can also be specified with the `COBBLER_CACERT_FILE`shell environment variable.
-- **insecure** (Boolean) The url to the Cobbler service. This can also be specified with the `COBBLER_URL` shell environment variable.
+- `cacert_file` (String) The path or contents of an SSL CA certificate. This can also be specified with the `COBBLER_CACERT_FILE`shell environment variable.
+- `insecure` (Boolean) The url to the Cobbler service. This can also be specified with the `COBBLER_URL` shell environment variable.

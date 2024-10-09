@@ -42,78 +42,80 @@ resource "cobbler_system" "my_system" {
 
 ### Required
 
-- **name** (String) The name of the system.
-- **profile** (String) Parent profile.
+- `name` (String) The name of the system.
+- `profile` (String) Parent profile.
 
 ### Optional
 
-- **autoinstall** (String) Template remote kickstarts or preseeds.
-- **autoinstall_meta** (String) Automatic installation template metadata, formerly Kickstart metadata.
-- **boot_files** (String) Files copied into tftpboot beyond the kernel/initrd.
-- **comment** (String) Free form text description.
-- **enable_gpxe** (Boolean) Use gPXE instead of PXELINUX for advanced booting options.
-- **fetchable_files** (String) Templates for tftp or wget.
-- **gateway** (String) Network gateway.
-- **hostname** (String) Hostname of the system.
-- **id** (String) The ID of this resource.
-- **image** (String) Parent image (if no profile is used).
-- **interface** (Block Set) The `interface` Block Set. (see [below for nested schema](#nestedblock--interface))
-- **ipv6_default_device** (String) IPv6 default device.
-- **kernel_options** (String) Kernel options. ex: `selinux=permissive`.
-- **kernel_options_post** (String) Kernel options (post install).
-- **mgmt_classes** (List of String) For external configuration management.
-- **mgmt_parameters** (String) Parameters which will be handed to your management application (Must be a valid YAML dictionary).
-- **name_servers** (List of String) Name servers.
-- **name_servers_search** (List of String) Name server search settings.
-- **netboot_enabled** (Boolean) (Re)install this machine at next boot.
-- **next_server_v4** (String) The next_server_v4 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
-- **next_server_v6** (String) The next_server_v6 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
-- **owners** (List of String) Owners list for authz_ownership.
-- **power_address** (String) Power management address.
-- **power_id** (String) Usually a plug number or blade name if power type requires it.
-- **power_pass** (String) Power management password.
-- **power_type** (String) Power management type.
-- **power_user** (String) Power management user.
-- **proxy** (String) Proxy URL.
-- **status** (String) System status (development, testing, acceptance, production).
-- **template_files** (String) File mappings for built-in config management.
-- **virt_auto_boot** (String) Auto boot virtual machines.
-- **virt_cpus** (String) The number of virtual CPUs
-- **virt_disk_driver** (String) The virtual machine disk driver.
-- **virt_file_size** (String) The virtual machine file size.
-- **virt_path** (String) The virtual machine path.
-- **virt_pxe_boot** (Number) Use PXE to build this virtual machine.
-- **virt_ram** (String) The amount of RAM for the virtual machine.
-- **virt_type** (String) The type of virtual machine. Valid options are: xenpv, xenfv, qemu, kvm, vmware, openvz.
+- `autoinstall` (String) Template remote kickstarts or preseeds.
+- `autoinstall_meta` (List of String) Automatic installation template metadata, formerly Kickstart metadata.
+- `boot_files` (String) Files copied into tftpboot beyond the kernel/initrd.
+- `boot_loaders` (List of String) Must be either `grub`, `pxe`, or `ipxe`.
+- `comment` (String) Free form text description.
+- `enable_gpxe` (Boolean) Use gPXE instead of PXELINUX for advanced booting options.
+- `fetchable_files` (List of String) Templates for tftp or wget.
+- `gateway` (String) Network gateway.
+- `hostname` (String) Hostname of the system.
+- `image` (String) Parent image (if no profile is used).
+- `interface` (Block Set) The `interface` Block Set. (see [below for nested schema](#nestedblock--interface))
+- `ipv6_default_device` (String) IPv6 default device.
+- `kernel_options` (List of String) Kernel options. ex: `selinux=permissive`.
+- `kernel_options_post` (List of String) Kernel options (post install).
+- `mgmt_classes` (List of String) For external configuration management.
+- `mgmt_parameters` (String) Parameters which will be handed to your management application (Must be a valid YAML dictionary).
+- `name_servers` (List of String) Name servers.
+- `name_servers_search` (List of String) Name server search settings.
+- `netboot_enabled` (Boolean) (Re)install this machine at next boot.
+- `next_server_v4` (String) The next_server_v4 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
+- `next_server_v6` (String) The next_server_v6 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
+- `owners` (List of String) Owners list for authz_ownership.
+- `power_address` (String) Power management address.
+- `power_id` (String) Usually a plug number or blade name if power type requires it.
+- `power_pass` (String) Power management password.
+- `power_type` (String) Power management type.
+- `power_user` (String) Power management user.
+- `proxy` (String) Proxy URL.
+- `status` (String) System status (development, testing, acceptance, production).
+- `template_files` (List of String) File mappings for built-in config management.
+- `virt_auto_boot` (String) Auto boot virtual machines.
+- `virt_cpus` (String) The number of virtual CPUs
+- `virt_disk_driver` (String) The virtual machine disk driver.
+- `virt_file_size` (String) The virtual machine file size.
+- `virt_path` (String) The virtual machine path.
+- `virt_pxe_boot` (Number) Use PXE to build this virtual machine.
+- `virt_ram` (String) The amount of RAM for the virtual machine.
+- `virt_type` (String) The type of virtual machine. Valid options are: xenpv, xenfv, qemu, kvm, vmware, openvz.
+
+### Read-Only
+
+- `id` (String) The ID of this resource.
 
 <a id="nestedblock--interface"></a>
 ### Nested Schema for `interface`
 
 Required:
 
-- **name** (String) The device name of the interface. ex: `eth0`.
+- `name` (String) The device name of the interface. ex: `eth0`.
 
 Optional:
 
-- **bonding_opts** (String) Options for bonded interfaces.
-- **bridge_opts** (String) Options for bridge interfaces.
-- **cnames** (List of String) Canonical name records.
-- **dhcp_tag** (String) DHCP tag.
-- **dns_name** (String) DNS name.
-- **gateway** (String) Per-interface gateway.
-- **interface_master** (String) The master interface when slave.
-- **interface_type** (String) The type of interface: na, master, slave, bond, bond_slave, bridge, bridge_slave, bonded_bridge_slave, infiniband, bmc.  Defaults to na.
-- **ip_address** (String) The IP address of the interface.
-- **ipv6_address** (String) The IPv6 address of the interface.
-- **ipv6_default_gateway** (String) The default gateawy for the IPv6 address / interface.
-- **ipv6_mtu** (String) The MTU of the IPv6 address.
-- **ipv6_secondaries** (List of String) IPv6 secondaries.
-- **ipv6_static_routes** (List of String) Static routes for the IPv6 interface.
-- **mac_address** (String) The MAC address of the interface.
-- **management** (Boolean) Whether this interface is a management interface.
-- **netmask** (String) The IPv4 netmask of the interface.
-- **static** (Boolean) Whether the interface should be static or DHCP.
-- **static_routes** (List of String) Static routes for the interface.
-- **virt_bridge** (String) The virtual bridge to attach to.
-
-
+- `bonding_opts` (String) Options for bonded interfaces.
+- `bridge_opts` (String) Options for bridge interfaces.
+- `cnames` (List of String) Canonical name records.
+- `dhcp_tag` (String) DHCP tag.
+- `dns_name` (String) DNS name.
+- `gateway` (String) Per-interface gateway.
+- `interface_master` (String) The master interface when slave.
+- `interface_type` (String) The type of interface: NA, master, slave, bond, bond_slave, bridge, bridge_slave, bonded_bridge_slave, infiniband, bmc
+- `ip_address` (String) The IP address of the interface.
+- `ipv6_address` (String) The IPv6 address of the interface.
+- `ipv6_default_gateway` (String) The default gateawy for the IPv6 address / interface.
+- `ipv6_mtu` (String) The MTU of the IPv6 address.
+- `ipv6_secondaries` (List of String) IPv6 secondaries.
+- `ipv6_static_routes` (List of String) Static routes for the IPv6 interface.
+- `mac_address` (String) The MAC address of the interface.
+- `management` (Boolean) Whether this interface is a management interface.
+- `netmask` (String) The IPv4 netmask of the interface.
+- `static` (Boolean) Whether the interface should be static or DHCP.
+- `static_routes` (List of String) Static routes for the interface.
+- `virt_bridge` (String) The virtual bridge to attach to.
