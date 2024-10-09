@@ -2,10 +2,10 @@ package cobbler
 
 import (
 	"context"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"log"
-
 	cobbler "github.com/cobbler/cobblerclient"
+	"github.com/fatih/structs"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -41,7 +41,9 @@ func resourceTemplateFileCreate(ctx context.Context, d *schema.ResourceData, met
 		Body: d.Get("body").(string),
 	}
 
-	log.Printf("[DEBUG] Cobbler TemplateFile: Create Options: %#v", ks)
+	tflog.Debug(ctx, "Cobbler TemplateFile: Create Options", map[string]interface{}{
+		"options": structs.Map(ks),
+	})
 
 	if err := config.cobblerClient.CreateTemplateFile(ks); err != nil {
 		return diag.Errorf("Cobbler TemplateFile: Error Creating: %s", err)
@@ -65,7 +67,10 @@ func resourceTemplateFileUpdate(ctx context.Context, d *schema.ResourceData, met
 		Body: d.Get("body").(string),
 	}
 
-	log.Printf("[DEBUG] Cobbler TemplateFile: Updating Template (%s) with options: %+v", d.Id(), ks)
+	tflog.Debug(ctx, "Cobbler TemplateFile: Updating Template with options", map[string]interface{}{
+		"template": d.Id(),
+		"options":  structs.Map(ks),
+	})
 
 	if err := config.cobblerClient.CreateTemplateFile(ks); err != nil {
 		return diag.Errorf("Cobbler TemplateFile: Error Updating (%s): %s", d.Id(), err)
@@ -78,7 +83,6 @@ func resourceTemplateFileDelete(ctx context.Context, d *schema.ResourceData, met
 	config := meta.(*Config)
 
 	if err := config.cobblerClient.DeleteTemplateFile(d.Id()); err != nil {
-		//goland:noinspection GoErrorStringFormat
 		return diag.Errorf("Cobbler TemplateFile: Error Deleting (%s): %s", d.Id(), err)
 	}
 

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/fatih/structs"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 	"log"
@@ -432,7 +434,9 @@ func resourceSystemCreate(ctx context.Context, d *schema.ResourceData, meta inte
 	system := buildSystem(d)
 
 	// Attempt to create the System
-	log.Printf("[DEBUG] Cobbler System: Create Options: %#v", system)
+	tflog.Debug(ctx, "Cobbler System: Create Options", map[string]interface{}{
+		"options": structs.Map(system),
+	})
 	newSystem, err := config.cobblerClient.CreateSystem(system)
 	if err != nil {
 		return diag.Errorf("Cobbler System: Error Creating: %s", err)
@@ -443,16 +447,21 @@ func resourceSystemCreate(ctx context.Context, d *schema.ResourceData, meta inte
 
 	// Add each interface to the system
 	for interfaceName, interfaceInfo := range interfaces {
-		log.Printf("[DEBUG] Cobbler System Interface %#v: %#v", interfaceName, interfaceInfo)
+		tflog.Debug(ctx, "Cobbler System Interface", map[string]interface{}{
+			"interface": interfaceName,
+			"options":   structs.Map(interfaceInfo),
+		})
 		if err := newSystem.CreateInterface(interfaceName, interfaceInfo); err != nil {
 			return diag.Errorf("Cobbler System: Error adding Interface %s to %s: %s", interfaceName, newSystem.Name, err)
 		}
 	}
 
-	log.Printf("[DEBUG] Cobbler System: Created System: %#v", newSystem)
+	tflog.Debug(ctx, "Cobbler System: Created System", map[string]interface{}{
+		"system": structs.Map(newSystem),
+	})
 	d.SetId(newSystem.Name)
 
-	log.Printf("[DEBUG] Cobbler System: syncing system")
+	tflog.Debug(ctx, "Cobbler System: syncing system")
 	if err := config.cobblerClient.Sync(); err != nil {
 		return diag.Errorf("Cobbler System: Error syncing system: %s", err)
 	}
@@ -462,13 +471,17 @@ func resourceSystemCreate(ctx context.Context, d *schema.ResourceData, meta inte
 
 func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
-	log.Printf("[DEBUG] Reading Cobbler system %s\n", d.Id())
+	tflog.Debug(ctx, "Reading Cobbler system", map[string]interface{}{
+		"system": d.Id(),
+	})
 
 	// Retrieve the system entry from Cobbler
 	system, err := config.cobblerClient.GetSystem(d.Id())
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
-			log.Printf("[WARN] Cobbler System (%s) not found, removing from state", d.Id())
+			tflog.Warn(ctx, "Cobbler System not found, removing from state", map[string]interface{}{
+				"system": d.Id(),
+			})
 			d.SetId("")
 			return nil
 		}
@@ -519,14 +532,16 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	// Get all interfaces that the System has
 	allInterfaces, err := system.GetInterfaces()
 	if err != nil {
-		//goland:noinspection GoErrorStringFormat
 		return diag.Errorf("Cobbler System %s: Error getting interfaces: %s", system.Name, err)
 	}
 
 	// Build a generic map array with the interface attributes
 	var systemInterfaces []map[string]interface{}
 	for interfaceName, interfaceInfo := range allInterfaces {
-		log.Printf("[DEBUG] Cobbler System Interface %#v: %#v", interfaceName, interfaceInfo)
+		tflog.Debug(ctx, "Cobbler System Interface", map[string]interface{}{
+			"interface": interfaceName,
+			"options":   structs.Map(interfaceInfo),
+		})
 		iface := make(map[string]interface{})
 		iface["name"] = interfaceName
 		iface["cnames"] = interfaceInfo.CNAMEs
@@ -554,7 +569,6 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 
 	err = d.Set("interface", systemInterfaces)
 	if err != nil {
-		//goland:noinspection GoErrorStringFormat
 		return diag.Errorf("Cobbler System %s: Error appending interface to : %s", system.Name, err)
 	}
 
@@ -570,7 +584,6 @@ func resourceSystemUpdate(ctx context.Context, d *schema.ResourceData, meta inte
 	// Retrieve the existing system entry from Cobbler
 	system, err := config.cobblerClient.GetSystem(d.Id())
 	if err != nil {
-		//goland:noinspection GoErrorStringFormat
 		return diag.Errorf("Cobbler System: Error Reading (%s): %s", d.Id(), err)
 	}
 
@@ -579,16 +592,24 @@ func resourceSystemUpdate(ctx context.Context, d *schema.ResourceData, meta inte
 	if err != nil {
 		return diag.Errorf("error getting interfaces: %s", err)
 	}
-	log.Printf("[DEBUG] Cobbler System Interfaces: %#v", currentInterfaces)
+	interfaceMap := make(map[string]map[string]interface{})
+	for interfaceName, interfaceInfo := range currentInterfaces {
+		interfaceMap[interfaceName] = structs.Map(interfaceInfo)
+	}
+	tflog.Debug(ctx, "Cobbler System Interfaces", map[string]interface{}{
+		"interfaces": interfaceMap,
+	})
 
 	// Create a new cobblerclient.System struct with the new information
 	newSystem := buildSystem(d)
 
 	// Attempt to update the system with new information
-	log.Printf("[DEBUG] Cobbler System: Updating System (%s) with options: %+v", d.Id(), system)
+	tflog.Debug(ctx, "Cobbler System: Updating System with options", map[string]interface{}{
+		"system":  d.Id(),
+		"options": structs.Map(system),
+	})
 	err = config.cobblerClient.UpdateSystem(&newSystem)
 	if err != nil {
-		//goland:noinspection GoErrorStringFormat
 		return diag.Errorf("Cobbler System: Error Updating (%s): %s", d.Id(), err)
 	}
 
@@ -604,7 +625,10 @@ func resourceSystemUpdate(ctx context.Context, d *schema.ResourceData, meta inte
 		for interfaceName, interfaceInfo := range oldIfaces {
 			if _, ok := newIfaces[interfaceName]; !ok {
 				// Interface does not exist in the new set, so it has been removed from terraform.
-				log.Printf("[DEBUG] Cobbler System: Deleting Interface %#v: %#v", interfaceName, interfaceInfo)
+				tflog.Debug(ctx, "Cobbler System: Deleting Interface", map[string]interface{}{
+					"interface": interfaceName,
+					"options":   structs.Map(interfaceInfo),
+				})
 
 				if err := system.DeleteInterface(interfaceName); err != nil {
 					return diag.Errorf("Cobbler System: Error deleting Interface %s to %s: %s", interfaceName, system.Name, err)
@@ -614,7 +638,10 @@ func resourceSystemUpdate(ctx context.Context, d *schema.ResourceData, meta inte
 
 		// Modify interfaces that have changed
 		for interfaceName, interfaceInfo := range newIfaces {
-			log.Printf("[DEBUG] Cobbler System: New Interface %#v: %#v", interfaceName, interfaceInfo)
+			tflog.Debug(ctx, "Cobbler System: New Interface", map[string]interface{}{
+				"interface": interfaceName,
+				"options":   structs.Map(interfaceInfo),
+			})
 
 			if err := system.CreateInterface(interfaceName, interfaceInfo); err != nil {
 				return diag.Errorf("Cobbler System: Error adding Interface %s to %s: %s", interfaceName, system.Name, err)
@@ -622,7 +649,7 @@ func resourceSystemUpdate(ctx context.Context, d *schema.ResourceData, meta inte
 		}
 	}
 
-	log.Printf("[DEBUG] Cobbler System: syncing system")
+	tflog.Debug(ctx, "Cobbler System: syncing system")
 	if err := config.cobblerClient.Sync(); err != nil {
 		return diag.Errorf("Cobbler System: Error syncing system: %s", err)
 	}

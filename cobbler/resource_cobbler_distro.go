@@ -2,10 +2,10 @@ package cobbler
 
 import (
 	"context"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"log"
-
 	cobbler "github.com/cobbler/cobblerclient"
+	"github.com/fatih/structs"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -125,8 +125,10 @@ func resourceDistroCreate(ctx context.Context, d *schema.ResourceData, meta inte
 	// Create a cobblerclient.Distro
 	distro := buildDistro(d, config)
 
-	// Attempte to create the Distro
-	log.Printf("[DEBUG] Cobbler Distro: Create Options: %#v", distro)
+	// Attempt to create the Distro
+	tflog.Debug(ctx, "Cobbler Distro Create Options", map[string]interface{}{
+		"options": structs.Map(distro),
+	})
 	newDistro, err := config.cobblerClient.CreateDistro(distro)
 	if err != nil {
 		return diag.Errorf("Cobbler Distro: Error Creating: %s", err)
@@ -143,7 +145,6 @@ func resourceDistroRead(ctx context.Context, d *schema.ResourceData, meta interf
 	// Retrieve the distro from cobbler
 	distro, err := config.cobblerClient.GetDistro(d.Id())
 	if err != nil {
-		//goland:noinspection GoErrorStringFormat
 		return diag.Errorf("Cobbler Distro: Error Reading (%s): %s", d.Id(), err)
 	}
 
@@ -174,10 +175,12 @@ func resourceDistroUpdate(ctx context.Context, d *schema.ResourceData, meta inte
 	distro := buildDistro(d, config)
 
 	// Attempt to updateh the distro with new information
-	log.Printf("[DEBUG] Cobbler Distro: Updating Distro (%s) with options: %+v", d.Id(), distro)
+	tflog.Debug(ctx, "Cobbler Distro: Updating Distro", map[string]interface{}{
+		"distro":  d.Id(),
+		"options": structs.Map(distro),
+	})
 	err := config.cobblerClient.UpdateDistro(&distro)
 	if err != nil {
-		//goland:noinspection GoErrorStringFormat
 		return diag.Errorf("Cobbler Distro: Error Updating (%s): %s", d.Id(), err)
 	}
 

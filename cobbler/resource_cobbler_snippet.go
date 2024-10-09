@@ -2,10 +2,10 @@ package cobbler
 
 import (
 	"context"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"log"
-
 	cobbler "github.com/cobbler/cobblerclient"
+	"github.com/fatih/structs"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -41,10 +41,11 @@ func resourceSnippetCreate(ctx context.Context, d *schema.ResourceData, meta int
 		Body: d.Get("body").(string),
 	}
 
-	log.Printf("[DEBUG] Cobbler Snippet: Create Options: %#v", snippet)
+	tflog.Debug(ctx, "Cobbler Snippet: Create Options", map[string]interface{}{
+		"options": structs.Map(snippet),
+	})
 
 	if err := config.cobblerClient.CreateSnippet(snippet); err != nil {
-		//goland:noinspection GoErrorStringFormat
 		return diag.Errorf("Cobbler Snippet: Error Creating: %s", err)
 	}
 
@@ -67,10 +68,12 @@ func resourceSnippetUpdate(ctx context.Context, d *schema.ResourceData, meta int
 		Body: d.Get("body").(string),
 	}
 
-	log.Printf("[DEBUG] Cobbler Snippet: Updating Snippet (%s) with options: %+v", d.Id(), snippet)
+	tflog.Debug(ctx, "Cobbler Snippet: Updating Snippet with options", map[string]interface{}{
+		"snippet": d.Id(),
+		"options": structs.Map(snippet),
+	})
 
 	if err := config.cobblerClient.CreateSnippet(snippet); err != nil {
-		//goland:noinspection GoErrorStringFormat
 		return diag.Errorf("Cobbler Snippet: Error Updating (%s): %s", d.Id(), err)
 	}
 
@@ -81,7 +84,6 @@ func resourceSnippetDelete(ctx context.Context, d *schema.ResourceData, meta int
 	config := meta.(*Config)
 
 	if err := config.cobblerClient.DeleteSnippet(d.Id()); err != nil {
-		//goland:noinspection GoErrorStringFormat
 		return diag.Errorf("Cobbler Snippet: Error Deleting (%s): %s", d.Id(), err)
 	}
 

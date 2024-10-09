@@ -2,10 +2,10 @@ package cobbler
 
 import (
 	"context"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"log"
-
 	cobbler "github.com/cobbler/cobblerclient"
+	"github.com/fatih/structs"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -116,7 +116,9 @@ func resourceRepoCreate(ctx context.Context, d *schema.ResourceData, meta interf
 	repo := buildRepo(d, config)
 
 	// Attempt to create the Repo
-	log.Printf("[DEBUG] Cobbler Repo: Create Options: %#v", repo)
+	tflog.Debug(ctx, "Cobbler Repo: Create Options", map[string]interface{}{
+		"options": structs.Map(repo),
+	})
 	newRepo, err := config.cobblerClient.CreateRepo(repo)
 	if err != nil {
 		return diag.Errorf("Cobbler Repo: Error Creating: %s", err)
@@ -149,22 +151,30 @@ func resourceRepoRead(ctx context.Context, d *schema.ResourceData, meta interfac
 
 	err = d.Set("apt_components", repo.AptComponents)
 	if err != nil {
-		log.Printf("[DEBUG] Unable to set apt_components: %s", err)
+		tflog.Debug(ctx, "Unable to set apt_components", map[string]interface{}{
+			"error": err,
+		})
 	}
 
 	err = d.Set("apt_dists", repo.AptDists)
 	if err != nil {
-		log.Printf("[DEBUG] Unable to set apt_dists: %s", err)
+		tflog.Debug(ctx, "Unable to set apt_dists", map[string]interface{}{
+			"error": err,
+		})
 	}
 
 	err = d.Set("owners", repo.Owners)
 	if err != nil {
-		log.Printf("[DEBUG] Unable to set owners: %s", err)
+		tflog.Debug(ctx, "Unable to set owners", map[string]interface{}{
+			"error": err,
+		})
 	}
 
 	err = d.Set("rpm_list", repo.RpmList)
 	if err != nil {
-		log.Printf("[DEBUG] Unable to set rpm_list: %s", err)
+		tflog.Debug(ctx, "Unable to set rpm_list", map[string]interface{}{
+			"error": err,
+		})
 	}
 
 	return nil
@@ -177,7 +187,10 @@ func resourceRepoUpdate(ctx context.Context, d *schema.ResourceData, meta interf
 	repo := buildRepo(d, config)
 
 	// Attempt to updateh the repo with new information
-	log.Printf("[DEBUG] Cobbler Repo: Updating Repo (%s) with options: %+v", d.Id(), repo)
+	tflog.Debug(ctx, "Cobbler Repo: Updating Repo with options", map[string]interface{}{
+		"repo":    d.Id(),
+		"options": structs.Map(repo),
+	})
 	err := config.cobblerClient.UpdateRepo(&repo)
 	if err != nil {
 		return diag.Errorf("Cobbler Repo: Error Updating (%s): %s", d.Id(), err)
