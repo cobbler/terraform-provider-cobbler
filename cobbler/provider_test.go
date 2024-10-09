@@ -11,7 +11,7 @@ import (
 
 var cobblerApiClient cobbler.Client
 var testAccProviderFactories = map[string]func() (*schema.Provider, error){
-	"cobbler": func() (*schema.Provider, error) {
+	"cobbler": func() (*schema.Provider, error) { //nolint:unparam // We satisfy an interface here
 		return New("dev")(), nil
 	},
 }
@@ -24,7 +24,7 @@ func init() {
 	})
 	_, _ = cobblerApiClient.Login()
 	testAccProviderFactories = map[string]func() (*schema.Provider, error){
-		"cobbler": func() (*schema.Provider, error) {
+		"cobbler": func() (*schema.Provider, error) { //nolint:unparam // We satisfy an interface here
 			return New("dev")(), nil
 		},
 	}

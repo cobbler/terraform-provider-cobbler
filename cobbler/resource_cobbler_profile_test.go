@@ -90,7 +90,7 @@ func testAccCobblerCheckProfileDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCobblerCheckProfileExists(n string, profile *cobbler.Profile) resource.TestCheckFunc {
+func testAccCobblerCheckProfileExists(n string, profile *cobbler.Profile) resource.TestCheckFunc { //nolint:unparam
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {

@@ -63,7 +63,7 @@ func testAccCobblerCheckDistroDestroy(s *terraform.State) error {
 	return nil
 }
 
-func testAccCobblerCheckDistroExists(n string, distro *cobbler.Distro) resource.TestCheckFunc {
+func testAccCobblerCheckDistroExists(n string, distro *cobbler.Distro) resource.TestCheckFunc { //nolint:unparam
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {

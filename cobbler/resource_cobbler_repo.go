@@ -139,15 +139,42 @@ func resourceRepoRead(ctx context.Context, d *schema.ResourceData, meta interfac
 	}
 
 	// Set all fields
-	d.Set("arch", repo.Arch)
-	d.Set("breed", repo.Breed)
-	d.Set("comment", repo.Comment)
-	d.Set("createrepo_flags", repo.CreateRepoFlags)
-	d.Set("keep_updated", repo.KeepUpdated)
-	d.Set("mirror", repo.Mirror)
-	d.Set("mirror_locally", repo.MirrorLocally)
-	d.Set("name", repo.Name)
-	d.Set("proxy", repo.Proxy)
+	err = d.Set("arch", repo.Arch)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("breed", repo.Breed)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("comment", repo.Comment)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("createrepo_flags", repo.CreateRepoFlags)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("keep_updated", repo.KeepUpdated)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("mirror", repo.Mirror)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("mirror_locally", repo.MirrorLocally)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("name", repo.Name)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("proxy", repo.Proxy)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	err = d.Set("apt_components", repo.AptComponents)
 	if err != nil {
@@ -211,7 +238,7 @@ func resourceRepoDelete(ctx context.Context, d *schema.ResourceData, meta interf
 }
 
 // buildRepo builds a cobbler.Repo from the Terraform attributes.
-func buildRepo(d *schema.ResourceData, meta interface{}) cobbler.Repo {
+func buildRepo(d *schema.ResourceData, meta interface{}) cobbler.Repo { //nolint:unparam // We satisfy our own pattern here
 	aptComponents := []string{}
 	for _, i := range d.Get("apt_components").([]interface{}) {
 		aptComponents = append(aptComponents, i.(string))

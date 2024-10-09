@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/cobbler/terraform-provider-cobbler/cobbler"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 )
@@ -22,7 +23,7 @@ func main() {
 	flag.Parse()
 
 	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: cobbler.New(version),
+		ProviderFunc: cobbler.New(fmt.Sprintf("%s-%s", version, commit)),
 		Debug:        debugMode,
 	})
 }
