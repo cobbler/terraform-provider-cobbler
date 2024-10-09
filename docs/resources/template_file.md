@@ -24,11 +24,9 @@ resource "cobbler_template_file" "my_template" {
 
 ### Required
 
-- **body** (String) The body of the template file. May also point to a file: `body = file("my_template.ks")`.
-- **name** (String) The name of the template file. This must be the name only, so without `/var/lib/cobbler/templates`.
+- `body` (String) The body of the template file. May also point to a file: `body = file("my_template.ks")`.
+- `name` (String) The name of the template file. This must be the name only, so without `/var/lib/cobbler/templates`.
 
-### Optional
+### Read-Only
 
-- **id** (String) The ID of this resource.
-
-
+- `id` (String) The ID of this resource.

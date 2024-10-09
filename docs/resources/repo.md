@@ -28,23 +28,24 @@ resource "cobbler_repo" "my_repo" {
 
 ### Required
 
-- **breed** (String) The "breed" of distribution. Valid options are: rsync, rhn, yum, apt, and wget. These choices may vary depending on the version of Cobbler in use.
-- **mirror** (String) Address of the repo to mirror.
-- **name** (String) A name for the repo.
+- `breed` (String) The "breed" of distribution. Valid options are: rsync, rhn, yum, apt, and wget. These choices may vary depending on the version of Cobbler in use.
+- `mirror` (String) Address of the repo to mirror.
+- `name` (String) A name for the repo.
 
 ### Optional
 
-- **apt_components** (List of String) List of Apt components such as main, restricted, universe. Applicable to apt breeds only.
-- **apt_dists** (List of String) List of Apt distribution names such as focal, focal-updates. Applicable to apt breeds only.
-- **arch** (String) The architecture of the repo. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.
-- **comment** (String) Free form text description.
-- **createrepo_flags** (String) Flags to use with `createrepo`.
-- **environment** (String) Environment variables to use during repo command execution.
-- **id** (String) The ID of this resource.
-- **keep_updated** (Boolean) Update the repo upon Cobbler sync. Valid values are true or false.
-- **mirror_locally** (Boolean) Whether to copy the files locally or just references to the external files. Valid values are true or false.
-- **owners** (List of String) List of Owners for authz_ownership.
-- **proxy** (String) Proxy to use for downloading the repo. This argument does not work on older versions of Cobbler.
-- **rpm_list** (List of String) List of specific RPMs to mirror.
+- `apt_components` (List of String) List of Apt components such as main, restricted, universe. Applicable to apt breeds only.
+- `apt_dists` (List of String) List of Apt distribution names such as focal, focal-updates. Applicable to apt breeds only.
+- `arch` (String) The architecture of the repo. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.
+- `comment` (String) Free form text description.
+- `createrepo_flags` (String) Flags to use with `createrepo`.
+- `environment` (String) Environment variables to use during repo command execution.
+- `keep_updated` (Boolean) Update the repo upon Cobbler sync. Valid values are true or false.
+- `mirror_locally` (Boolean) Whether to copy the files locally or just references to the external files. Valid values are true or false.
+- `owners` (List of String) List of Owners for authz_ownership.
+- `proxy` (String) Proxy to use for downloading the repo. This argument does not work on older versions of Cobbler.
+- `rpm_list` (List of String) List of specific RPMs to mirror.
 
+### Read-Only
 
+- `id` (String) The ID of this resource.

@@ -24,11 +24,9 @@ resource "cobbler_snippet" "my_snippet" {
 
 ### Required
 
-- **body** (String) The body of the snippet. May also point to a file: `body = file("my_snippet")`.
-- **name** (String) The name of the snippet. This must be the name only, so without `/var/lib/cobbler/snippets`.
+- `body` (String) The body of the snippet. May also point to a file: `body = file("my_snippet")`.
+- `name` (String) The name of the snippet. This must be the name only, so without `/var/lib/cobbler/snippets`.
 
-### Optional
+### Read-Only
 
-- **id** (String) The ID of this resource.
-
-
+- `id` (String) The ID of this resource.

@@ -1,0 +1,42 @@
+name: Linting
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint_docs:
+    runs-on: ubuntu-latest
+    # Only verify this on PRs
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Install tfplugindocs
+        run: |
+          go install github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@latest
+      - name: Run tfplugindocs
+        run: |
+          tfplugindocs
+      - name: Check for changes
+        run: |
+          if [[ $(git diff | wc --lines) -gt 0 ]]; then false; fi
+  lint_go:
+    name: Linting Go
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: golangci-lint
+        # https://github.com/golangci/golangci-lint-action
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.61
