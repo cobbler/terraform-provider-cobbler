@@ -10,6 +10,7 @@ on:
 
 jobs:
   lint_docs:
+    name: Linting Docs
     runs-on: ubuntu-latest
     # Only verify this on PRs
     if: github.event_name == 'pull_request'

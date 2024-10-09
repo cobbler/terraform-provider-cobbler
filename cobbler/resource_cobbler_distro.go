@@ -149,21 +149,66 @@ func resourceDistroRead(ctx context.Context, d *schema.ResourceData, meta interf
 	}
 
 	// Set all fields
-	d.Set("arch", distro.Arch)
-	d.Set("breed", distro.Breed)
-	d.Set("boot_files", distro.BootFiles)
-	d.Set("boot_loaders", distro.BootLoaders)
-	d.Set("comment", distro.Comment)
-	d.Set("fetchable_files", distro.FetchableFiles)
-	d.Set("initrd", distro.Initrd)
-	d.Set("kernel", distro.Kernel)
-	d.Set("kernel_options", distro.KernelOptions)
-	d.Set("kernel_options_post", distro.KernelOptionsPost)
-	d.Set("initrd", distro.Initrd)
-	d.Set("mgmt_classes", distro.MGMTClasses)
-	d.Set("os_version", distro.OSVersion)
-	d.Set("owners", distro.Owners)
-	d.Set("template_files", distro.TemplateFiles)
+	err = d.Set("arch", distro.Arch)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("breed", distro.Breed)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("boot_files", distro.BootFiles)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("boot_loaders", distro.BootLoaders)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("comment", distro.Comment)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("fetchable_files", distro.FetchableFiles)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("initrd", distro.Initrd)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("kernel", distro.Kernel)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("kernel_options", distro.KernelOptions)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("kernel_options_post", distro.KernelOptionsPost)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("initrd", distro.Initrd)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("mgmt_classes", distro.MGMTClasses)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("os_version", distro.OSVersion)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("owners", distro.Owners)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("template_files", distro.TemplateFiles)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	return nil
 }
@@ -199,7 +244,7 @@ func resourceDistroDelete(ctx context.Context, d *schema.ResourceData, meta inte
 }
 
 // buildDistro builds a cobbler.Distro from the Terraform attributes.
-func buildDistro(d *schema.ResourceData, meta interface{}) cobbler.Distro {
+func buildDistro(d *schema.ResourceData, meta interface{}) cobbler.Distro { //nolint:unparam // We satisfy our own pattern here
 	mgmtClasses := []string{}
 	for _, i := range d.Get("mgmt_classes").([]interface{}) {
 		mgmtClasses = append(mgmtClasses, i.(string))

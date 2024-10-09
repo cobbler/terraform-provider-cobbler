@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/mitchellh/go-homedir"
 	"hash/crc32"
-	"io/ioutil"
 	"os"
 )
 
@@ -30,7 +29,7 @@ func Read(poc string) (string, bool, error) {
 	}
 
 	if _, err := os.Stat(path); err == nil {
-		contents, err := ioutil.ReadFile(path)
+		contents, err := os.ReadFile(path)
 		if err != nil {
 			return string(contents), true, err
 		}

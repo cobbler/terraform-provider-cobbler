@@ -253,36 +253,126 @@ func resourceProfileRead(ctx context.Context, d *schema.ResourceData, meta inter
 	}
 
 	// Set all fields
-	d.Set("autoinstall", profile.Autoinstall)
-	d.Set("autoinstall_meta", profile.AutoinstallMeta)
-	d.Set("boot_files", profile.BootFiles)
-	d.Set("comment", profile.Comment)
-	d.Set("dhcp_tag", profile.DHCPTag)
-	d.Set("distro", profile.Distro)
-	d.Set("enable_gpxe", profile.EnableGPXE)
-	d.Set("enable_menu", profile.EnableMenu)
-	d.Set("fetchable_files", profile.FetchableFiles)
-	d.Set("kernel_options", profile.KernelOptions)
-	d.Set("kernel_options_post", profile.KernelOptionsPost)
-	d.Set("mgmt_classes", profile.MGMTClasses)
-	d.Set("mgmt_parameters", profile.MGMTParameters)
-	d.Set("name", profile.Name)
-	d.Set("name_servers_search", profile.NameServersSearch)
-	d.Set("name_servers", profile.NameServers)
-	d.Set("next_server_v4", profile.NextServerv4)
-	d.Set("next_server_v6", profile.NextServerv6)
-	d.Set("owners", profile.Owners)
-	d.Set("proxy", profile.Proxy)
-	d.Set("repos", profile.Repos)
-	d.Set("template_files", profile.TemplateFiles)
-	d.Set("virt_auto_boot", profile.VirtAutoBoot)
-	d.Set("virt_bridge", profile.VirtBridge)
-	d.Set("virt_cpus", profile.VirtCPUs)
-	d.Set("virt_disk_driver", profile.VirtDiskDriver)
-	d.Set("virt_file_size", profile.VirtFileSize)
-	d.Set("virt_path", profile.VirtPath)
-	d.Set("virt_ram", profile.VirtRAM)
-	d.Set("virt_type", profile.VirtType)
+	err = d.Set("autoinstall", profile.Autoinstall)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("autoinstall_meta", profile.AutoinstallMeta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("boot_files", profile.BootFiles)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("comment", profile.Comment)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("dhcp_tag", profile.DHCPTag)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("distro", profile.Distro)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("enable_gpxe", profile.EnableGPXE)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("enable_menu", profile.EnableMenu)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("fetchable_files", profile.FetchableFiles)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("kernel_options", profile.KernelOptions)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("kernel_options_post", profile.KernelOptionsPost)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("mgmt_classes", profile.MGMTClasses)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("mgmt_parameters", profile.MGMTParameters)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("name", profile.Name)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("name_servers_search", profile.NameServersSearch)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("name_servers", profile.NameServers)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("next_server_v4", profile.NextServerv4)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("next_server_v6", profile.NextServerv6)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("owners", profile.Owners)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("proxy", profile.Proxy)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("repos", profile.Repos)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("template_files", profile.TemplateFiles)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_auto_boot", profile.VirtAutoBoot)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_bridge", profile.VirtBridge)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_cpus", profile.VirtCPUs)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_disk_driver", profile.VirtDiskDriver)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_file_size", profile.VirtFileSize)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_path", profile.VirtPath)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_ram", profile.VirtRAM)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_type", profile.VirtType)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	return nil
 }
@@ -318,7 +408,7 @@ func resourceProfileDelete(ctx context.Context, d *schema.ResourceData, meta int
 }
 
 // buildProfile builds a cobblerclient.Profile out of the Terraform attributes.
-func buildProfile(d *schema.ResourceData, meta interface{}) cobbler.Profile {
+func buildProfile(d *schema.ResourceData, meta interface{}) cobbler.Profile { //nolint:unparam // We satisfy our own pattern here
 	mgmtClasses := []string{}
 	for _, i := range d.Get("mgmt_classes").([]interface{}) {
 		mgmtClasses = append(mgmtClasses, i.(string))

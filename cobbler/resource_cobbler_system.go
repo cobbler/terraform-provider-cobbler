@@ -490,44 +490,158 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	}
 
 	// Set all fields
-	d.Set("boot_files", system.BootFiles)
-	d.Set("boot_loaders", system.BootLoaders)
-	d.Set("comment", system.Comment)
-	d.Set("enable_gpxe", system.EnableGPXE)
-	d.Set("fetchable_files", system.FetchableFiles)
-	d.Set("gateway", system.Gateway)
-	d.Set("hostname", system.Hostname)
-	d.Set("image", system.Image)
-	d.Set("ipv6_default_device", system.IPv6DefaultDevice)
-	d.Set("kernel_options", system.KernelOptions)
-	d.Set("kernel_options_post", system.KernelOptionsPost)
-	d.Set("autoinstall_meta", system.AutoinstallMeta)
-	d.Set("mgmt_classes", system.MGMTClasses)
-	d.Set("mgmt_parameters", system.MGMTParameters)
-	d.Set("name", system.Name)
-	d.Set("name_servers_search", system.NameServersSearch)
-	d.Set("name_servers", system.NameServers)
-	d.Set("netboot_enabled", system.NetbootEnabled)
-	d.Set("next_server_v4", system.NextServerv4)
-	d.Set("next_server_v6", system.NextServerv6)
-	d.Set("owners", system.Owners)
-	d.Set("power_address", system.PowerAddress)
-	d.Set("power_id", system.PowerID)
-	d.Set("power_pass", system.PowerPass)
-	d.Set("power_type", system.PowerType)
-	d.Set("power_user", system.PowerUser)
-	d.Set("profile", system.Profile)
-	d.Set("proxy", system.Proxy)
-	d.Set("status", system.Status)
-	d.Set("template_files", system.TemplateFiles)
-	d.Set("virt_auto_boot", system.VirtAutoBoot)
-	d.Set("virt_file_size", system.VirtFileSize)
-	d.Set("virt_cpus", system.VirtCPUs)
-	d.Set("virt_type", system.VirtType)
-	d.Set("virt_path", system.VirtPath)
-	d.Set("virt_pxe_boot", system.VirtPXEBoot)
-	d.Set("virt_ram", system.VirtRAM)
-	d.Set("virt_disk_driver", system.VirtDiskDriver)
+	err = d.Set("boot_files", system.BootFiles)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("boot_loaders", system.BootLoaders)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("comment", system.Comment)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("enable_gpxe", system.EnableGPXE)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("fetchable_files", system.FetchableFiles)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("gateway", system.Gateway)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("hostname", system.Hostname)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("image", system.Image)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("ipv6_default_device", system.IPv6DefaultDevice)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("kernel_options", system.KernelOptions)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("kernel_options_post", system.KernelOptionsPost)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("autoinstall_meta", system.AutoinstallMeta)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("mgmt_classes", system.MGMTClasses)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("mgmt_parameters", system.MGMTParameters)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("name", system.Name)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("name_servers_search", system.NameServersSearch)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("name_servers", system.NameServers)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("netboot_enabled", system.NetbootEnabled)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("next_server_v4", system.NextServerv4)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("next_server_v6", system.NextServerv6)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("owners", system.Owners)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("power_address", system.PowerAddress)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("power_id", system.PowerID)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("power_pass", system.PowerPass)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("power_type", system.PowerType)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("power_user", system.PowerUser)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("profile", system.Profile)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("proxy", system.Proxy)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("status", system.Status)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("template_files", system.TemplateFiles)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_auto_boot", system.VirtAutoBoot)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_file_size", system.VirtFileSize)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_cpus", system.VirtCPUs)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_type", system.VirtType)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_path", system.VirtPath)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_pxe_boot", system.VirtPXEBoot)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_ram", system.VirtRAM)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("virt_disk_driver", system.VirtDiskDriver)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	// Get all interfaces that the System has
 	allInterfaces, err := system.GetInterfaces()
@@ -815,7 +929,7 @@ func resourceSystemInterfaceHash(v interface{}) int {
 	var buf bytes.Buffer
 	m := v.(map[string]interface{})
 
-	buf.WriteString(fmt.Sprintf("%s", m["name"].(string)))
+	buf.WriteString(m["name"].(string))
 
 	if v, ok := m["mac_address"]; ok {
 		buf.WriteString(fmt.Sprintf("%v-", v.(string)))
