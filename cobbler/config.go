@@ -31,7 +31,7 @@ func (c *Config) loadAndValidate() error {
 	if c.CACertFile != "" {
 		caCert, _, err := Read(c.CACertFile)
 		if err != nil {
-			return fmt.Errorf("Error reading CA Cert: %s", err)
+			return fmt.Errorf("error reading CA Cert: %s", err)
 		}
 
 		caCertPool := x509.NewCertPool()
@@ -53,7 +53,7 @@ func (c *Config) loadAndValidate() error {
 	client := cobbler.NewClient(httpClient, config)
 	_, err := client.Login()
 	if err != nil {
-		return fmt.Errorf("Failed to login: %s", err)
+		return fmt.Errorf("failed to login: %s", err)
 	}
 
 	c.cobblerClient = client

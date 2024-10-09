@@ -1,20 +1,21 @@
 package cobbler
 
 import (
-	"fmt"
-	"log"
-
+	"context"
 	cobbler "github.com/cobbler/cobblerclient"
+	"github.com/fatih/structs"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceTemplateFile() *schema.Resource {
 	return &schema.Resource{
-		Description: "`cobbler_template_file` manages a template file within Cobbler.",
-		Create:      resourceTemplateFileCreate,
-		Read:        resourceTemplateFileRead,
-		Update:      resourceTemplateFileUpdate,
-		Delete:      resourceTemplateFileDelete,
+		Description:   "`cobbler_template_file` manages a template file within Cobbler.",
+		CreateContext: resourceTemplateFileCreate,
+		ReadContext:   resourceTemplateFileRead,
+		UpdateContext: resourceTemplateFileUpdate,
+		DeleteContext: resourceTemplateFileDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -32,7 +33,7 @@ func resourceTemplateFile() *schema.Resource {
 	}
 }
 
-func resourceTemplateFileCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceTemplateFileCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	ks := cobbler.TemplateFile{
@@ -40,23 +41,25 @@ func resourceTemplateFileCreate(d *schema.ResourceData, meta interface{}) error 
 		Body: d.Get("body").(string),
 	}
 
-	log.Printf("[DEBUG] Cobbler TemplateFile: Create Options: %#v", ks)
+	tflog.Debug(ctx, "Cobbler TemplateFile: Create Options", map[string]interface{}{
+		"options": structs.Map(ks),
+	})
 
 	if err := config.cobblerClient.CreateTemplateFile(ks); err != nil {
-		return fmt.Errorf("Cobbler TemplateFile: Error Creating: %s", err)
+		return diag.Errorf("Cobbler TemplateFile: Error Creating: %s", err)
 	}
 
 	d.SetId(ks.Name)
 
-	return resourceTemplateFileRead(d, meta)
+	return resourceTemplateFileRead(ctx, d, meta)
 }
 
-func resourceTemplateFileRead(d *schema.ResourceData, meta interface{}) error {
+func resourceTemplateFileRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// Since all attributes are required and not computed, there's no reason to read.
 	return nil
 }
 
-func resourceTemplateFileUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceTemplateFileUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	ks := cobbler.TemplateFile{
@@ -64,20 +67,23 @@ func resourceTemplateFileUpdate(d *schema.ResourceData, meta interface{}) error 
 		Body: d.Get("body").(string),
 	}
 
-	log.Printf("[DEBUG] Cobbler TemplateFile: Updating Template (%s) with options: %+v", d.Id(), ks)
+	tflog.Debug(ctx, "Cobbler TemplateFile: Updating Template with options", map[string]interface{}{
+		"template": d.Id(),
+		"options":  structs.Map(ks),
+	})
 
 	if err := config.cobblerClient.CreateTemplateFile(ks); err != nil {
-		return fmt.Errorf("Cobbler TemplateFile: Error Updating (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler TemplateFile: Error Updating (%s): %s", d.Id(), err)
 	}
 
-	return resourceTemplateFileRead(d, meta)
+	return resourceTemplateFileRead(ctx, d, meta)
 }
 
-func resourceTemplateFileDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceTemplateFileDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	if err := config.cobblerClient.DeleteTemplateFile(d.Id()); err != nil {
-		return fmt.Errorf("Cobbler TemplateFile: Error Deleting (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler TemplateFile: Error Deleting (%s): %s", d.Id(), err)
 	}
 
 	return nil

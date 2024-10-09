@@ -1,20 +1,21 @@
 package cobbler
 
 import (
-	"fmt"
-	"log"
-
+	"context"
 	cobbler "github.com/cobbler/cobblerclient"
+	"github.com/fatih/structs"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceSnippet() *schema.Resource {
 	return &schema.Resource{
-		Description: "`cobbler_snippet` manages a snippet within Cobbler.",
-		Create:      resourceSnippetCreate,
-		Read:        resourceSnippetRead,
-		Update:      resourceSnippetUpdate,
-		Delete:      resourceSnippetDelete,
+		Description:   "`cobbler_snippet` manages a snippet within Cobbler.",
+		CreateContext: resourceSnippetCreate,
+		ReadContext:   resourceSnippetRead,
+		UpdateContext: resourceSnippetUpdate,
+		DeleteContext: resourceSnippetDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -32,7 +33,7 @@ func resourceSnippet() *schema.Resource {
 	}
 }
 
-func resourceSnippetCreate(d *schema.ResourceData, meta interface{}) error {
+func resourceSnippetCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	snippet := cobbler.Snippet{
@@ -40,24 +41,26 @@ func resourceSnippetCreate(d *schema.ResourceData, meta interface{}) error {
 		Body: d.Get("body").(string),
 	}
 
-	log.Printf("[DEBUG] Cobbler Snippet: Create Options: %#v", snippet)
+	tflog.Debug(ctx, "Cobbler Snippet: Create Options", map[string]interface{}{
+		"options": structs.Map(snippet),
+	})
 
 	if err := config.cobblerClient.CreateSnippet(snippet); err != nil {
-		return fmt.Errorf("Cobbler Snippet: Error Creating: %s", err)
+		return diag.Errorf("Cobbler Snippet: Error Creating: %s", err)
 	}
 
 	d.SetId(snippet.Name)
 
-	return resourceSnippetRead(d, meta)
+	return resourceSnippetRead(ctx, d, meta)
 }
 
-func resourceSnippetRead(d *schema.ResourceData, meta interface{}) error {
+func resourceSnippetRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// Since all attributes are required and not computed,
 	// there's no reason to read.
 	return nil
 }
 
-func resourceSnippetUpdate(d *schema.ResourceData, meta interface{}) error {
+func resourceSnippetUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	snippet := cobbler.Snippet{
@@ -65,20 +68,23 @@ func resourceSnippetUpdate(d *schema.ResourceData, meta interface{}) error {
 		Body: d.Get("body").(string),
 	}
 
-	log.Printf("[DEBUG] Cobbler Snippet: Updating Snippet (%s) with options: %+v", d.Id(), snippet)
+	tflog.Debug(ctx, "Cobbler Snippet: Updating Snippet with options", map[string]interface{}{
+		"snippet": d.Id(),
+		"options": structs.Map(snippet),
+	})
 
 	if err := config.cobblerClient.CreateSnippet(snippet); err != nil {
-		return fmt.Errorf("Cobbler Snippet: Error Updating (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler Snippet: Error Updating (%s): %s", d.Id(), err)
 	}
 
-	return resourceSnippetRead(d, meta)
+	return resourceSnippetRead(ctx, d, meta)
 }
 
-func resourceSnippetDelete(d *schema.ResourceData, meta interface{}) error {
+func resourceSnippetDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	config := meta.(*Config)
 
 	if err := config.cobblerClient.DeleteSnippet(d.Id()); err != nil {
-		return fmt.Errorf("Cobbler Snippet: Error Deleting (%s): %s", d.Id(), err)
+		return diag.Errorf("Cobbler Snippet: Error Deleting (%s): %s", d.Id(), err)
 	}
 
 	return nil

@@ -82,6 +82,7 @@ func testAccCobblerCheckProfileDestroy(s *terraform.State) error {
 		}
 
 		if _, err := cobblerApiClient.GetProfile(rs.Primary.ID); err == nil {
+			//goland:noinspection GoErrorStringFormat
 			return fmt.Errorf("Profile still exists")
 		}
 	}
@@ -93,11 +94,11 @@ func testAccCobblerCheckProfileExists(n string, profile *cobbler.Profile) resour
 	return func(s *terraform.State) error {
 		rs, ok := s.RootModule().Resources[n]
 		if !ok {
-			return fmt.Errorf("Not found: %s", n)
+			return fmt.Errorf("not found: %s", n)
 		}
 
 		if rs.Primary.ID == "" {
-			return fmt.Errorf("No ID is set")
+			return fmt.Errorf("no ID is set")
 		}
 
 		found, err := cobblerApiClient.GetProfile(rs.Primary.ID)
@@ -106,6 +107,7 @@ func testAccCobblerCheckProfileExists(n string, profile *cobbler.Profile) resour
 		}
 
 		if found.Name != rs.Primary.ID {
+			//goland:noinspection GoErrorStringFormat
 			return fmt.Errorf("Profile not found")
 		}
 
