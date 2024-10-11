@@ -3,7 +3,7 @@ module github.com/cobbler/terraform-provider-cobbler
 go 1.22
 
 require (
-	github.com/cobbler/cobblerclient v0.4.3
+	github.com/cobbler/cobblerclient v0.5.3
 	github.com/hashicorp/terraform-plugin-log v0.9.0
 	github.com/hashicorp/terraform-plugin-testing v1.10.0
 )
@@ -12,6 +12,8 @@ require (
 	github.com/ProtonMail/go-crypto v1.1.0-alpha.2 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
+	github.com/go-test/deep v1.1.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.0.0 // indirect
 	github.com/hashicorp/go-cty v1.4.1-0.20200414143053-d3edf31b6320 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.7 // indirect
 	github.com/hashicorp/hc-install v0.8.0 // indirect

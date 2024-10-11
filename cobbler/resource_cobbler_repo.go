@@ -133,7 +133,7 @@ func resourceRepoRead(ctx context.Context, d *schema.ResourceData, meta interfac
 	config := meta.(*Config)
 
 	// Retrieve the repo from cobbler
-	repo, err := config.cobblerClient.GetRepo(d.Id())
+	repo, err := config.cobblerClient.GetRepo(d.Id(), false, false)
 	if err != nil {
 		return diag.Errorf("Cobbler Repo: Error Reading (%s): %s", d.Id(), err)
 	}
@@ -151,7 +151,7 @@ func resourceRepoRead(ctx context.Context, d *schema.ResourceData, meta interfac
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("createrepo_flags", repo.CreateRepoFlags)
+	err = d.Set("createrepo_flags", repo.CreateRepoFlags.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -171,7 +171,7 @@ func resourceRepoRead(ctx context.Context, d *schema.ResourceData, meta interfac
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("proxy", repo.Proxy)
+	err = d.Set("proxy", repo.Proxy.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -190,7 +190,7 @@ func resourceRepoRead(ctx context.Context, d *schema.ResourceData, meta interfac
 		})
 	}
 
-	err = d.Set("owners", repo.Owners)
+	err = d.Set("owners", repo.Owners.Data)
 	if err != nil {
 		tflog.Debug(ctx, "Unable to set owners", map[string]interface{}{
 			"error": err,
@@ -259,21 +259,29 @@ func buildRepo(d *schema.ResourceData, meta interface{}) cobbler.Repo { //nolint
 		rpmList = append(rpmList, i.(string))
 	}
 
-	repo := cobbler.Repo{
-		AptComponents:   aptComponents,
-		AptDists:        aptDists,
-		Arch:            d.Get("arch").(string),
-		Breed:           d.Get("breed").(string),
-		Comment:         d.Get("comment").(string),
-		CreateRepoFlags: d.Get("createrepo_flags").(string),
-		KeepUpdated:     d.Get("keep_updated").(bool),
-		Mirror:          d.Get("mirror").(string),
-		MirrorLocally:   d.Get("mirror_locally").(bool),
-		Name:            d.Get("name").(string),
-		Owners:          owners,
-		Proxy:           d.Get("proxy").(string),
-		RpmList:         rpmList,
+	repo := cobbler.NewRepo()
+	repo.AptComponents = aptComponents
+	repo.AptDists = aptDists
+	repo.Arch = d.Get("arch").(string)
+	repo.Breed = d.Get("breed").(string)
+	repo.Comment = d.Get("comment").(string)
+	repo.CreateRepoFlags = cobbler.Value[string]{
+		Data:        d.Get("createrepo_flags").(string),
+		IsInherited: false,
 	}
+	repo.KeepUpdated = d.Get("keep_updated").(bool)
+	repo.Mirror = d.Get("mirror").(string)
+	repo.MirrorLocally = d.Get("mirror_locally").(bool)
+	repo.Name = d.Get("name").(string)
+	repo.Owners = cobbler.Value[[]string]{
+		Data:        owners,
+		IsInherited: false,
+	}
+	repo.Proxy = cobbler.Value[string]{
+		Data:        d.Get("proxy").(string),
+		IsInherited: false,
+	}
+	repo.RpmList = rpmList
 
 	return repo
 }

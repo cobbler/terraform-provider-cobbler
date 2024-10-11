@@ -6,8 +6,8 @@ if [ -z "$1" ]
     echo "No cobbler server url supplied"
 fi
 
-cobbler_commit=b3b6ee2391c5a1fb89f7796e4d9dc6538617485a # master as of 4/2/2022
-cobbler_branch=master
+cobbler_commit=df356046f3cf27be62a61001b982d5983800cfd9 # 3.3.6 as of 2024-10-09
+cobbler_branch=release33
 iso_url=https://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso
 iso_os=ubuntu
 valid_iso_checksum=00a9d46306fbe9beb3581853a289490bc231c51f

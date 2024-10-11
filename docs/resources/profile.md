@@ -31,17 +31,17 @@ resource "cobbler_profile" "my_profile" {
 ### Optional
 
 - `autoinstall` (String) Template remote kickstarts or preseeds.
-- `autoinstall_meta` (List of String) Automatic installation template metadata, formerly Kickstart metadata.
-- `boot_files` (List of String) Files copied into tftpboot beyond the kernel/initrd.
+- `autoinstall_meta` (Map of String) Automatic installation template metadata, formerly Kickstart metadata.
+- `boot_files` (Map of String) Files copied into tftpboot beyond the kernel/initrd.
 - `comment` (String) Free form text description.
 - `dhcp_tag` (String) DHCP tag.
 - `enable_gpxe` (Boolean) Use gPXE instead of PXELINUX for advanced booting options.
 - `enable_menu` (Boolean) Enable a boot menu.
-- `fetchable_files` (List of String) Templates for tftp or wget.
-- `kernel_options` (List of String) Kernel options for the profile.
-- `kernel_options_post` (List of String) Post install kernel options.
+- `fetchable_files` (Map of String) Templates for tftp or wget.
+- `kernel_options` (Map of String) Kernel options for the profile.
+- `kernel_options_post` (Map of String) Post install kernel options.
 - `mgmt_classes` (List of String) For external configuration management.
-- `mgmt_parameters` (String) Parameters which will be handed to your management application (Must be a valid YAML dictionary).
+- `mgmt_parameters` (Map of String) Parameters which will be handed to your management application (Must be a valid YAML dictionary).
 - `name_servers` (List of String) Name servers.
 - `name_servers_search` (List of String) Name server search settings.
 - `next_server_v4` (String) The next_server_v4 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
@@ -51,14 +51,14 @@ resource "cobbler_profile" "my_profile" {
 - `proxy` (String) Proxy URL.
 - `repos` (List of String) Repos to auto-assign to this profile.
 - `server` (String) The server-override for the profile.
-- `template_files` (List of String) File mappings for built-in config management.
-- `virt_auto_boot` (String) Auto boot virtual machines.
+- `template_files` (Map of String) File mappings for built-in config management.
+- `virt_auto_boot` (Boolean) Auto boot virtual machines.
 - `virt_bridge` (String) The bridge for virtual machines.
-- `virt_cpus` (String) The number of virtual CPUs
+- `virt_cpus` (Number) The number of virtual CPUs
 - `virt_disk_driver` (String) The virtual machine disk driver.
-- `virt_file_size` (String) The virtual machine file size.
+- `virt_file_size` (Number) The virtual machine file size.
 - `virt_path` (String) The virtual machine path.
-- `virt_ram` (String) The amount of RAM for the virtual machine.
+- `virt_ram` (Number) The amount of RAM for the virtual machine.
 - `virt_type` (String) The type of virtual machine. Valid options are: xenpv, xenfv, qemu, kvm, vmware, openvz.
 
 ### Read-Only

@@ -55,7 +55,7 @@ func testAccCobblerCheckDistroDestroy(s *terraform.State) error {
 		if rs.Type != "cobbler_distro" {
 			continue
 		}
-		if _, err := cobblerApiClient.GetDistro(rs.Primary.ID); err == nil {
+		if _, err := cobblerApiClient.GetDistro(rs.Primary.ID, false, false); err == nil {
 			//goland:noinspection GoErrorStringFormat
 			return fmt.Errorf("Distro still exists")
 		}
@@ -72,7 +72,7 @@ func testAccCobblerCheckDistroExists(n string, distro *cobbler.Distro) resource.
 		if rs.Primary.ID == "" {
 			return fmt.Errorf("no ID is set")
 		}
-		found, err := cobblerApiClient.GetDistro(rs.Primary.ID)
+		found, err := cobblerApiClient.GetDistro(rs.Primary.ID, false, false)
 		if err != nil {
 			return err
 		}

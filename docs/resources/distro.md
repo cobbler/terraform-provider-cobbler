@@ -37,15 +37,15 @@ resource "cobbler_distro" "Ubuntu-2004-x86_64" {
 ### Optional
 
 - `arch` (String) The architecture of the distro. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.
-- `boot_files` (List of String) Files copied into tftpboot beyond the kernel/initrd.
+- `boot_files` (Map of String) Files copied into tftpboot beyond the kernel/initrd.
 - `boot_loaders` (List of String) Must be either 'grub', 'pxe', or 'ipxe'.
 - `comment` (String) Free form text description.
-- `fetchable_files` (List of String) Templates for tftp or wget.
-- `kernel_options` (List of String) Kernel options to use with the kernel.
-- `kernel_options_post` (List of String) Post install Kernel options to use with the kernel after installation.
+- `fetchable_files` (Map of String) Templates for tftp or wget.
+- `kernel_options` (Map of String) Kernel options to use with the kernel.
+- `kernel_options_post` (Map of String) Post install Kernel options to use with the kernel after installation.
 - `mgmt_classes` (List of String) Management classes for external config management.
 - `owners` (List of String) Owners list for authz_ownership.
-- `template_files` (List of String) File mappings for built-in config management.
+- `template_files` (Map of String) File mappings for built-in config management.
 
 ### Read-Only
 

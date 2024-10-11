@@ -3,6 +3,7 @@ services:
   cobbler:
     image: cobbler-dev
     container_name: cobbler-dev
+    privileged: true  # Required for Cobbler 3.3.2 and newer
     volumes:
       - ./cobbler_source:/code
       - ../extracted_iso_image:/extracted_iso_image

@@ -3,6 +3,7 @@ package cobbler
 import (
 	"bytes"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/mitchellh/go-homedir"
 	"hash/crc32"
 	"os"
@@ -65,4 +66,30 @@ func Strings(strings []string) string {
 	}
 
 	return fmt.Sprintf("%d", String(buf.String()))
+}
+
+// GetStringSlice is a helper which safely retrieves the data of a given key and casts it to a string slice.
+func GetStringSlice(d *schema.ResourceData, key string) ([]string, error) {
+	result := make([]string, 0)
+	keyData, ok := d.Get(key).([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("key `%s` is not an array", key)
+	}
+	for _, element := range keyData {
+		var castedElement string
+		castedElement, ok = element.(string)
+		if !ok {
+			return nil, fmt.Errorf("key `%s` is not a string", key)
+		}
+		result = append(result, castedElement)
+	}
+	return result, nil
+}
+
+func GetInterfaceMap(d *schema.ResourceData, key string) (map[string]interface{}, error) {
+	interfaceData, ok := d.Get(key).(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("key `%s` is not a map", key)
+	}
+	return interfaceData, nil
 }

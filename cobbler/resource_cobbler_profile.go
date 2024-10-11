@@ -26,14 +26,14 @@ func resourceProfile() *schema.Resource {
 			},
 			"autoinstall_meta": {
 				Description: "Automatic installation template metadata, formerly Kickstart metadata.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeMap,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
 			},
 			"boot_files": {
 				Description: "Files copied into tftpboot beyond the kernel/initrd.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeMap,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
@@ -68,22 +68,21 @@ func resourceProfile() *schema.Resource {
 			},
 			"fetchable_files": {
 				Description: "Templates for tftp or wget.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeMap,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
 			},
 			"kernel_options": {
 				Description: "Kernel options for the profile.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeMap,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
 			},
 			"kernel_options_post": {
 				Description: "Post install kernel options.",
-				Type:        schema.TypeList,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeMap,
 				Optional:    true,
 				Computed:    true,
 			},
@@ -96,7 +95,7 @@ func resourceProfile() *schema.Resource {
 			},
 			"mgmt_parameters": {
 				Description: "Parameters which will be handed to your management application (Must be a valid YAML dictionary).",
-				Type:        schema.TypeString,
+				Type:        schema.TypeMap,
 				Optional:    true,
 				Computed:    true,
 			},
@@ -166,14 +165,14 @@ func resourceProfile() *schema.Resource {
 			},
 			"template_files": {
 				Description: "File mappings for built-in config management.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeMap,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
 			},
 			"virt_auto_boot": {
 				Description: "Auto boot virtual machines.",
-				Type:        schema.TypeString,
+				Type:        schema.TypeBool,
 				Optional:    true,
 				Computed:    true,
 			},
@@ -185,7 +184,7 @@ func resourceProfile() *schema.Resource {
 			},
 			"virt_cpus": {
 				Description: "The number of virtual CPUs",
-				Type:        schema.TypeString,
+				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
 			},
@@ -197,7 +196,7 @@ func resourceProfile() *schema.Resource {
 			},
 			"virt_file_size": {
 				Description: "The virtual machine file size.",
-				Type:        schema.TypeString,
+				Type:        schema.TypeFloat,
 				Optional:    true,
 				Computed:    true,
 			},
@@ -209,7 +208,7 @@ func resourceProfile() *schema.Resource {
 			},
 			"virt_ram": {
 				Description: "The amount of RAM for the virtual machine.",
-				Type:        schema.TypeString,
+				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
 			},
@@ -227,7 +226,10 @@ func resourceProfileCreate(ctx context.Context, d *schema.ResourceData, meta int
 	config := meta.(*Config)
 
 	// Create a cobblerclient.Profile struct
-	profile := buildProfile(d, config)
+	profile, err := buildProfile(d, config)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	// Attempt to create the Profile
 	tflog.Debug(ctx, "Cobbler Profile: Create Options", map[string]interface{}{
@@ -247,7 +249,7 @@ func resourceProfileRead(ctx context.Context, d *schema.ResourceData, meta inter
 	config := meta.(*Config)
 
 	// Retrieve the profile entry from Cobbler
-	profile, err := config.cobblerClient.GetProfile(d.Id())
+	profile, err := config.cobblerClient.GetProfile(d.Id(), false, false)
 	if err != nil {
 		return diag.Errorf("Cobbler Profile: Error Reading (%s): %s", d.Id(), err)
 	}
@@ -257,11 +259,11 @@ func resourceProfileRead(ctx context.Context, d *schema.ResourceData, meta inter
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("autoinstall_meta", profile.AutoinstallMeta)
+	err = d.Set("autoinstall_meta", profile.AutoinstallMeta.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("boot_files", profile.BootFiles)
+	err = d.Set("boot_files", profile.BootFiles.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -277,43 +279,51 @@ func resourceProfileRead(ctx context.Context, d *schema.ResourceData, meta inter
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("enable_gpxe", profile.EnableGPXE)
+	// TODO: enable_ipxe
+	err = d.Set("enable_gpxe", profile.EnableIPXE.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("enable_menu", profile.EnableMenu)
+	err = d.Set("enable_menu", profile.EnableMenu.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("fetchable_files", profile.FetchableFiles)
+	err = d.Set("fetchable_files", profile.FetchableFiles.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("kernel_options", profile.KernelOptions)
+	err = d.Set("kernel_options", profile.KernelOptions.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("kernel_options_post", profile.KernelOptionsPost)
+	err = d.Set("kernel_options_post", profile.KernelOptionsPost.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("mgmt_classes", profile.MGMTClasses)
+	err = d.Set("mgmt_classes", profile.MgmtClasses.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("mgmt_parameters", profile.MGMTParameters)
-	if err != nil {
-		return diag.FromErr(err)
+	if profile.MgmtParameters.IsInherited {
+		err = d.Set("mgmt_parameters", make(map[string]interface{}))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+	} else {
+		err = d.Set("mgmt_parameters", profile.MgmtParameters.Data)
+		if err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	err = d.Set("name", profile.Name)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("name_servers_search", profile.NameServersSearch)
+	err = d.Set("name_servers_search", profile.NameServersSearch.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("name_servers", profile.NameServers)
+	err = d.Set("name_servers", profile.NameServers.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -325,7 +335,7 @@ func resourceProfileRead(ctx context.Context, d *schema.ResourceData, meta inter
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("owners", profile.Owners)
+	err = d.Set("owners", profile.Owners.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -337,11 +347,11 @@ func resourceProfileRead(ctx context.Context, d *schema.ResourceData, meta inter
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("template_files", profile.TemplateFiles)
+	err = d.Set("template_files", profile.TemplateFiles.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("virt_auto_boot", profile.VirtAutoBoot)
+	err = d.Set("virt_auto_boot", profile.VirtAutoBoot.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -357,15 +367,17 @@ func resourceProfileRead(ctx context.Context, d *schema.ResourceData, meta inter
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("virt_file_size", profile.VirtFileSize)
-	if err != nil {
-		return diag.FromErr(err)
+	if !profile.VirtFileSize.IsInherited {
+		err = d.Set("virt_file_size", profile.VirtFileSize.Data)
+		if err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	err = d.Set("virt_path", profile.VirtPath)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("virt_ram", profile.VirtRAM)
+	err = d.Set("virt_ram", profile.VirtRAM.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -381,14 +393,17 @@ func resourceProfileUpdate(ctx context.Context, d *schema.ResourceData, meta int
 	config := meta.(*Config)
 
 	// Create a cobblerclient.Profile struct
-	profile := buildProfile(d, config)
+	profile, err := buildProfile(d, config)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	// Attempt to update the profile with new information
 	tflog.Debug(ctx, "Cobbler Profile: Updating Profile with options", map[string]interface{}{
 		"profile": d.Id(),
 		"options": structs.Map(profile),
 	})
-	err := config.cobblerClient.UpdateProfile(&profile)
+	err = config.cobblerClient.UpdateProfile(&profile)
 	if err != nil {
 		return diag.Errorf("error updating Cobbler Profile: Error Updating (%s): %s", d.Id(), err)
 	}
@@ -408,85 +423,137 @@ func resourceProfileDelete(ctx context.Context, d *schema.ResourceData, meta int
 }
 
 // buildProfile builds a cobblerclient.Profile out of the Terraform attributes.
-func buildProfile(d *schema.ResourceData, meta interface{}) cobbler.Profile { //nolint:unparam // We satisfy our own pattern here
-	mgmtClasses := []string{}
-	for _, i := range d.Get("mgmt_classes").([]interface{}) {
-		mgmtClasses = append(mgmtClasses, i.(string))
+func buildProfile(d *schema.ResourceData, meta interface{}) (cobbler.Profile, error) { //nolint:unparam // We satisfy our own pattern here
+	mgmtClasses, err := GetStringSlice(d, "mgmt_classes")
+	if err != nil {
+		return cobbler.Profile{}, err
 	}
-	nameServersSearch := []string{}
-	for _, i := range d.Get("name_servers_search").([]interface{}) {
-		nameServersSearch = append(nameServersSearch, i.(string))
+	mgmtParameters, err := GetInterfaceMap(d, "mgmt_parameters")
+	if err != nil {
+		return cobbler.Profile{}, err
 	}
-	nameServers := []string{}
-	for _, i := range d.Get("name_servers").([]interface{}) {
-		nameServers = append(nameServers, i.(string))
+	nameServersSearch, err := GetStringSlice(d, "name_servers_search")
+	if err != nil {
+		return cobbler.Profile{}, err
 	}
-	owners := []string{}
-	for _, i := range d.Get("owners").([]interface{}) {
-		owners = append(owners, i.(string))
+	nameServers, err := GetStringSlice(d, "name_servers")
+	if err != nil {
+		return cobbler.Profile{}, err
 	}
-	repos := []string{}
-	for _, i := range d.Get("repos").([]interface{}) {
-		repos = append(repos, i.(string))
+	owners, err := GetStringSlice(d, "owners")
+	if err != nil {
+		return cobbler.Profile{}, err
 	}
-	bootFiles := []string{}
-	for _, i := range d.Get("boot_files").([]interface{}) {
-		bootFiles = append(bootFiles, i.(string))
+	repos, err := GetStringSlice(d, "repos")
+	if err != nil {
+		return cobbler.Profile{}, err
 	}
-	fetchableFiles := []string{}
-	for _, i := range d.Get("fetchable_files").([]interface{}) {
-		fetchableFiles = append(fetchableFiles, i.(string))
+	bootFiles, err := GetInterfaceMap(d, "boot_files")
+	if err != nil {
+		return cobbler.Profile{}, err
 	}
-	kernelOptions := []string{}
-	for _, i := range d.Get("kernel_options").([]interface{}) {
-		kernelOptions = append(kernelOptions, i.(string))
+	fetchableFiles, err := GetInterfaceMap(d, "fetchable_files")
+	if err != nil {
+		return cobbler.Profile{}, err
 	}
-	kernelOptionsPost := []string{}
-	for _, i := range d.Get("kernel_options_post").([]interface{}) {
-		kernelOptionsPost = append(kernelOptionsPost, i.(string))
+	kernelOptions, err := GetInterfaceMap(d, "kernel_options")
+	if err != nil {
+		return cobbler.Profile{}, err
 	}
-	templateFiles := []string{}
-	for _, i := range d.Get("template_files").([]interface{}) {
-		templateFiles = append(templateFiles, i.(string))
+	kernelOptionsPost, err := GetInterfaceMap(d, "kernel_options_post")
+	if err != nil {
+		return cobbler.Profile{}, err
 	}
-	autoinstallMeta := []string{}
-	for _, i := range d.Get("autoinstall_meta").([]interface{}) {
-		autoinstallMeta = append(autoinstallMeta, i.(string))
+	templateFiles, err := GetInterfaceMap(d, "template_files")
+	if err != nil {
+		return cobbler.Profile{}, err
 	}
-
-	profile := cobbler.Profile{
-		Autoinstall:       d.Get("autoinstall").(string),
-		AutoinstallMeta:   autoinstallMeta,
-		BootFiles:         bootFiles,
-		Comment:           d.Get("comment").(string),
-		DHCPTag:           d.Get("dhcp_tag").(string),
-		Distro:            d.Get("distro").(string),
-		EnableGPXE:        d.Get("enable_gpxe").(bool),
-		EnableMenu:        d.Get("enable_menu").(bool),
-		FetchableFiles:    fetchableFiles,
-		KernelOptions:     kernelOptions,
-		KernelOptionsPost: kernelOptionsPost,
-		MGMTClasses:       mgmtClasses,
-		MGMTParameters:    d.Get("mgmt_parameters").(string),
-		Name:              d.Get("name").(string),
-		NameServersSearch: nameServersSearch,
-		NameServers:       nameServers,
-		NextServerv4:      d.Get("next_server_v4").(string),
-		NextServerv6:      d.Get("next_server_v6").(string),
-		Owners:            owners,
-		Proxy:             d.Get("proxy").(string),
-		Repos:             repos,
-		Server:            d.Get("server").(string),
-		TemplateFiles:     templateFiles,
-		VirtAutoBoot:      d.Get("virt_auto_boot").(string),
-		VirtBridge:        d.Get("virt_bridge").(string),
-		VirtCPUs:          d.Get("virt_cpus").(string),
-		VirtDiskDriver:    d.Get("virt_disk_driver").(string),
-		VirtFileSize:      d.Get("virt_file_size").(string),
-		VirtPath:          d.Get("virt_path").(string),
-		VirtRAM:           d.Get("virt_ram").(string),
-		VirtType:          d.Get("virt_type").(string),
+	autoinstallMeta, err := GetInterfaceMap(d, "autoinstall_meta")
+	if err != nil {
+		return cobbler.Profile{}, err
 	}
 
-	return profile
+	profile := cobbler.NewProfile()
+	profile.Autoinstall = d.Get("autoinstall").(string)
+	profile.AutoinstallMeta = cobbler.Value[map[string]interface{}]{
+		Data:        autoinstallMeta,
+		IsInherited: false,
+	}
+	profile.BootFiles = cobbler.Value[map[string]interface{}]{
+		Data:        bootFiles,
+		IsInherited: false,
+	}
+	profile.Comment = d.Get("comment").(string)
+	profile.DHCPTag = d.Get("dhcp_tag").(string)
+	profile.Distro = d.Get("distro").(string)
+	// TODO: enable_ipxe
+	profile.EnableIPXE = cobbler.Value[bool]{
+		Data:        d.Get("enable_gpxe").(bool),
+		IsInherited: false,
+	}
+	profile.EnableMenu = cobbler.Value[bool]{
+		Data:        d.Get("enable_menu").(bool),
+		IsInherited: false,
+	}
+	profile.FetchableFiles = cobbler.Value[map[string]interface{}]{
+		Data:        fetchableFiles,
+		IsInherited: false,
+	}
+	profile.KernelOptions = cobbler.Value[map[string]interface{}]{
+		Data:        kernelOptions,
+		IsInherited: false,
+	}
+	profile.KernelOptionsPost = cobbler.Value[map[string]interface{}]{
+		Data:        kernelOptionsPost,
+		IsInherited: false,
+	}
+	profile.MgmtClasses = cobbler.Value[[]string]{
+		Data:        mgmtClasses,
+		IsInherited: false,
+	}
+	profile.MgmtParameters = cobbler.Value[map[string]interface{}]{
+		Data:        mgmtParameters,
+		IsInherited: false,
+	}
+	profile.Name = d.Get("name").(string)
+	profile.NameServersSearch = cobbler.Value[[]string]{
+		Data:        nameServersSearch,
+		IsInherited: false,
+	}
+	profile.NameServers = cobbler.Value[[]string]{
+		Data:        nameServers,
+		IsInherited: false,
+	}
+	profile.NextServerv4 = d.Get("next_server_v4").(string)
+	profile.NextServerv6 = d.Get("next_server_v6").(string)
+	profile.Owners = cobbler.Value[[]string]{
+		Data:        owners,
+		IsInherited: false,
+	}
+	profile.Proxy = d.Get("proxy").(string)
+	profile.Repos = repos
+	profile.Server = d.Get("server").(string)
+	profile.TemplateFiles = cobbler.Value[map[string]interface{}]{
+		Data:        templateFiles,
+		IsInherited: false,
+	}
+	profile.VirtAutoBoot = cobbler.Value[bool]{
+		Data:        d.Get("virt_auto_boot").(bool),
+		IsInherited: false,
+	}
+	profile.VirtBridge = d.Get("virt_bridge").(string)
+	profile.VirtCPUs = d.Get("virt_cpus").(int)
+	profile.VirtDiskDriver = d.Get("virt_disk_driver").(string)
+	profile.VirtFileSize = cobbler.Value[float64]{
+		Data:        d.Get("virt_file_size").(float64),
+		IsInherited: false,
+	}
+	profile.VirtPath = d.Get("virt_path").(string)
+	profile.VirtRAM = cobbler.Value[int]{
+		Data:        d.Get("virt_ram").(int),
+		IsInherited: false,
+	}
+	profile.VirtType = d.Get("virt_type").(string)
+
+	return profile, nil
 }

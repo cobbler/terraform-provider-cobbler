@@ -35,14 +35,14 @@ func resourceSystem() *schema.Resource {
 			},
 			"autoinstall_meta": {
 				Description: "Automatic installation template metadata, formerly Kickstart metadata.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeMap,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
 			},
 			"boot_files": {
 				Description: "Files copied into tftpboot beyond the kernel/initrd.",
-				Type:        schema.TypeString,
+				Type:        schema.TypeMap,
 				Optional:    true,
 				Computed:    true,
 			},
@@ -70,7 +70,7 @@ func resourceSystem() *schema.Resource {
 
 			"fetchable_files": {
 				Description: "Templates for tftp or wget.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeMap,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
@@ -248,15 +248,13 @@ func resourceSystem() *schema.Resource {
 			},
 			"kernel_options": {
 				Description: "Kernel options. ex: `selinux=permissive`.",
-				Type:        schema.TypeList,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeMap,
 				Optional:    true,
 				Computed:    true,
 			},
 			"kernel_options_post": {
 				Description: "Kernel options (post install).",
-				Type:        schema.TypeList,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeMap,
 				Optional:    true,
 				Computed:    true,
 			},
@@ -269,7 +267,7 @@ func resourceSystem() *schema.Resource {
 			},
 			"mgmt_parameters": {
 				Description: "Parameters which will be handed to your management application (Must be a valid YAML dictionary).",
-				Type:        schema.TypeString,
+				Type:        schema.TypeMap,
 				Optional:    true,
 				Computed:    true,
 			},
@@ -367,26 +365,26 @@ func resourceSystem() *schema.Resource {
 			},
 			"template_files": {
 				Description: "File mappings for built-in config management.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeMap,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
 			},
 			"virt_auto_boot": {
 				Description: "Auto boot virtual machines.",
-				Type:        schema.TypeString,
+				Type:        schema.TypeBool,
 				Optional:    true,
 				Computed:    true,
 			},
 			"virt_file_size": {
 				Description: "The virtual machine file size.",
-				Type:        schema.TypeString,
+				Type:        schema.TypeFloat,
 				Optional:    true,
 				Computed:    true,
 			},
 			"virt_cpus": {
 				Description: "The number of virtual CPUs",
-				Type:        schema.TypeString,
+				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
 			},
@@ -404,13 +402,13 @@ func resourceSystem() *schema.Resource {
 			},
 			"virt_pxe_boot": {
 				Description: "Use PXE to build this virtual machine.",
-				Type:        schema.TypeInt,
+				Type:        schema.TypeBool,
 				Optional:    true,
 				Computed:    true,
 			},
 			"virt_ram": {
 				Description: "The amount of RAM for the virtual machine.",
-				Type:        schema.TypeString,
+				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
 			},
@@ -431,7 +429,10 @@ func resourceSystemCreate(ctx context.Context, d *schema.ResourceData, meta inte
 	config := meta.(*Config)
 
 	// Create a cobblerclient.System struct
-	system := buildSystem(d)
+	system, err := buildSystem(d)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	// Attempt to create the System
 	tflog.Debug(ctx, "Cobbler System: Create Options", map[string]interface{}{
@@ -451,7 +452,7 @@ func resourceSystemCreate(ctx context.Context, d *schema.ResourceData, meta inte
 			"interface": interfaceName,
 			"options":   structs.Map(interfaceInfo),
 		})
-		if err := newSystem.CreateInterface(interfaceName, interfaceInfo); err != nil {
+		if err = newSystem.CreateInterface(interfaceName, interfaceInfo); err != nil {
 			return diag.Errorf("Cobbler System: Error adding Interface %s to %s: %s", interfaceName, newSystem.Name, err)
 		}
 	}
@@ -462,7 +463,7 @@ func resourceSystemCreate(ctx context.Context, d *schema.ResourceData, meta inte
 	d.SetId(newSystem.Name)
 
 	tflog.Debug(ctx, "Cobbler System: syncing system")
-	if err := config.cobblerClient.Sync(); err != nil {
+	if err = config.cobblerClient.Sync(); err != nil {
 		return diag.Errorf("Cobbler System: Error syncing system: %s", err)
 	}
 
@@ -476,7 +477,7 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	})
 
 	// Retrieve the system entry from Cobbler
-	system, err := config.cobblerClient.GetSystem(d.Id())
+	system, err := config.cobblerClient.GetSystem(d.Id(), false, false)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			tflog.Warn(ctx, "Cobbler System not found, removing from state", map[string]interface{}{
@@ -490,11 +491,11 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	}
 
 	// Set all fields
-	err = d.Set("boot_files", system.BootFiles)
+	err = d.Set("boot_files", system.BootFiles.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("boot_loaders", system.BootLoaders)
+	err = d.Set("boot_loaders", system.BootLoaders.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -502,11 +503,12 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("enable_gpxe", system.EnableGPXE)
+	// TODO: enable_ipxe
+	err = d.Set("enable_gpxe", system.EnableIPXE.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("fetchable_files", system.FetchableFiles)
+	err = d.Set("fetchable_files", system.FetchableFiles.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -526,25 +528,32 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("kernel_options", system.KernelOptions)
+	err = d.Set("kernel_options", system.KernelOptions.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("kernel_options_post", system.KernelOptionsPost)
+	err = d.Set("kernel_options_post", system.KernelOptionsPost.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("autoinstall_meta", system.AutoinstallMeta)
+	err = d.Set("autoinstall_meta", system.AutoinstallMeta.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("mgmt_classes", system.MGMTClasses)
+	err = d.Set("mgmt_classes", system.MgmtClasses.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("mgmt_parameters", system.MGMTParameters)
-	if err != nil {
-		return diag.FromErr(err)
+	if system.MgmtParameters.IsInherited {
+		err = d.Set("mgmt_parameters", make(map[string]interface{}))
+		if err != nil {
+			return diag.FromErr(err)
+		}
+	} else {
+		err = d.Set("mgmt_parameters", system.MgmtParameters.Data)
+		if err != nil {
+			return diag.FromErr(err)
+		}
 	}
 	err = d.Set("name", system.Name)
 	if err != nil {
@@ -570,7 +579,7 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("owners", system.Owners)
+	err = d.Set("owners", system.Owners.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -606,19 +615,21 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("template_files", system.TemplateFiles)
+	err = d.Set("template_files", system.TemplateFiles.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("virt_auto_boot", system.VirtAutoBoot)
+	err = d.Set("virt_auto_boot", system.VirtAutoBoot.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("virt_file_size", system.VirtFileSize)
-	if err != nil {
-		return diag.FromErr(err)
+	if !system.VirtFileSize.IsInherited {
+		err = d.Set("virt_file_size", system.VirtFileSize.Data)
+		if err != nil {
+			return diag.FromErr(err)
+		}
 	}
-	err = d.Set("virt_cpus", system.VirtCPUs)
+	err = d.Set("virt_cpus", system.VirtCPUs.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -634,7 +645,7 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("virt_ram", system.VirtRAM)
+	err = d.Set("virt_ram", system.VirtRAM.Data)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -696,7 +707,7 @@ func resourceSystemUpdate(ctx context.Context, d *schema.ResourceData, meta inte
 	config := meta.(*Config)
 
 	// Retrieve the existing system entry from Cobbler
-	system, err := config.cobblerClient.GetSystem(d.Id())
+	system, err := config.cobblerClient.GetSystem(d.Id(), false, false)
 	if err != nil {
 		return diag.Errorf("Cobbler System: Error Reading (%s): %s", d.Id(), err)
 	}
@@ -715,7 +726,10 @@ func resourceSystemUpdate(ctx context.Context, d *schema.ResourceData, meta inte
 	})
 
 	// Create a new cobblerclient.System struct with the new information
-	newSystem := buildSystem(d)
+	newSystem, err := buildSystem(d)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	// Attempt to update the system with new information
 	tflog.Debug(ctx, "Cobbler System: Updating System with options", map[string]interface{}{
@@ -783,91 +797,144 @@ func resourceSystemDelete(ctx context.Context, d *schema.ResourceData, meta inte
 }
 
 // buildSystem builds a cobblerclient.System out of the Terraform attributes.
-func buildSystem(d *schema.ResourceData) cobbler.System {
-	autoinstallMeta := []string{}
-	for _, i := range d.Get("autoinstall_meta").([]interface{}) {
-		autoinstallMeta = append(autoinstallMeta, i.(string))
+func buildSystem(d *schema.ResourceData) (cobbler.System, error) {
+	mgmtClasses, err := GetStringSlice(d, "mgmt_classes")
+	if err != nil {
+		return cobbler.System{}, err
 	}
-	bootLoaders := []string{}
-	for _, i := range d.Get("boot_loaders").([]interface{}) {
-		bootLoaders = append(bootLoaders, i.(string))
+	mgmtParameters, err := GetInterfaceMap(d, "mgmt_parameters")
+	if err != nil {
+		return cobbler.System{}, err
 	}
-	fetchableFiles := []string{}
-	for _, i := range d.Get("fetchable_files").([]interface{}) {
-		fetchableFiles = append(fetchableFiles, i.(string))
+	nameServersSearch, err := GetStringSlice(d, "name_servers_search")
+	if err != nil {
+		return cobbler.System{}, err
 	}
-	kernelOptions := []string{}
-	for _, i := range d.Get("kernel_options").([]interface{}) {
-		kernelOptions = append(kernelOptions, i.(string))
+	nameServers, err := GetStringSlice(d, "name_servers")
+	if err != nil {
+		return cobbler.System{}, err
 	}
-	kernelOptionsPost := []string{}
-	for _, i := range d.Get("kernel_options_post").([]interface{}) {
-		kernelOptionsPost = append(kernelOptionsPost, i.(string))
+	owners, err := GetStringSlice(d, "owners")
+	if err != nil {
+		return cobbler.System{}, err
 	}
-	mgmtClasses := []string{}
-	for _, i := range d.Get("mgmt_classes").([]interface{}) {
-		mgmtClasses = append(mgmtClasses, i.(string))
+	bootFiles, err := GetInterfaceMap(d, "boot_files")
+	if err != nil {
+		return cobbler.System{}, err
 	}
-	nameServersSearch := []string{}
-	for _, i := range d.Get("name_servers_search").([]interface{}) {
-		nameServersSearch = append(nameServersSearch, i.(string))
+	fetchableFiles, err := GetInterfaceMap(d, "fetchable_files")
+	if err != nil {
+		return cobbler.System{}, err
 	}
-	nameServers := []string{}
-	for _, i := range d.Get("name_servers").([]interface{}) {
-		nameServers = append(nameServers, i.(string))
+	kernelOptions, err := GetInterfaceMap(d, "kernel_options")
+	if err != nil {
+		return cobbler.System{}, err
 	}
-	owners := []string{}
-	for _, i := range d.Get("owners").([]interface{}) {
-		owners = append(owners, i.(string))
+	kernelOptionsPost, err := GetInterfaceMap(d, "kernel_options_post")
+	if err != nil {
+		return cobbler.System{}, err
 	}
-	templateFiles := []string{}
-	for _, i := range d.Get("template_files").([]interface{}) {
-		templateFiles = append(templateFiles, i.(string))
+	templateFiles, err := GetInterfaceMap(d, "template_files")
+	if err != nil {
+		return cobbler.System{}, err
 	}
-
-	system := cobbler.System{
-		Autoinstall:       d.Get("autoinstall").(string),
-		AutoinstallMeta:   autoinstallMeta,
-		BootFiles:         d.Get("boot_files").(string),
-		BootLoaders:       bootLoaders,
-		Comment:           d.Get("comment").(string),
-		EnableGPXE:        d.Get("enable_gpxe").(bool),
-		FetchableFiles:    fetchableFiles,
-		Gateway:           d.Get("gateway").(string),
-		Hostname:          d.Get("hostname").(string),
-		Image:             d.Get("image").(string),
-		IPv6DefaultDevice: d.Get("ipv6_default_device").(string),
-		KernelOptions:     kernelOptions,
-		KernelOptionsPost: kernelOptionsPost,
-		MGMTClasses:       mgmtClasses,
-		MGMTParameters:    d.Get("mgmt_parameters").(string),
-		Name:              d.Get("name").(string),
-		NameServersSearch: nameServersSearch,
-		NameServers:       nameServers,
-		NetbootEnabled:    d.Get("netboot_enabled").(bool),
-		NextServerv4:      d.Get("next_server_v4").(string),
-		NextServerv6:      d.Get("next_server_v6").(string),
-		Owners:            owners,
-		PowerAddress:      d.Get("power_address").(string),
-		PowerID:           d.Get("power_id").(string),
-		PowerPass:         d.Get("power_pass").(string),
-		PowerType:         d.Get("power_type").(string),
-		PowerUser:         d.Get("power_user").(string),
-		Profile:           d.Get("profile").(string),
-		Proxy:             d.Get("proxy").(string),
-		Status:            d.Get("status").(string),
-		TemplateFiles:     templateFiles,
-		VirtAutoBoot:      d.Get("virt_auto_boot").(string),
-		VirtFileSize:      d.Get("virt_file_size").(string),
-		VirtCPUs:          d.Get("virt_cpus").(string),
-		VirtType:          d.Get("virt_type").(string),
-		VirtPath:          d.Get("virt_path").(string),
-		VirtPXEBoot:       d.Get("virt_pxe_boot").(int),
-		VirtRAM:           d.Get("virt_ram").(string),
-		VirtDiskDriver:    d.Get("virt_disk_driver").(string),
+	autoinstallMeta, err := GetInterfaceMap(d, "autoinstall_meta")
+	if err != nil {
+		return cobbler.System{}, err
+	}
+	bootLoaders, err := GetStringSlice(d, "boot_loaders")
+	if err != nil {
+		return cobbler.System{}, err
 	}
 
-	return system
+	system := cobbler.NewSystem()
+	system.Autoinstall = d.Get("autoinstall").(string)
+	system.AutoinstallMeta = cobbler.Value[map[string]interface{}]{
+		Data:        autoinstallMeta,
+		IsInherited: false,
+	}
+	system.BootFiles = cobbler.Value[map[string]interface{}]{
+		Data:        bootFiles,
+		IsInherited: false,
+	}
+	system.BootLoaders = cobbler.Value[[]string]{
+		Data:        bootLoaders,
+		IsInherited: false,
+	}
+	system.Comment = d.Get("comment").(string)
+	// TODO: enable_ipxe
+	system.EnableIPXE = cobbler.Value[bool]{
+		Data:        d.Get("enable_gpxe").(bool),
+		IsInherited: false,
+	}
+	system.FetchableFiles = cobbler.Value[map[string]interface{}]{
+		Data:        fetchableFiles,
+		IsInherited: false,
+	}
+	system.Gateway = d.Get("gateway").(string)
+	system.Hostname = d.Get("hostname").(string)
+	system.Image = d.Get("image").(string)
+	system.IPv6DefaultDevice = d.Get("ipv6_default_device").(string)
+	system.KernelOptions = cobbler.Value[map[string]interface{}]{
+		Data:        kernelOptions,
+		IsInherited: false,
+	}
+	system.KernelOptionsPost = cobbler.Value[map[string]interface{}]{
+		Data:        kernelOptionsPost,
+		IsInherited: false,
+	}
+	system.MgmtClasses = cobbler.Value[[]string]{
+		Data:        mgmtClasses,
+		IsInherited: false,
+	}
+	system.MgmtParameters = cobbler.Value[map[string]interface{}]{
+		Data:        mgmtParameters,
+		IsInherited: false,
+	}
+	system.Name = d.Get("name").(string)
+	system.NameServersSearch = nameServersSearch
+	system.NameServers = nameServers
+	system.NetbootEnabled = d.Get("netboot_enabled").(bool)
+	system.NextServerv4 = d.Get("next_server_v4").(string)
+	system.NextServerv6 = d.Get("next_server_v6").(string)
+	system.Owners = cobbler.Value[[]string]{
+		Data:        owners,
+		IsInherited: false,
+	}
+	system.PowerAddress = d.Get("power_address").(string)
+	system.PowerID = d.Get("power_id").(string)
+	system.PowerPass = d.Get("power_pass").(string)
+	system.PowerType = d.Get("power_type").(string)
+	system.PowerUser = d.Get("power_user").(string)
+	system.Profile = d.Get("profile").(string)
+	system.Proxy = d.Get("proxy").(string)
+	system.Status = d.Get("status").(string)
+	system.TemplateFiles = cobbler.Value[map[string]interface{}]{
+		Data:        templateFiles,
+		IsInherited: false,
+	}
+	system.VirtAutoBoot = cobbler.Value[bool]{
+		Data:        d.Get("virt_auto_boot").(bool),
+		IsInherited: false,
+	}
+	system.VirtFileSize = cobbler.Value[float64]{
+		Data:        d.Get("virt_file_size").(float64),
+		IsInherited: false,
+	}
+	system.VirtCPUs = cobbler.Value[int]{
+		Data:        d.Get("virt_cpus").(int),
+		IsInherited: false,
+	}
+	system.VirtType = d.Get("virt_type").(string)
+	system.VirtPath = d.Get("virt_path").(string)
+	system.VirtPXEBoot = d.Get("virt_pxe_boot").(bool)
+	system.VirtRAM = cobbler.Value[int]{
+		Data:        d.Get("virt_ram").(int),
+		IsInherited: false,
+	}
+	system.VirtDiskDriver = d.Get("virt_disk_driver").(string)
+
+	return system, err
 }
 
 // buildSystemInterface builds a cobblerclient.Interface out of the Terraform attributes.
