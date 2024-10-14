@@ -26,6 +26,24 @@ func TestAccCobblerDistro_basic(t *testing.T) {
 	})
 }
 
+func TestAccCobblerDistro_basic_inherit(t *testing.T) {
+	var distro cobbler.Distro
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:          func() { testAccCobblerPreCheck(t) },
+		ProviderFactories: testAccProviderFactories,
+		CheckDestroy:      testAccCobblerCheckDistroDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccCobblerDistroBasicInherit,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCobblerCheckDistroExists("cobbler_distro.foo", &distro),
+				),
+			},
+		},
+	})
+}
+
 func TestAccCobblerDistro_change(t *testing.T) {
 	var distro cobbler.Distro
 
@@ -94,6 +112,17 @@ var testAccCobblerDistroBasic = `
 		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
 		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
 		boot_loaders = ["ipxe"]
+	}`
+
+var testAccCobblerDistroBasicInherit = `
+	resource "cobbler_distro" "foo" {
+		name = "foo"
+		breed = "ubuntu"
+		os_version = "focal"
+		arch = "x86_64"
+		kernel = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+		initrd = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
+		boot_loaders_inherit = true
 	}`
 
 var testAccCobblerDistroChange1 = `

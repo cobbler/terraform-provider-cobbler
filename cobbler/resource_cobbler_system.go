@@ -40,11 +40,25 @@ func resourceSystem() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
+			"autoinstall_meta_inherit": {
+				Description:   "Signal that autoinstall_meta should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"autoinstall_meta"},
+			},
 			"boot_files": {
 				Description: "Files copied into tftpboot beyond the kernel/initrd.",
 				Type:        schema.TypeMap,
 				Optional:    true,
 				Computed:    true,
+			},
+			"boot_files_inherit": {
+				Description:   "Signal that boot_files should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"boot_files"},
 			},
 			"boot_loaders": {
 				Description: "Must be either `grub`, `pxe`, or `ipxe`.",
@@ -53,21 +67,32 @@ func resourceSystem() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
-
+			"boot_loaders_inherit": {
+				Description:   "Signal that boot_loaders should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"boot_loaders"},
+			},
 			"comment": {
 				Description: "Free form text description.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"enable_gpxe": {
 				Description: "Use gPXE instead of PXELINUX for advanced booting options.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Computed:    true,
 			},
-
+			"enable_gpxe_inherit": {
+				Description:   "Signal that enable_gpxe should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"enable_gpxe"},
+			},
 			"fetchable_files": {
 				Description: "Templates for tftp or wget.",
 				Type:        schema.TypeMap,
@@ -75,28 +100,31 @@ func resourceSystem() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
-
+			"fetchable_files_inherit": {
+				Description:   "Signal that fetchable_files should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"fetchable_files"},
+			},
 			"gateway": {
 				Description: "Network gateway.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"hostname": {
 				Description: "Hostname of the system.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"image": {
 				Description: "Parent image (if no profile is used).",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
 			},
-
 			"interface": {
 				Description: "The `interface` Block Set.",
 				Type:        schema.TypeSet,
@@ -252,11 +280,25 @@ func resourceSystem() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
+			"kernel_options_inherit": {
+				Description:   "Signal that kernel_options should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"kernel_options"},
+			},
 			"kernel_options_post": {
 				Description: "Kernel options (post install).",
 				Type:        schema.TypeMap,
 				Optional:    true,
 				Computed:    true,
+			},
+			"kernel_options_post_inherit": {
+				Description:   "Signal that kernel_options_post should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"kernel_options_post"},
 			},
 			"mgmt_classes": {
 				Description: "For external configuration management.",
@@ -265,11 +307,25 @@ func resourceSystem() *schema.Resource {
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 			},
+			"mgmt_classes_inherit": {
+				Description:   "Signal that mgmt_classes should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"mgmt_classes"},
+			},
 			"mgmt_parameters": {
 				Description: "Parameters which will be handed to your management application (Must be a valid YAML dictionary).",
 				Type:        schema.TypeMap,
 				Optional:    true,
 				Computed:    true,
+			},
+			"mgmt_parameters_inherit": {
+				Description:   "Signal that mgmt_parameters should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"mgmt_parameters"},
 			},
 			"name": {
 				Description: "The name of the system.",
@@ -315,6 +371,13 @@ func resourceSystem() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
+			},
+			"owners_inherit": {
+				Description:   "Signal that owners should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"owners"},
 			},
 			"power_address": {
 				Description: "Power management address.",
@@ -370,11 +433,25 @@ func resourceSystem() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
+			"template_files_inherit": {
+				Description:   "Signal that template_files should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"template_files"},
+			},
 			"virt_auto_boot": {
 				Description: "Auto boot virtual machines.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Computed:    true,
+			},
+			"virt_auto_boot_inherit": {
+				Description:   "Signal that virt_auto_boot should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"virt_auto_boot"},
 			},
 			"virt_file_size": {
 				Description: "The virtual machine file size.",
@@ -382,11 +459,25 @@ func resourceSystem() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
+			"virt_file_size_inherit": {
+				Description:   "Signal that virt_file_size should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"virt_file_size"},
+			},
 			"virt_cpus": {
 				Description: "The number of virtual CPUs",
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
+			},
+			"virt_cpus_inherit": {
+				Description:   "Signal that virt_cpus should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"virt_cpus"},
 			},
 			"virt_type": {
 				Description: "The type of virtual machine. Valid options are: xenpv, xenfv, qemu, kvm, vmware, openvz.",
@@ -411,6 +502,13 @@ func resourceSystem() *schema.Resource {
 				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
+			},
+			"virt_ram_inherit": {
+				Description:   "Signal that virt_ram should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"virt_ram"},
 			},
 			"virt_disk_driver": {
 				Description: "The virtual machine disk driver.",
@@ -491,11 +589,11 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	}
 
 	// Set all fields
-	err = d.Set("boot_files", system.BootFiles.Data)
+	err = SetInherit(d, "boot_files", system.BootFiles, make(map[string]interface{}))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("boot_loaders", system.BootLoaders.Data)
+	err = SetInherit(d, "boot_loaders", system.BootLoaders, make([]string, 0))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -504,11 +602,11 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 		return diag.FromErr(err)
 	}
 	// TODO: enable_ipxe
-	err = d.Set("enable_gpxe", system.EnableIPXE.Data)
+	err = SetInherit(d, "enable_gpxe", system.EnableIPXE, false)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("fetchable_files", system.FetchableFiles.Data)
+	err = SetInherit(d, "fetchable_files", system.FetchableFiles, make(map[string]interface{}))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -528,32 +626,25 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("kernel_options", system.KernelOptions.Data)
+	err = SetInherit(d, "kernel_options", system.KernelOptions, make(map[string]interface{}))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("kernel_options_post", system.KernelOptionsPost.Data)
+	err = SetInherit(d, "kernel_options_post", system.KernelOptionsPost, make(map[string]interface{}))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("autoinstall_meta", system.AutoinstallMeta.Data)
+	err = SetInherit(d, "autoinstall_meta", system.AutoinstallMeta, make(map[string]interface{}))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("mgmt_classes", system.MgmtClasses.Data)
+	err = SetInherit(d, "mgmt_classes", system.MgmtClasses, make([]string, 0))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if system.MgmtParameters.IsInherited {
-		err = d.Set("mgmt_parameters", make(map[string]interface{}))
-		if err != nil {
-			return diag.FromErr(err)
-		}
-	} else {
-		err = d.Set("mgmt_parameters", system.MgmtParameters.Data)
-		if err != nil {
-			return diag.FromErr(err)
-		}
+	err = SetInherit(d, "mgmt_parameters", system.MgmtParameters, make(map[string]interface{}))
+	if err != nil {
+		return diag.FromErr(err)
 	}
 	err = d.Set("name", system.Name)
 	if err != nil {
@@ -579,7 +670,7 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("owners", system.Owners.Data)
+	err = SetInherit(d, "owners", system.Owners, make([]string, 0))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -615,21 +706,19 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("template_files", system.TemplateFiles.Data)
+	err = SetInherit(d, "template_files", system.TemplateFiles, make(map[string]interface{}))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("virt_auto_boot", system.VirtAutoBoot.Data)
+	err = SetInherit(d, "virt_auto_boot", system.VirtAutoBoot, false)
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	if !system.VirtFileSize.IsInherited {
-		err = d.Set("virt_file_size", system.VirtFileSize.Data)
-		if err != nil {
-			return diag.FromErr(err)
-		}
+	err = SetInherit(d, "virt_file_size", system.VirtFileSize, 0)
+	if err != nil {
+		return diag.FromErr(err)
 	}
-	err = d.Set("virt_cpus", system.VirtCPUs.Data)
+	err = SetInherit(d, "virt_cpus", system.VirtCPUs, 0)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -645,7 +734,7 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("virt_ram", system.VirtRAM.Data)
+	err = SetInherit(d, "virt_ram", system.VirtRAM, 0)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -855,21 +944,21 @@ func buildSystem(d *schema.ResourceData) (cobbler.System, error) {
 	}
 	system.BootFiles = cobbler.Value[map[string]interface{}]{
 		Data:        bootFiles,
-		IsInherited: false,
+		IsInherited: d.Get("boot_files_inherit").(bool),
 	}
 	system.BootLoaders = cobbler.Value[[]string]{
 		Data:        bootLoaders,
-		IsInherited: false,
+		IsInherited: d.Get("boot_loaders_inherit").(bool),
 	}
 	system.Comment = d.Get("comment").(string)
 	// TODO: enable_ipxe
 	system.EnableIPXE = cobbler.Value[bool]{
 		Data:        d.Get("enable_gpxe").(bool),
-		IsInherited: false,
+		IsInherited: d.Get("enable_gpxe_inherit").(bool),
 	}
 	system.FetchableFiles = cobbler.Value[map[string]interface{}]{
 		Data:        fetchableFiles,
-		IsInherited: false,
+		IsInherited: d.Get("fetchable_files_inherit").(bool),
 	}
 	system.Gateway = d.Get("gateway").(string)
 	system.Hostname = d.Get("hostname").(string)
@@ -877,19 +966,19 @@ func buildSystem(d *schema.ResourceData) (cobbler.System, error) {
 	system.IPv6DefaultDevice = d.Get("ipv6_default_device").(string)
 	system.KernelOptions = cobbler.Value[map[string]interface{}]{
 		Data:        kernelOptions,
-		IsInherited: false,
+		IsInherited: d.Get("kernel_options_inherit").(bool),
 	}
 	system.KernelOptionsPost = cobbler.Value[map[string]interface{}]{
 		Data:        kernelOptionsPost,
-		IsInherited: false,
+		IsInherited: d.Get("kernel_options_post_inherit").(bool),
 	}
 	system.MgmtClasses = cobbler.Value[[]string]{
 		Data:        mgmtClasses,
-		IsInherited: false,
+		IsInherited: d.Get("mgmt_classes_inherit").(bool),
 	}
 	system.MgmtParameters = cobbler.Value[map[string]interface{}]{
 		Data:        mgmtParameters,
-		IsInherited: false,
+		IsInherited: d.Get("mgmt_parameters_inherit").(bool),
 	}
 	system.Name = d.Get("name").(string)
 	system.NameServersSearch = nameServersSearch
@@ -899,7 +988,7 @@ func buildSystem(d *schema.ResourceData) (cobbler.System, error) {
 	system.NextServerv6 = d.Get("next_server_v6").(string)
 	system.Owners = cobbler.Value[[]string]{
 		Data:        owners,
-		IsInherited: false,
+		IsInherited: d.Get("owners_inherit").(bool),
 	}
 	system.PowerAddress = d.Get("power_address").(string)
 	system.PowerID = d.Get("power_id").(string)
@@ -911,26 +1000,26 @@ func buildSystem(d *schema.ResourceData) (cobbler.System, error) {
 	system.Status = d.Get("status").(string)
 	system.TemplateFiles = cobbler.Value[map[string]interface{}]{
 		Data:        templateFiles,
-		IsInherited: false,
+		IsInherited: d.Get("template_files_inherit").(bool),
 	}
 	system.VirtAutoBoot = cobbler.Value[bool]{
 		Data:        d.Get("virt_auto_boot").(bool),
-		IsInherited: false,
+		IsInherited: d.Get("virt_auto_boot_inherit").(bool),
 	}
 	system.VirtFileSize = cobbler.Value[float64]{
 		Data:        d.Get("virt_file_size").(float64),
-		IsInherited: false,
+		IsInherited: d.Get("virt_file_size_inherit").(bool),
 	}
 	system.VirtCPUs = cobbler.Value[int]{
 		Data:        d.Get("virt_cpus").(int),
-		IsInherited: false,
+		IsInherited: d.Get("virt_cpus_inherit").(bool),
 	}
 	system.VirtType = d.Get("virt_type").(string)
 	system.VirtPath = d.Get("virt_path").(string)
 	system.VirtPXEBoot = d.Get("virt_pxe_boot").(bool)
 	system.VirtRAM = cobbler.Value[int]{
 		Data:        d.Get("virt_ram").(int),
-		IsInherited: false,
+		IsInherited: d.Get("virt_ram_inherit").(bool),
 	}
 	system.VirtDiskDriver = d.Get("virt_disk_driver").(string)
 
