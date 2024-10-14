@@ -80,18 +80,18 @@ func resourceSystem() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
-			"enable_gpxe": {
-				Description: "Use gPXE instead of PXELINUX for advanced booting options.",
+			"enable_ipxe": {
+				Description: "Use iPXE instead of PXELINUX for advanced booting options.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Computed:    true,
 			},
-			"enable_gpxe_inherit": {
-				Description:   "Signal that enable_gpxe should be set to inherit from its parent",
+			"enable_ipxe_inherit": {
+				Description:   "Signal that enable_ipxe should be set to inherit from its parent",
 				Type:          schema.TypeBool,
 				Optional:      true,
 				Computed:      true,
-				ConflictsWith: []string{"enable_gpxe"},
+				ConflictsWith: []string{"enable_ipxe"},
 			},
 			"fetchable_files": {
 				Description: "Templates for tftp or wget.",
@@ -601,8 +601,7 @@ func resourceSystemRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	// TODO: enable_ipxe
-	err = SetInherit(d, "enable_gpxe", system.EnableIPXE, false)
+	err = SetInherit(d, "enable_ipxe", system.EnableIPXE, false)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -951,10 +950,9 @@ func buildSystem(d *schema.ResourceData) (cobbler.System, error) {
 		IsInherited: d.Get("boot_loaders_inherit").(bool),
 	}
 	system.Comment = d.Get("comment").(string)
-	// TODO: enable_ipxe
 	system.EnableIPXE = cobbler.Value[bool]{
-		Data:        d.Get("enable_gpxe").(bool),
-		IsInherited: d.Get("enable_gpxe_inherit").(bool),
+		Data:        d.Get("enable_ipxe").(bool),
+		IsInherited: d.Get("enable_ipxe_inherit").(bool),
 	}
 	system.FetchableFiles = cobbler.Value[map[string]interface{}]{
 		Data:        fetchableFiles,

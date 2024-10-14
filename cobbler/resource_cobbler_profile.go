@@ -68,18 +68,18 @@ func resourceProfile() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 			},
-			"enable_gpxe": {
-				Description: "Use gPXE instead of PXELINUX for advanced booting options.",
+			"enable_ipxe": {
+				Description: "Use iPXE instead of PXELINUX for advanced booting options.",
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Computed:    true,
 			},
-			"enable_gpxe_inherit": {
-				Description:   "Signal that enable_gpxe should be set to inherit from its parent",
+			"enable_ipxe_inherit": {
+				Description:   "Signal that enable_ipxe should be set to inherit from its parent",
 				Type:          schema.TypeBool,
 				Optional:      true,
 				Computed:      true,
-				ConflictsWith: []string{"enable_gpxe"},
+				ConflictsWith: []string{"enable_ipxe"},
 			},
 			"enable_menu": {
 				Description: "Enable a boot menu.",
@@ -391,8 +391,7 @@ func resourceProfileRead(ctx context.Context, d *schema.ResourceData, meta inter
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	// TODO: enable_ipxe
-	err = SetInherit(d, "enable_gpxe", profile.EnableIPXE, false)
+	err = SetInherit(d, "enable_ipxe", profile.EnableIPXE, false)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -589,10 +588,9 @@ func buildProfile(d *schema.ResourceData, meta interface{}) (cobbler.Profile, er
 	profile.Comment = d.Get("comment").(string)
 	profile.DHCPTag = d.Get("dhcp_tag").(string)
 	profile.Distro = d.Get("distro").(string)
-	// TODO: enable_ipxe
 	profile.EnableIPXE = cobbler.Value[bool]{
-		Data:        d.Get("enable_gpxe").(bool),
-		IsInherited: d.Get("enable_gpxe_inherit").(bool),
+		Data:        d.Get("enable_ipxe").(bool),
+		IsInherited: d.Get("enable_ipxe_inherit").(bool),
 	}
 	profile.EnableMenu = cobbler.Value[bool]{
 		Data:        d.Get("enable_menu").(bool),
