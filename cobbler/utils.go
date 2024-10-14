@@ -3,6 +3,8 @@ package cobbler
 import (
 	"bytes"
 	"fmt"
+	cobbler "github.com/cobbler/cobblerclient"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/mitchellh/go-homedir"
 	"hash/crc32"
 	"os"
@@ -65,4 +67,53 @@ func Strings(strings []string) string {
 	}
 
 	return fmt.Sprintf("%d", String(buf.String()))
+}
+
+// GetStringSlice is a helper which safely retrieves the data of a given key and casts it to a string slice.
+func GetStringSlice(d *schema.ResourceData, key string) ([]string, error) {
+	result := make([]string, 0)
+	keyData, ok := d.Get(key).([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("key `%s` is not an array", key)
+	}
+	for _, element := range keyData {
+		var castedElement string
+		castedElement, ok = element.(string)
+		if !ok {
+			return nil, fmt.Errorf("key `%s` is not a string", key)
+		}
+		result = append(result, castedElement)
+	}
+	return result, nil
+}
+
+func GetInterfaceMap(d *schema.ResourceData, key string) (map[string]interface{}, error) {
+	interfaceData, ok := d.Get(key).(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("key `%s` is not a map", key)
+	}
+	return interfaceData, nil
+}
+
+func SetInherit[K any](d *schema.ResourceData, key string, value cobbler.Value[K], defaultValue K) error {
+	if value.IsInherited {
+		err := d.Set(fmt.Sprintf("%s_inherit", key), value.IsInherited)
+		if err != nil {
+			return err
+		}
+		err = d.Set(key, defaultValue)
+		if err != nil {
+			return err
+		}
+	} else {
+		err := d.Set(fmt.Sprintf("%s_inherit", key), false)
+		if err != nil {
+			return err
+		}
+		err = d.Set(key, value.Data)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

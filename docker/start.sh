@@ -6,8 +6,8 @@ if [ -z "$1" ]
     echo "No cobbler server url supplied"
 fi
 
-cobbler_commit=b3b6ee2391c5a1fb89f7796e4d9dc6538617485a # master as of 4/2/2022
-cobbler_branch=master
+cobbler_commit=df356046f3cf27be62a61001b982d5983800cfd9 # 3.3.6 as of 2024-10-09
+cobbler_branch=release33
 iso_url=https://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso
 iso_os=ubuntu
 valid_iso_checksum=00a9d46306fbe9beb3581853a289490bc231c51f
@@ -44,7 +44,7 @@ else
 fi
 
 docker build -f ./docker/cobbler_source/docker/develop/develop.dockerfile -t cobbler-dev .
-docker compose -f docker/docker-compose.yml up -d
+docker compose -f docker/compose.yml up -d
 
 SERVER_URL=$1
 printf "### Waiting for Cobbler to become available on ${SERVER_URL} \n\n"
@@ -56,7 +56,7 @@ until $(curl --connect-timeout 1 --output /dev/null --silent ${SERVER_URL}); do
   if [ ${attempt_counter} -eq ${max_attempts} ];then
     echo "Max attempts reached"
     # Debug logs
-    docker compose -f ./docker/docker-compose.yml logs
+    docker compose -f ./docker/compose.yml logs
     exit 1
   fi
 
@@ -67,4 +67,4 @@ done
 # Sleep 10 seconds to let the "cobbler import" succeed
 sleep 10
 
-docker compose -f docker/docker-compose.yml logs
+docker compose -f docker/compose.yml logs

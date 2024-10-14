@@ -58,7 +58,7 @@ func testAccCobblerCheckRepoDestroy(s *terraform.State) error {
 			continue
 		}
 
-		if _, err := cobblerApiClient.GetRepo(rs.Primary.ID); err == nil {
+		if _, err := cobblerApiClient.GetRepo(rs.Primary.ID, false, false); err == nil {
 			//goland:noinspection GoErrorStringFormat
 			return fmt.Errorf("Repo still exists")
 		}
@@ -78,7 +78,7 @@ func testAccCobblerCheckRepoExists(n string, repo *cobbler.Repo) resource.TestCh
 			return fmt.Errorf("no ID is set")
 		}
 
-		found, err := cobblerApiClient.GetRepo(rs.Primary.ID)
+		found, err := cobblerApiClient.GetRepo(rs.Primary.ID, false, false)
 		if err != nil {
 			return err
 		}

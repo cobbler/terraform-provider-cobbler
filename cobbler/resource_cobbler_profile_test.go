@@ -81,7 +81,7 @@ func testAccCobblerCheckProfileDestroy(s *terraform.State) error {
 			continue
 		}
 
-		if _, err := cobblerApiClient.GetProfile(rs.Primary.ID); err == nil {
+		if _, err := cobblerApiClient.GetProfile(rs.Primary.ID, false, false); err == nil {
 			//goland:noinspection GoErrorStringFormat
 			return fmt.Errorf("Profile still exists")
 		}
@@ -101,7 +101,7 @@ func testAccCobblerCheckProfileExists(n string, profile *cobbler.Profile) resour
 			return fmt.Errorf("no ID is set")
 		}
 
-		found, err := cobblerApiClient.GetProfile(rs.Primary.ID)
+		found, err := cobblerApiClient.GetProfile(rs.Primary.ID, false, false)
 		if err != nil {
 			return err
 		}

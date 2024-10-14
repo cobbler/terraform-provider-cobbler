@@ -38,14 +38,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v4
+      - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
       - run: go test -v -cover ./...
   test:
-    name: Integration Tests
+    name: Integration Tests (Cobbler ${{ matrix.cobbler_version }})
     needs: build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cobbler_version:
+          # - d8f60bbf14a838c8c8a1dba98086b223e35fe70a # 3.3.0 - TypeError during import
+          - f5b0599acce32de4288c76e4f601aece0c664fed # 3.3.1
+          # - 9044aa990a94752fa5bd5a24051adde099280bfa # 3.3.2 - Testing Docker Image broken
+          # - 5c498dbf2af6e3782b37605a477759e1aacc16b2 # 3.3.3 - Testing Docker Image broken
+          - 3ed865b79ce69fca7464e0957f4bcadcc9917a9d # 3.3.4
+          - 718e3256a5989941e8a678404fdea07364255637 # 3.3.5
+          - df356046f3cf27be62a61001b982d5983800cfd9 # 3.3.6
+      fail-fast: false
     steps:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v4
@@ -54,12 +65,32 @@ jobs:
         with:
           go-version-file: 'go.mod'
         id: go
+      - name: Set up Terraform
+        # https://github.com/hashicorp/setup-terraform
+        uses: hashicorp/setup-terraform@v3
+      - name: Install system dependencies
+        run: |
+          sudo apt-get install -y xorriso
       - name: Get dependencies
         run: |
           go mod download
+      - name: Replace git version hash
+        run: |
+          sed -i "s/cobbler_commit=.*/cobbler_commit=${{ matrix.cobbler_version }}/" docker/start.sh
+      - name: Restore OS ISO
+        id: cache-iso-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            *.iso
+          key: ${{ runner.os }}-${{ matrix.cobbler_version }}-iso
       - name: Make Test
         run: |
           make testacc
-      - name: Make Vet
-        run: |
-          make vet
+      - name: Save OS ISO
+        id: cache-iso-save
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            *.iso
+          key: ${{ steps.cache-iso-restore.outputs.cache-primary-key }}

@@ -57,6 +57,13 @@ func resourceRepo() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 			},
+			"createrepo_flags_inherit": {
+				Description:   "Signal that createrepo_flags should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"createrepo_flags"},
+			},
 			"environment": {
 				Description: "Environment variables to use during repo command execution.",
 				Type:        schema.TypeString,
@@ -92,11 +99,25 @@ func resourceRepo() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Computed:    true,
 			},
+			"owners_inherit": {
+				Description:   "Signal that owners should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"owners"},
+			},
 			"proxy": {
 				Description: "Proxy to use for downloading the repo. This argument does not work on older versions of Cobbler.",
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
+			},
+			"proxy_inherit": {
+				Description:   "Signal that proxy should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"proxy"},
 			},
 			"rpm_list": {
 				Description: "List of specific RPMs to mirror.",
@@ -113,7 +134,10 @@ func resourceRepoCreate(ctx context.Context, d *schema.ResourceData, meta interf
 	config := meta.(*Config)
 
 	// Create a cobblerclient.Repo
-	repo := buildRepo(d, config)
+	repo, err := buildRepo(d, config)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	// Attempt to create the Repo
 	tflog.Debug(ctx, "Cobbler Repo: Create Options", map[string]interface{}{
@@ -133,7 +157,7 @@ func resourceRepoRead(ctx context.Context, d *schema.ResourceData, meta interfac
 	config := meta.(*Config)
 
 	// Retrieve the repo from cobbler
-	repo, err := config.cobblerClient.GetRepo(d.Id())
+	repo, err := config.cobblerClient.GetRepo(d.Id(), false, false)
 	if err != nil {
 		return diag.Errorf("Cobbler Repo: Error Reading (%s): %s", d.Id(), err)
 	}
@@ -151,7 +175,7 @@ func resourceRepoRead(ctx context.Context, d *schema.ResourceData, meta interfac
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("createrepo_flags", repo.CreateRepoFlags)
+	err = SetInherit(d, "createrepo_flags", repo.CreateRepoFlags, "")
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -171,7 +195,7 @@ func resourceRepoRead(ctx context.Context, d *schema.ResourceData, meta interfac
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("proxy", repo.Proxy)
+	err = SetInherit(d, "proxy", repo.Proxy, "")
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -190,7 +214,7 @@ func resourceRepoRead(ctx context.Context, d *schema.ResourceData, meta interfac
 		})
 	}
 
-	err = d.Set("owners", repo.Owners)
+	err = SetInherit(d, "owners", repo.Owners, make([]string, 0))
 	if err != nil {
 		tflog.Debug(ctx, "Unable to set owners", map[string]interface{}{
 			"error": err,
@@ -211,14 +235,17 @@ func resourceRepoUpdate(ctx context.Context, d *schema.ResourceData, meta interf
 	config := meta.(*Config)
 
 	// create a cobblerclient.Repo
-	repo := buildRepo(d, config)
+	repo, err := buildRepo(d, config)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	// Attempt to updateh the repo with new information
 	tflog.Debug(ctx, "Cobbler Repo: Updating Repo with options", map[string]interface{}{
 		"repo":    d.Id(),
 		"options": structs.Map(repo),
 	})
-	err := config.cobblerClient.UpdateRepo(&repo)
+	err = config.cobblerClient.UpdateRepo(&repo)
 	if err != nil {
 		return diag.Errorf("Cobbler Repo: Error Updating (%s): %s", d.Id(), err)
 	}
@@ -238,42 +265,47 @@ func resourceRepoDelete(ctx context.Context, d *schema.ResourceData, meta interf
 }
 
 // buildRepo builds a cobbler.Repo from the Terraform attributes.
-func buildRepo(d *schema.ResourceData, meta interface{}) cobbler.Repo { //nolint:unparam // We satisfy our own pattern here
-	aptComponents := []string{}
-	for _, i := range d.Get("apt_components").([]interface{}) {
-		aptComponents = append(aptComponents, i.(string))
+func buildRepo(d *schema.ResourceData, meta interface{}) (cobbler.Repo, error) { //nolint:unparam // We satisfy our own pattern here
+	aptComponents, err := GetStringSlice(d, "apt_components")
+	if err != nil {
+		return cobbler.Repo{}, err
+	}
+	aptDists, err := GetStringSlice(d, "apt_dists")
+	if err != nil {
+		return cobbler.Repo{}, err
+	}
+	owners, err := GetStringSlice(d, "owners")
+	if err != nil {
+		return cobbler.Repo{}, err
+	}
+	rpmList, err := GetStringSlice(d, "rpm_list")
+	if err != nil {
+		return cobbler.Repo{}, err
 	}
 
-	aptDists := []string{}
-	for _, i := range d.Get("apt_dists").([]interface{}) {
-		aptDists = append(aptDists, i.(string))
+	repo := cobbler.NewRepo()
+	repo.AptComponents = aptComponents
+	repo.AptDists = aptDists
+	repo.Arch = d.Get("arch").(string)
+	repo.Breed = d.Get("breed").(string)
+	repo.Comment = d.Get("comment").(string)
+	repo.CreateRepoFlags = cobbler.Value[string]{
+		Data:        d.Get("createrepo_flags").(string),
+		IsInherited: d.Get("createrepo_flags_inherit").(bool),
 	}
-
-	owners := []string{}
-	for _, i := range d.Get("owners").([]interface{}) {
-		owners = append(owners, i.(string))
+	repo.KeepUpdated = d.Get("keep_updated").(bool)
+	repo.Mirror = d.Get("mirror").(string)
+	repo.MirrorLocally = d.Get("mirror_locally").(bool)
+	repo.Name = d.Get("name").(string)
+	repo.Owners = cobbler.Value[[]string]{
+		Data:        owners,
+		IsInherited: d.Get("owners_inherit").(bool),
 	}
-
-	rpmList := []string{}
-	for _, i := range d.Get("rpm_list").([]interface{}) {
-		rpmList = append(rpmList, i.(string))
+	repo.Proxy = cobbler.Value[string]{
+		Data:        d.Get("proxy").(string),
+		IsInherited: d.Get("proxy_inherit").(bool),
 	}
+	repo.RpmList = rpmList
 
-	repo := cobbler.Repo{
-		AptComponents:   aptComponents,
-		AptDists:        aptDists,
-		Arch:            d.Get("arch").(string),
-		Breed:           d.Get("breed").(string),
-		Comment:         d.Get("comment").(string),
-		CreateRepoFlags: d.Get("createrepo_flags").(string),
-		KeepUpdated:     d.Get("keep_updated").(bool),
-		Mirror:          d.Get("mirror").(string),
-		MirrorLocally:   d.Get("mirror_locally").(bool),
-		Name:            d.Get("name").(string),
-		Owners:          owners,
-		Proxy:           d.Get("proxy").(string),
-		RpmList:         rpmList,
-	}
-
-	return repo
+	return repo, nil
 }

@@ -32,12 +32,20 @@ func resourceDistro() *schema.Resource {
 				ForceNew:    true,
 			},
 			"boot_files": {
-				Description: "Files copied into tftpboot beyond the kernel/initrd.",
-				Type:        schema.TypeList,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Optional:    true,
-				ForceNew:    true,
-				Computed:    true,
+				Description:   "Files copied into tftpboot beyond the kernel/initrd.",
+				Type:          schema.TypeMap,
+				Elem:          &schema.Schema{Type: schema.TypeString},
+				Optional:      true,
+				ForceNew:      true,
+				Computed:      true,
+				ConflictsWith: []string{"boot_files_inherit"},
+			},
+			"boot_files_inherit": {
+				Description:   "Signal that boot_files should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"boot_files"},
 			},
 			"boot_loaders": {
 				Description: "Must be either 'grub', 'pxe', or 'ipxe'.",
@@ -47,6 +55,13 @@ func resourceDistro() *schema.Resource {
 				ForceNew:    true,
 				Computed:    true,
 			},
+			"boot_loaders_inherit": {
+				Description:   "Signal that boot_loaders should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"boot_loaders"},
+			},
 			"comment": {
 				Description: "Free form text description.",
 				Type:        schema.TypeString,
@@ -55,10 +70,17 @@ func resourceDistro() *schema.Resource {
 			},
 			"fetchable_files": {
 				Description: "Templates for tftp or wget.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeMap,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
+			},
+			"fetchable_files_inherit": {
+				Description:   "Signal that fetchable_files should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"fetchable_files"},
 			},
 			"initrd": {
 				Description: "Absolute path to initrd on filesystem. This must already exist prior to creating the distro.",
@@ -72,17 +94,30 @@ func resourceDistro() *schema.Resource {
 			},
 			"kernel_options": {
 				Description: "Kernel options to use with the kernel.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeMap,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
 			},
+			"kernel_options_inherit": {
+				Description:   "Signal that kernel_options should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"kernel_options"},
+			},
 			"kernel_options_post": {
 				Description: "Post install Kernel options to use with the kernel after installation.",
-				Type:        schema.TypeList,
-				Elem:        &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeMap,
 				Optional:    true,
 				Computed:    true,
+			},
+			"kernel_options_post_inherit": {
+				Description:   "Signal that kernel_options_post should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"kernel_options_post"},
 			},
 			"mgmt_classes": {
 				Description: "Management classes for external config management.",
@@ -90,6 +125,13 @@ func resourceDistro() *schema.Resource {
 				Optional:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Computed:    true,
+			},
+			"mgmt_classes_inherit": {
+				Description:   "Signal that mgmt_classes should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"mgmt_classes"},
 			},
 			"name": {
 				Description: "A name for the distro.",
@@ -108,12 +150,26 @@ func resourceDistro() *schema.Resource {
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Computed:    true,
 			},
+			"owners_inherit": {
+				Description:   "Signal that owners should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"owners"},
+			},
 			"template_files": {
 				Description: "File mappings for built-in config management.",
-				Type:        schema.TypeList,
+				Type:        schema.TypeMap,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
 				Computed:    true,
+			},
+			"template_files_inherit": {
+				Description:   "Signal that template_files should be set to inherit from its parent",
+				Type:          schema.TypeBool,
+				Optional:      true,
+				Computed:      true,
+				ConflictsWith: []string{"template_files"},
 			},
 		},
 	}
@@ -123,7 +179,10 @@ func resourceDistroCreate(ctx context.Context, d *schema.ResourceData, meta inte
 	config := meta.(*Config)
 
 	// Create a cobblerclient.Distro
-	distro := buildDistro(d, config)
+	distro, err := buildDistro(d, config)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	// Attempt to create the Distro
 	tflog.Debug(ctx, "Cobbler Distro Create Options", map[string]interface{}{
@@ -143,7 +202,7 @@ func resourceDistroRead(ctx context.Context, d *schema.ResourceData, meta interf
 	config := meta.(*Config)
 
 	// Retrieve the distro from cobbler
-	distro, err := config.cobblerClient.GetDistro(d.Id())
+	distro, err := config.cobblerClient.GetDistro(d.Id(), false, false)
 	if err != nil {
 		return diag.Errorf("Cobbler Distro: Error Reading (%s): %s", d.Id(), err)
 	}
@@ -157,11 +216,11 @@ func resourceDistroRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("boot_files", distro.BootFiles)
+	err = SetInherit(d, "boot_files", distro.BootFiles, make(map[string]interface{}))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("boot_loaders", distro.BootLoaders)
+	err = SetInherit(d, "boot_loaders", distro.BootLoaders, make([]string, 0))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -169,7 +228,7 @@ func resourceDistroRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("fetchable_files", distro.FetchableFiles)
+	err = SetInherit(d, "fetchable_files", distro.FetchableFiles, make(map[string]interface{}))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -181,11 +240,11 @@ func resourceDistroRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("kernel_options", distro.KernelOptions)
+	err = SetInherit(d, "kernel_options", distro.KernelOptions, make(map[string]interface{}))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("kernel_options_post", distro.KernelOptionsPost)
+	err = SetInherit(d, "kernel_options_post", distro.KernelOptionsPost, make(map[string]interface{}))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -193,7 +252,7 @@ func resourceDistroRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("mgmt_classes", distro.MGMTClasses)
+	err = SetInherit(d, "mgmt_classes", distro.MgmtClasses, make([]string, 0))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -201,11 +260,11 @@ func resourceDistroRead(ctx context.Context, d *schema.ResourceData, meta interf
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("owners", distro.Owners)
+	err = SetInherit(d, "owners", distro.Owners, make([]string, 0))
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	err = d.Set("template_files", distro.TemplateFiles)
+	err = SetInherit(d, "template_files", distro.TemplateFiles, make(map[string]interface{}))
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -217,14 +276,17 @@ func resourceDistroUpdate(ctx context.Context, d *schema.ResourceData, meta inte
 	config := meta.(*Config)
 
 	// create a cobblerclient.Distro
-	distro := buildDistro(d, config)
+	distro, err := buildDistro(d, config)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
 	// Attempt to updateh the distro with new information
 	tflog.Debug(ctx, "Cobbler Distro: Updating Distro", map[string]interface{}{
 		"distro":  d.Id(),
 		"options": structs.Map(distro),
 	})
-	err := config.cobblerClient.UpdateDistro(&distro)
+	err = config.cobblerClient.UpdateDistro(&distro)
 	if err != nil {
 		return diag.Errorf("Cobbler Distro: Error Updating (%s): %s", d.Id(), err)
 	}
@@ -244,58 +306,80 @@ func resourceDistroDelete(ctx context.Context, d *schema.ResourceData, meta inte
 }
 
 // buildDistro builds a cobbler.Distro from the Terraform attributes.
-func buildDistro(d *schema.ResourceData, meta interface{}) cobbler.Distro { //nolint:unparam // We satisfy our own pattern here
-	mgmtClasses := []string{}
-	for _, i := range d.Get("mgmt_classes").([]interface{}) {
-		mgmtClasses = append(mgmtClasses, i.(string))
+func buildDistro(d *schema.ResourceData, meta interface{}) (cobbler.Distro, error) { //nolint:unparam // We satisfy our own pattern here
+	mgmtClasses, err := GetStringSlice(d, "mgmt_classes")
+	if err != nil {
+		return cobbler.Distro{}, err
+	}
+	owners, err := GetStringSlice(d, "owners")
+	if err != nil {
+		return cobbler.Distro{}, err
+	}
+	bootFiles, err := GetInterfaceMap(d, "boot_files")
+	if err != nil {
+		return cobbler.Distro{}, err
+	}
+	bootLoaders, err := GetStringSlice(d, "boot_loaders")
+	if err != nil {
+		return cobbler.Distro{}, err
+	}
+	fetchableFiles, err := GetInterfaceMap(d, "fetchable_files")
+	if err != nil {
+		return cobbler.Distro{}, err
+	}
+	kernelOptions, err := GetInterfaceMap(d, "kernel_options")
+	if err != nil {
+		return cobbler.Distro{}, err
+	}
+	kernelOptionsPost, err := GetInterfaceMap(d, "kernel_options_post")
+	if err != nil {
+		return cobbler.Distro{}, err
+	}
+	templateFiles, err := GetInterfaceMap(d, "template_files")
+	if err != nil {
+		return cobbler.Distro{}, err
 	}
 
-	owners := []string{}
-	for _, i := range d.Get("owners").([]interface{}) {
-		owners = append(owners, i.(string))
+	distro := cobbler.NewDistro()
+	distro.Arch = d.Get("arch").(string)
+	distro.Breed = d.Get("breed").(string)
+	distro.BootFiles = cobbler.Value[map[string]interface{}]{
+		Data:        bootFiles,
+		IsInherited: d.Get("boot_files_inherit").(bool),
 	}
-	bootFiles := []string{}
-	for _, i := range d.Get("boot_files").([]interface{}) {
-		bootFiles = append(bootFiles, i.(string))
+	distro.BootLoaders = cobbler.Value[[]string]{
+		Data:        bootLoaders,
+		IsInherited: d.Get("boot_loaders_inherit").(bool),
 	}
-	bootLoaders := []string{}
-	for _, i := range d.Get("boot_loaders").([]interface{}) {
-		bootLoaders = append(bootLoaders, i.(string))
+	distro.Comment = d.Get("comment").(string)
+	distro.FetchableFiles = cobbler.Value[map[string]interface{}]{
+		Data:        fetchableFiles,
+		IsInherited: d.Get("fetchable_files_inherit").(bool),
 	}
-	fetchableFiles := []string{}
-	for _, i := range d.Get("fetchable_files").([]interface{}) {
-		fetchableFiles = append(fetchableFiles, i.(string))
+	distro.Kernel = d.Get("kernel").(string)
+	distro.KernelOptions = cobbler.Value[map[string]interface{}]{
+		Data:        kernelOptions,
+		IsInherited: d.Get("kernel_options_inherit").(bool),
 	}
-	kernelOptions := []string{}
-	for _, i := range d.Get("kernel_options").([]interface{}) {
-		kernelOptions = append(owners, i.(string))
+	distro.KernelOptionsPost = cobbler.Value[map[string]interface{}]{
+		Data:        kernelOptionsPost,
+		IsInherited: d.Get("kernel_options_post_inherit").(bool),
 	}
-	kernelOptionsPost := []string{}
-	for _, i := range d.Get("kernel_options_post").([]interface{}) {
-		kernelOptionsPost = append(owners, i.(string))
+	distro.Initrd = d.Get("initrd").(string)
+	distro.MgmtClasses = cobbler.Value[[]string]{
+		Data:        mgmtClasses,
+		IsInherited: d.Get("mgmt_classes_inherit").(bool),
 	}
-	templateFiles := []string{}
-	for _, i := range d.Get("template_files").([]interface{}) {
-		templateFiles = append(templateFiles, i.(string))
+	distro.Name = d.Get("name").(string)
+	distro.OSVersion = d.Get("os_version").(string)
+	distro.Owners = cobbler.Value[[]string]{
+		Data:        owners,
+		IsInherited: d.Get("owners_inherit").(bool),
 	}
-
-	distro := cobbler.Distro{
-		Arch:              d.Get("arch").(string),
-		Breed:             d.Get("breed").(string),
-		BootFiles:         bootFiles,
-		BootLoaders:       bootLoaders,
-		Comment:           d.Get("comment").(string),
-		FetchableFiles:    fetchableFiles,
-		Kernel:            d.Get("kernel").(string),
-		KernelOptions:     kernelOptions,
-		KernelOptionsPost: kernelOptionsPost,
-		Initrd:            d.Get("initrd").(string),
-		MGMTClasses:       mgmtClasses,
-		Name:              d.Get("name").(string),
-		OSVersion:         d.Get("os_version").(string),
-		Owners:            owners,
-		TemplateFiles:     templateFiles,
+	distro.TemplateFiles = cobbler.Value[map[string]interface{}]{
+		Data:        templateFiles,
+		IsInherited: d.Get("template_files_inherit").(bool),
 	}
 
-	return distro
+	return distro, nil
 }

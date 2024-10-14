@@ -37,15 +37,23 @@ resource "cobbler_distro" "Ubuntu-2004-x86_64" {
 ### Optional
 
 - `arch` (String) The architecture of the distro. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.
-- `boot_files` (List of String) Files copied into tftpboot beyond the kernel/initrd.
+- `boot_files` (Map of String) Files copied into tftpboot beyond the kernel/initrd.
+- `boot_files_inherit` (Boolean) Signal that boot_files should be set to inherit from its parent
 - `boot_loaders` (List of String) Must be either 'grub', 'pxe', or 'ipxe'.
+- `boot_loaders_inherit` (Boolean) Signal that boot_loaders should be set to inherit from its parent
 - `comment` (String) Free form text description.
-- `fetchable_files` (List of String) Templates for tftp or wget.
-- `kernel_options` (List of String) Kernel options to use with the kernel.
-- `kernel_options_post` (List of String) Post install Kernel options to use with the kernel after installation.
+- `fetchable_files` (Map of String) Templates for tftp or wget.
+- `fetchable_files_inherit` (Boolean) Signal that fetchable_files should be set to inherit from its parent
+- `kernel_options` (Map of String) Kernel options to use with the kernel.
+- `kernel_options_inherit` (Boolean) Signal that kernel_options should be set to inherit from its parent
+- `kernel_options_post` (Map of String) Post install Kernel options to use with the kernel after installation.
+- `kernel_options_post_inherit` (Boolean) Signal that kernel_options_post should be set to inherit from its parent
 - `mgmt_classes` (List of String) Management classes for external config management.
+- `mgmt_classes_inherit` (Boolean) Signal that mgmt_classes should be set to inherit from its parent
 - `owners` (List of String) Owners list for authz_ownership.
-- `template_files` (List of String) File mappings for built-in config management.
+- `owners_inherit` (Boolean) Signal that owners should be set to inherit from its parent
+- `template_files` (Map of String) File mappings for built-in config management.
+- `template_files_inherit` (Boolean) Signal that template_files should be set to inherit from its parent
 
 ### Read-Only
 

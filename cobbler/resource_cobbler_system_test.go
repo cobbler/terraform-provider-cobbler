@@ -120,7 +120,7 @@ func testAccCobblerCheckSystemDestroy(s *terraform.State) error {
 			continue
 		}
 
-		if _, err := cobblerApiClient.GetSystem(rs.Primary.ID); err == nil {
+		if _, err := cobblerApiClient.GetSystem(rs.Primary.ID, false, false); err == nil {
 			//goland:noinspection GoErrorStringFormat
 			return fmt.Errorf("System still exists")
 		}
@@ -140,7 +140,7 @@ func testAccCobblerCheckSystemExists(n string, system *cobbler.System) resource.
 			return fmt.Errorf("no ID is set")
 		}
 
-		found, err := cobblerApiClient.GetSystem(rs.Primary.ID)
+		found, err := cobblerApiClient.GetSystem(rs.Primary.ID, false, false)
 		if err != nil {
 			return err
 		}
