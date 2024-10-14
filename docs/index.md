@@ -7,19 +7,13 @@ description: |-
 
 # Cobbler Provider
 
-The Cobbler provider is used to interact with a locally installed [Cobbler](https://cobbler.github.io/) service. The provider needs to be configured with the proper credentials before it can be used.
+> The current version of the provider is only compatible with the Cobbler 3.3.x release series. Other versions are
+> incompatible.
+
+The Cobbler provider is used to interact with a locally installed [Cobbler](https://cobbler.github.io/) service. The
+provider needs to be configured with the proper credentials before it can be used.
 
 Use the navigation to the left to read about the available resources.
-
-## Prerequisites
-
-Until [this issue](https://github.com/cobbler/cobbler/issues/2386) is
-fixed, it is necessary to disable Cobbler's cache by adding the following
-line to `/etc/cobbler/settings` (since Cobbler 3.2.1 `settings.yaml`) file:
-
-```txt
-cache_enabled: 0
-```
 
 ## Example Usage
 
