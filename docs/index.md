@@ -18,10 +18,35 @@ Use the navigation to the left to read about the available resources.
 ## Example Usage
 
 ```terraform
+terraform {
+  required_providers {
+    cobbler = {
+      source = "cobbler/cobbler"
+      version = "3.0.0"
+    }
+  }
+}
+
+variable "username" {
+  type = string
+}
+
+variable "password" {
+  type = string
+}
+
+variable "url" {
+  type = string
+}
+
+variable "insecure" {
+  type = bool
+}
+
 provider "cobbler" {
   username = var.username # optionally use COBBLER_USERNAME env var
   password = var.password # optionally use COBBLER_PASSWORD env var
-  api_url  = var.url      # optionally use COBBLER_URL env var
+  url  = var.url          # optionally use COBBLER_URL env var
 
   # You may need to allow insecure TLS communications unless you
   # have configured certificates
