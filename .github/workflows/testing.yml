@@ -94,3 +94,11 @@ jobs:
           path: |
             *.iso
           key: ${{ steps.cache-iso-restore.outputs.cache-primary-key }}
+      # https://github.com/actions/upload-artifact
+      - name: Upload coverage report to GH artifacts
+        if: matrix.cobbler_version == 'df356046f3cf27be62a61001b982d5983800cfd9'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.out
+          if-no-files-found: error

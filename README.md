@@ -1,5 +1,7 @@
 # Cobbler Terraform Provider
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/d68c9aff2cd74b69afc9366ab4415f6a)](https://app.codacy.com/gh/cobbler/terraform-provider-cobbler/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+
 The Cobbler provider is used to interact with a locally installed Cobbler service.\
 The provider needs to be configured with the proper credentials before it can be used.
 
