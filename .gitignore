@@ -37,3 +37,4 @@ vendor/
 docker/cobbler_source/
 extracted_iso_image/
 *.iso
+coverage.out
