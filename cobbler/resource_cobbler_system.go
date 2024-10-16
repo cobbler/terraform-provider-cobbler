@@ -939,24 +939,24 @@ func buildSystem(d *schema.ResourceData) (cobbler.System, error) {
 	system.Autoinstall = d.Get("autoinstall").(string)
 	system.AutoinstallMeta = cobbler.Value[map[string]interface{}]{
 		Data:        autoinstallMeta,
-		IsInherited: false,
+		IsInherited: IsOptionInherited(d, "autoinstall_meta"),
 	}
 	system.BootFiles = cobbler.Value[map[string]interface{}]{
 		Data:        bootFiles,
-		IsInherited: d.Get("boot_files_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "boot_files"),
 	}
 	system.BootLoaders = cobbler.Value[[]string]{
 		Data:        bootLoaders,
-		IsInherited: d.Get("boot_loaders_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "boot_loaders"),
 	}
 	system.Comment = d.Get("comment").(string)
 	system.EnableIPXE = cobbler.Value[bool]{
 		Data:        d.Get("enable_ipxe").(bool),
-		IsInherited: d.Get("enable_ipxe_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "enable_ipxe"),
 	}
 	system.FetchableFiles = cobbler.Value[map[string]interface{}]{
 		Data:        fetchableFiles,
-		IsInherited: d.Get("fetchable_files_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "fetchable_files"),
 	}
 	system.Gateway = d.Get("gateway").(string)
 	system.Hostname = d.Get("hostname").(string)
@@ -964,19 +964,19 @@ func buildSystem(d *schema.ResourceData) (cobbler.System, error) {
 	system.IPv6DefaultDevice = d.Get("ipv6_default_device").(string)
 	system.KernelOptions = cobbler.Value[map[string]interface{}]{
 		Data:        kernelOptions,
-		IsInherited: d.Get("kernel_options_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "kernel_options"),
 	}
 	system.KernelOptionsPost = cobbler.Value[map[string]interface{}]{
 		Data:        kernelOptionsPost,
-		IsInherited: d.Get("kernel_options_post_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "kernel_options_post"),
 	}
 	system.MgmtClasses = cobbler.Value[[]string]{
 		Data:        mgmtClasses,
-		IsInherited: d.Get("mgmt_classes_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "mgmt_classes"),
 	}
 	system.MgmtParameters = cobbler.Value[map[string]interface{}]{
 		Data:        mgmtParameters,
-		IsInherited: d.Get("mgmt_parameters_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "mgmt_parameters"),
 	}
 	system.Name = d.Get("name").(string)
 	system.NameServersSearch = nameServersSearch
@@ -986,7 +986,7 @@ func buildSystem(d *schema.ResourceData) (cobbler.System, error) {
 	system.NextServerv6 = d.Get("next_server_v6").(string)
 	system.Owners = cobbler.Value[[]string]{
 		Data:        owners,
-		IsInherited: d.Get("owners_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "owners"),
 	}
 	system.PowerAddress = d.Get("power_address").(string)
 	system.PowerID = d.Get("power_id").(string)
@@ -998,26 +998,26 @@ func buildSystem(d *schema.ResourceData) (cobbler.System, error) {
 	system.Status = d.Get("status").(string)
 	system.TemplateFiles = cobbler.Value[map[string]interface{}]{
 		Data:        templateFiles,
-		IsInherited: d.Get("template_files_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "template_files"),
 	}
 	system.VirtAutoBoot = cobbler.Value[bool]{
 		Data:        d.Get("virt_auto_boot").(bool),
-		IsInherited: d.Get("virt_auto_boot_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "virt_auto_boot"),
 	}
 	system.VirtFileSize = cobbler.Value[float64]{
 		Data:        d.Get("virt_file_size").(float64),
-		IsInherited: d.Get("virt_file_size_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "virt_file_size"),
 	}
 	system.VirtCPUs = cobbler.Value[int]{
 		Data:        d.Get("virt_cpus").(int),
-		IsInherited: d.Get("virt_cpus_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "virt_cpus"),
 	}
 	system.VirtType = d.Get("virt_type").(string)
 	system.VirtPath = d.Get("virt_path").(string)
 	system.VirtPXEBoot = d.Get("virt_pxe_boot").(bool)
 	system.VirtRAM = cobbler.Value[int]{
 		Data:        d.Get("virt_ram").(int),
-		IsInherited: d.Get("virt_ram_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "virt_ram"),
 	}
 	system.VirtDiskDriver = d.Get("virt_disk_driver").(string)
 

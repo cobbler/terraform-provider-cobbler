@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/mitchellh/go-homedir"
 	"hash/crc32"
+	"log"
 	"os"
 )
 
@@ -116,4 +117,18 @@ func SetInherit[K any](d *schema.ResourceData, key string, value cobbler.Value[K
 		}
 	}
 	return nil
+}
+
+// IsOptionInherited calculates if a given key inherits or not.
+func IsOptionInherited(d *schema.ResourceData, key string) bool {
+	inheritKeyValue := d.Get(fmt.Sprintf("%s_inherit", key)).(bool)
+	valueKeyHasChange := d.HasChange(key)
+	if valueKeyHasChange && inheritKeyValue {
+		log.Println("[INFO] edge case for IsOptionInherit explicitly returned false")
+		// The inherit key is true due to the tfstate but the user is changing the map in the tf file.
+		// Due to this the inherit key must be false now.
+		return false
+	}
+
+	return inheritKeyValue
 }

@@ -36,14 +36,12 @@ func resourceRepo() *schema.Resource {
 				Description: "The architecture of the repo. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.",
 				Type:        schema.TypeString,
 				Optional:    true,
-				ForceNew:    true,
 				Computed:    true,
 			},
 			"breed": {
 				Description: "The \"breed\" of distribution. Valid options are: rsync, rhn, yum, apt, and wget. These choices may vary depending on the version of Cobbler in use.",
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
 			},
 			"comment": {
 				Description: "Free form text description.",
@@ -291,7 +289,7 @@ func buildRepo(d *schema.ResourceData, meta interface{}) (cobbler.Repo, error) {
 	repo.Comment = d.Get("comment").(string)
 	repo.CreateRepoFlags = cobbler.Value[string]{
 		Data:        d.Get("createrepo_flags").(string),
-		IsInherited: d.Get("createrepo_flags_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "createrepo_flags"),
 	}
 	repo.KeepUpdated = d.Get("keep_updated").(bool)
 	repo.Mirror = d.Get("mirror").(string)
@@ -299,11 +297,11 @@ func buildRepo(d *schema.ResourceData, meta interface{}) (cobbler.Repo, error) {
 	repo.Name = d.Get("name").(string)
 	repo.Owners = cobbler.Value[[]string]{
 		Data:        owners,
-		IsInherited: d.Get("owners_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "owners"),
 	}
 	repo.Proxy = cobbler.Value[string]{
 		Data:        d.Get("proxy").(string),
-		IsInherited: d.Get("proxy_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "proxy"),
 	}
 	repo.RpmList = rpmList
 

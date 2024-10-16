@@ -22,21 +22,18 @@ func resourceDistro() *schema.Resource {
 				Description: "The architecture of the distro. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.",
 				Type:        schema.TypeString,
 				Optional:    true,
-				ForceNew:    true,
 				Computed:    true,
 			},
 			"breed": {
 				Description: "The \"breed\" of distribution. Valid options are: redhat, fedora, centos, scientific linux, suse, debian, and ubuntu. These choices may vary depending on the version of Cobbler in use.",
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
 			},
 			"boot_files": {
 				Description:   "Files copied into tftpboot beyond the kernel/initrd.",
 				Type:          schema.TypeMap,
 				Elem:          &schema.Schema{Type: schema.TypeString},
 				Optional:      true,
-				ForceNew:      true,
 				Computed:      true,
 				ConflictsWith: []string{"boot_files_inherit"},
 			},
@@ -52,7 +49,6 @@ func resourceDistro() *schema.Resource {
 				Type:        schema.TypeList,
 				Elem:        &schema.Schema{Type: schema.TypeString},
 				Optional:    true,
-				ForceNew:    true,
 				Computed:    true,
 			},
 			"boot_loaders_inherit": {
@@ -345,40 +341,40 @@ func buildDistro(d *schema.ResourceData, meta interface{}) (cobbler.Distro, erro
 	distro.Breed = d.Get("breed").(string)
 	distro.BootFiles = cobbler.Value[map[string]interface{}]{
 		Data:        bootFiles,
-		IsInherited: d.Get("boot_files_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "boot_files"),
 	}
 	distro.BootLoaders = cobbler.Value[[]string]{
 		Data:        bootLoaders,
-		IsInherited: d.Get("boot_loaders_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "boot_loaders"),
 	}
 	distro.Comment = d.Get("comment").(string)
 	distro.FetchableFiles = cobbler.Value[map[string]interface{}]{
 		Data:        fetchableFiles,
-		IsInherited: d.Get("fetchable_files_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "fetchable_files"),
 	}
 	distro.Kernel = d.Get("kernel").(string)
 	distro.KernelOptions = cobbler.Value[map[string]interface{}]{
 		Data:        kernelOptions,
-		IsInherited: d.Get("kernel_options_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "kernel_options"),
 	}
 	distro.KernelOptionsPost = cobbler.Value[map[string]interface{}]{
 		Data:        kernelOptionsPost,
-		IsInherited: d.Get("kernel_options_post_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "kernel_options_post"),
 	}
 	distro.Initrd = d.Get("initrd").(string)
 	distro.MgmtClasses = cobbler.Value[[]string]{
 		Data:        mgmtClasses,
-		IsInherited: d.Get("mgmt_classes_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "mgmt_classes"),
 	}
 	distro.Name = d.Get("name").(string)
 	distro.OSVersion = d.Get("os_version").(string)
 	distro.Owners = cobbler.Value[[]string]{
 		Data:        owners,
-		IsInherited: d.Get("owners_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "owners"),
 	}
 	distro.TemplateFiles = cobbler.Value[map[string]interface{}]{
 		Data:        templateFiles,
-		IsInherited: d.Get("template_files_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "template_files"),
 	}
 
 	return distro, nil
