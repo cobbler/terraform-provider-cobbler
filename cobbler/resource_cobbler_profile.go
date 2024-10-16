@@ -62,6 +62,7 @@ func resourceProfile() *schema.Resource {
 				Description: "DHCP tag.",
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 			},
 			"distro": {
 				Description: "Parent distribution.",
@@ -579,80 +580,80 @@ func buildProfile(d *schema.ResourceData, meta interface{}) (cobbler.Profile, er
 	profile.Autoinstall = d.Get("autoinstall").(string)
 	profile.AutoinstallMeta = cobbler.Value[map[string]interface{}]{
 		Data:        autoinstallMeta,
-		IsInherited: false,
+		IsInherited: IsOptionInherited(d, "autoinstall_meta"),
 	}
 	profile.BootFiles = cobbler.Value[map[string]interface{}]{
 		Data:        bootFiles,
-		IsInherited: d.Get("boot_files_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "boot_files"),
 	}
 	profile.Comment = d.Get("comment").(string)
 	profile.DHCPTag = d.Get("dhcp_tag").(string)
 	profile.Distro = d.Get("distro").(string)
 	profile.EnableIPXE = cobbler.Value[bool]{
 		Data:        d.Get("enable_ipxe").(bool),
-		IsInherited: d.Get("enable_ipxe_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "enable_ipxe"),
 	}
 	profile.EnableMenu = cobbler.Value[bool]{
 		Data:        d.Get("enable_menu").(bool),
-		IsInherited: d.Get("enable_menu_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "enable_menu"),
 	}
 	profile.FetchableFiles = cobbler.Value[map[string]interface{}]{
 		Data:        fetchableFiles,
-		IsInherited: d.Get("fetchable_files_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "fetchable_files"),
 	}
 	profile.KernelOptions = cobbler.Value[map[string]interface{}]{
 		Data:        kernelOptions,
-		IsInherited: d.Get("kernel_options_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "kernel_options"),
 	}
 	profile.KernelOptionsPost = cobbler.Value[map[string]interface{}]{
 		Data:        kernelOptionsPost,
-		IsInherited: d.Get("kernel_options_post_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "kernel_options_post"),
 	}
 	profile.MgmtClasses = cobbler.Value[[]string]{
 		Data:        mgmtClasses,
-		IsInherited: d.Get("mgmt_classes_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "mgmt_classes"),
 	}
 	profile.MgmtParameters = cobbler.Value[map[string]interface{}]{
 		Data:        mgmtParameters,
-		IsInherited: d.Get("mgmt_parameters_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "mgmt_parameters"),
 	}
 	profile.Name = d.Get("name").(string)
 	profile.NameServersSearch = cobbler.Value[[]string]{
 		Data:        nameServersSearch,
-		IsInherited: d.Get("name_servers_search_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "name_servers_search"),
 	}
 	profile.NameServers = cobbler.Value[[]string]{
 		Data:        nameServers,
-		IsInherited: d.Get("name_servers_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "name_servers"),
 	}
 	profile.NextServerv4 = d.Get("next_server_v4").(string)
 	profile.NextServerv6 = d.Get("next_server_v6").(string)
 	profile.Owners = cobbler.Value[[]string]{
 		Data:        owners,
-		IsInherited: d.Get("owners_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "owners"),
 	}
 	profile.Proxy = d.Get("proxy").(string)
 	profile.Repos = repos
 	profile.Server = d.Get("server").(string)
 	profile.TemplateFiles = cobbler.Value[map[string]interface{}]{
 		Data:        templateFiles,
-		IsInherited: d.Get("template_files_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "template_files"),
 	}
 	profile.VirtAutoBoot = cobbler.Value[bool]{
 		Data:        d.Get("virt_auto_boot").(bool),
-		IsInherited: d.Get("virt_auto_boot_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "virt_auto_boot"),
 	}
 	profile.VirtBridge = d.Get("virt_bridge").(string)
 	profile.VirtCPUs = d.Get("virt_cpus").(int)
 	profile.VirtDiskDriver = d.Get("virt_disk_driver").(string)
 	profile.VirtFileSize = cobbler.Value[float64]{
 		Data:        d.Get("virt_file_size").(float64),
-		IsInherited: d.Get("virt_file_size_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "virt_file_size"),
 	}
 	profile.VirtPath = d.Get("virt_path").(string)
 	profile.VirtRAM = cobbler.Value[int]{
 		Data:        d.Get("virt_ram").(int),
-		IsInherited: d.Get("virt_ram_inherit").(bool),
+		IsInherited: IsOptionInherited(d, "virt_ram"),
 	}
 	profile.VirtType = d.Get("virt_type").(string)
 
