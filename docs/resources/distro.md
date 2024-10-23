@@ -28,11 +28,9 @@ resource "cobbler_distro" "Ubuntu-2004-x86_64" {
 
 ### Required
 
-- `breed` (String) The "breed" of distribution. Valid options are: redhat, fedora, centos, scientific linux, suse, debian, and ubuntu. These choices may vary depending on the version of Cobbler in use.
 - `initrd` (String) Absolute path to initrd on filesystem. This must already exist prior to creating the distro.
 - `kernel` (String) Absolute path to kernel on filesystem. This must already exist prior to creating the distro.
 - `name` (String) A name for the distro.
-- `os_version` (String) The version of the distro you are creating. This varies with the version of Cobbler you are using. An updated signature list may need to be obtained in order to support a newer version. Example: `focal`.
 
 ### Optional
 
@@ -41,6 +39,7 @@ resource "cobbler_distro" "Ubuntu-2004-x86_64" {
 - `boot_files_inherit` (Boolean) Signal that boot_files should be set to inherit from its parent
 - `boot_loaders` (List of String) Must be either 'grub', 'pxe', or 'ipxe'.
 - `boot_loaders_inherit` (Boolean) Signal that boot_loaders should be set to inherit from its parent
+- `breed` (String) The "breed" of distribution. Valid options are: redhat, fedora, centos, scientific linux, suse, debian, and ubuntu. These choices may vary depending on the version of Cobbler in use.
 - `comment` (String) Free form text description.
 - `fetchable_files` (Map of String) Templates for tftp or wget.
 - `fetchable_files_inherit` (Boolean) Signal that fetchable_files should be set to inherit from its parent
@@ -50,6 +49,7 @@ resource "cobbler_distro" "Ubuntu-2004-x86_64" {
 - `kernel_options_post_inherit` (Boolean) Signal that kernel_options_post should be set to inherit from its parent
 - `mgmt_classes` (List of String) Management classes for external config management.
 - `mgmt_classes_inherit` (Boolean) Signal that mgmt_classes should be set to inherit from its parent
+- `os_version` (String) The version of the distro you are creating. This varies with the version of Cobbler you are using. An updated signature list may need to be obtained in order to support a newer version. Example: `focal`.
 - `owners` (List of String) Owners list for authz_ownership.
 - `owners_inherit` (Boolean) Signal that owners should be set to inherit from its parent
 - `template_files` (Map of String) File mappings for built-in config management.

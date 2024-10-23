@@ -27,7 +27,8 @@ func resourceDistro() *schema.Resource {
 			"breed": {
 				Description: "The \"breed\" of distribution. Valid options are: redhat, fedora, centos, scientific linux, suse, debian, and ubuntu. These choices may vary depending on the version of Cobbler in use.",
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
+				Computed:    true,
 			},
 			"boot_files": {
 				Description:   "Files copied into tftpboot beyond the kernel/initrd.",
@@ -137,7 +138,8 @@ func resourceDistro() *schema.Resource {
 			"os_version": {
 				Description: "The version of the distro you are creating. This varies with the version of Cobbler you are using. An updated signature list may need to be obtained in order to support a newer version. Example: `focal`.",
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
+				Computed:    true,
 			},
 			"owners": {
 				Description: "Owners list for authz_ownership.",
