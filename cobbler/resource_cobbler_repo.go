@@ -41,7 +41,8 @@ func resourceRepo() *schema.Resource {
 			"breed": {
 				Description: "The \"breed\" of distribution. Valid options are: rsync, rhn, yum, apt, and wget. These choices may vary depending on the version of Cobbler in use.",
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
+				Computed:    true,
 			},
 			"comment": {
 				Description: "Free form text description.",

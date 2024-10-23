@@ -28,7 +28,6 @@ resource "cobbler_repo" "my_repo" {
 
 ### Required
 
-- `breed` (String) The "breed" of distribution. Valid options are: rsync, rhn, yum, apt, and wget. These choices may vary depending on the version of Cobbler in use.
 - `mirror` (String) Address of the repo to mirror.
 - `name` (String) A name for the repo.
 
@@ -37,6 +36,7 @@ resource "cobbler_repo" "my_repo" {
 - `apt_components` (List of String) List of Apt components such as main, restricted, universe. Applicable to apt breeds only.
 - `apt_dists` (List of String) List of Apt distribution names such as focal, focal-updates. Applicable to apt breeds only.
 - `arch` (String) The architecture of the repo. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.
+- `breed` (String) The "breed" of distribution. Valid options are: rsync, rhn, yum, apt, and wget. These choices may vary depending on the version of Cobbler in use.
 - `comment` (String) Free form text description.
 - `createrepo_flags` (String) Flags to use with `createrepo`.
 - `createrepo_flags_inherit` (Boolean) Signal that createrepo_flags should be set to inherit from its parent
