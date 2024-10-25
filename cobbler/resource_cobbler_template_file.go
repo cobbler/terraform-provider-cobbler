@@ -16,6 +16,9 @@ func resourceTemplateFile() *schema.Resource {
 		ReadContext:   resourceTemplateFileRead,
 		UpdateContext: resourceTemplateFileUpdate,
 		DeleteContext: resourceTemplateFileDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -55,7 +58,20 @@ func resourceTemplateFileCreate(ctx context.Context, d *schema.ResourceData, met
 }
 
 func resourceTemplateFileRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	// Since all attributes are required and not computed, there's no reason to read.
+	config := meta.(*Config)
+
+	templateFile, err := config.cobblerClient.GetTemplateFile(d.Id())
+	if err != nil {
+		return diag.Errorf("Cobbler TemplateFile: Error Reading: %s", err)
+	}
+	err = d.Set("name", templateFile.Name)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("body", templateFile.Body)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 

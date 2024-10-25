@@ -80,3 +80,11 @@ resource "cobbler_profile" "my_profile" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terraform import cobbler_profile.foo foo
+```

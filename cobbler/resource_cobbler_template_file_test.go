@@ -24,6 +24,11 @@ func TestAccCobblerTemplateFile_basic(t *testing.T) {
 					testAccCobblerCheckTemplateFileExists("cobbler_template_file.foo", &ks),
 				),
 			},
+			{
+				ResourceName:      "cobbler_template_file.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }

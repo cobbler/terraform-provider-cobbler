@@ -1,0 +1,1 @@
+terraform import cobbler_snippet.foo foo

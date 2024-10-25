@@ -1,0 +1,1 @@
+terraform import cobbler_profile.foo foo

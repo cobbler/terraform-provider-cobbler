@@ -1,0 +1,1 @@
+terraform import cobbler_distro.foo foo

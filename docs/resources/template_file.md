@@ -30,3 +30,11 @@ resource "cobbler_template_file" "my_template" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terraform import cobbler_template_file.foo foo
+```

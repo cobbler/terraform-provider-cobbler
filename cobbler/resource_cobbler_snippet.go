@@ -16,6 +16,9 @@ func resourceSnippet() *schema.Resource {
 		ReadContext:   resourceSnippetRead,
 		UpdateContext: resourceSnippetUpdate,
 		DeleteContext: resourceSnippetDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -55,8 +58,20 @@ func resourceSnippetCreate(ctx context.Context, d *schema.ResourceData, meta int
 }
 
 func resourceSnippetRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	// Since all attributes are required and not computed,
-	// there's no reason to read.
+	config := meta.(*Config)
+
+	snippet, err := config.cobblerClient.GetSnippet(d.Id())
+	if err != nil {
+		return diag.Errorf("Cobbler TemplateFile: Error Reading: %s", err)
+	}
+	err = d.Set("name", snippet.Name)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("body", snippet.Body)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	return nil
 }
 

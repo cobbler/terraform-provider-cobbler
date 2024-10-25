@@ -16,6 +16,9 @@ func resourceDistro() *schema.Resource {
 		ReadContext:   resourceDistroRead,
 		UpdateContext: resourceDistroUpdate,
 		DeleteContext: resourceDistroDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"arch": {
@@ -206,6 +209,10 @@ func resourceDistroRead(ctx context.Context, d *schema.ResourceData, meta interf
 	}
 
 	// Set all fields
+	err = d.Set("name", distro.Name)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 	err = d.Set("arch", distro.Arch)
 	if err != nil {
 		return diag.FromErr(err)
