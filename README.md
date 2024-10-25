@@ -43,7 +43,7 @@ Make sure the file `variables.tf` contains the right version in the provider blo
 
 ```hcl
 provider "cobbler" {
-  version  = "~> 3.0.0"
+  version  = "~> 4.1.0"
   username = var.cobbler_username
   password = var.cobbler_password
   url      = var.cobbler_url
