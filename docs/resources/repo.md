@@ -52,3 +52,11 @@ resource "cobbler_repo" "my_repo" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terraform import cobbler_repo.foo foo
+```

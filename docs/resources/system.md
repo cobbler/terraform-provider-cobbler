@@ -134,3 +134,11 @@ Optional:
 - `static` (Boolean) Whether the interface should be static or DHCP.
 - `static_routes` (List of String) Static routes for the interface.
 - `virt_bridge` (String) The virtual bridge to attach to.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terraform import cobbler_system.foo foo
+```

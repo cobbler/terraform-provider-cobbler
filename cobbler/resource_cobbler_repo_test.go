@@ -24,6 +24,11 @@ func TestAccCobblerRepo_basic(t *testing.T) {
 					testAccCobblerCheckRepoExists("cobbler_repo.foo", &repo),
 				),
 			},
+			{
+				ResourceName:      "cobbler_repo.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -47,6 +52,11 @@ func TestAccCobblerRepo_change(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckRepoExists("cobbler_repo.foo", &repo),
 				),
+			},
+			{
+				ResourceName:      "cobbler_repo.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})

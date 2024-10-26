@@ -22,6 +22,11 @@ func TestAccCobblerDistro_basic(t *testing.T) {
 					testAccCobblerCheckDistroExists("cobbler_distro.foo", &distro),
 				),
 			},
+			{
+				ResourceName:      "cobbler_distro.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -39,6 +44,11 @@ func TestAccCobblerDistro_basic_inherit(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckDistroExists("cobbler_distro.foo", &distro),
 				),
+			},
+			{
+				ResourceName:      "cobbler_distro.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
@@ -64,6 +74,11 @@ func TestAccCobblerDistro_basic_inheritConcrete(t *testing.T) {
 					testAccCobblerCheckDistroExists("cobbler_distro.foo", &distro),
 				),
 			},
+			{
+				ResourceName:      "cobbler_distro.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -87,6 +102,11 @@ func TestAccCobblerDistro_change(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					testAccCobblerCheckDistroExists("cobbler_distro.foo", &distro),
 				),
+			},
+			{
+				ResourceName:      "cobbler_distro.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})

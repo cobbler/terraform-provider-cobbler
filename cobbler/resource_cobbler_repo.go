@@ -16,6 +16,9 @@ func resourceRepo() *schema.Resource {
 		ReadContext:   resourceRepoRead,
 		UpdateContext: resourceRepoUpdate,
 		DeleteContext: resourceRepoDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"apt_components": {

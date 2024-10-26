@@ -58,3 +58,11 @@ resource "cobbler_distro" "Ubuntu-2004-x86_64" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terraform import cobbler_distro.foo foo
+```

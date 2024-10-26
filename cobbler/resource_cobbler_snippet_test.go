@@ -24,6 +24,11 @@ func TestAccCobblerSnippet_basic(t *testing.T) {
 					testAccCobblerCheckSnippetExists("cobbler_snippet.foo", &snippet),
 				),
 			},
+			{
+				ResourceName:      "cobbler_snippet.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }

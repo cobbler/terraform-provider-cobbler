@@ -28,6 +28,11 @@ func TestAccCobblerSystem_basic(t *testing.T) {
 					testAccCobblerCheckSystemExists("cobbler_system.foo", &system),
 				),
 			},
+			{
+				ResourceName:      "cobbler_system.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -49,6 +54,13 @@ func TestAccCobblerSystem_multi(t *testing.T) {
 					testAccCobblerCheckProfileExists("cobbler_profile.foo", &profile),
 					testAccCobblerCheckSystemExists("cobbler_system.foo.45", &system),
 				),
+			},
+			{
+				ResourceName:            "cobbler_system.foo[45]",
+				ImportState:             true,
+				ImportStateId:           "foo-44",
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"interface_type"},
 			},
 		},
 	})
@@ -80,6 +92,11 @@ func TestAccCobblerSystem_change(t *testing.T) {
 					testAccCobblerCheckSystemExists("cobbler_system.foo", &system),
 				),
 			},
+			{
+				ResourceName:      "cobbler_system.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -109,6 +126,12 @@ func TestAccCobblerSystem_removeInterface(t *testing.T) {
 					testAccCobblerCheckProfileExists("cobbler_profile.foo", &profile),
 					testAccCobblerCheckSystemExists("cobbler_system.foo", &system),
 				),
+			},
+			{
+				ResourceName:            "cobbler_system.foo",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"interface.0.interface_type", "interface.1.interface_type"},
 			},
 		},
 	})

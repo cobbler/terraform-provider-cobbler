@@ -30,3 +30,11 @@ resource "cobbler_snippet" "my_snippet" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+terraform import cobbler_snippet.foo foo
+```

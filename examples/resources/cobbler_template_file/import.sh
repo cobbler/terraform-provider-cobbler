@@ -1,0 +1,1 @@
+terraform import cobbler_template_file.foo foo

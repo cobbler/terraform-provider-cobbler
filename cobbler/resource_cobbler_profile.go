@@ -16,6 +16,9 @@ func resourceProfile() *schema.Resource {
 		ReadContext:   resourceProfileRead,
 		UpdateContext: resourceProfileUpdate,
 		DeleteContext: resourceProfileDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: schema.ImportStatePassthroughContext,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"autoinstall": {

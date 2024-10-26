@@ -24,6 +24,11 @@ func TestAccCobblerProfile_basic(t *testing.T) {
 					testAccCobblerCheckProfileExists("cobbler_profile.foo", &profile),
 				),
 			},
+			{
+				ResourceName:      "cobbler_profile.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -51,6 +56,11 @@ func TestAccCobblerProfile_change(t *testing.T) {
 					testAccCobblerCheckProfileExists("cobbler_profile.foo", &profile),
 				),
 			},
+			{
+				ResourceName:      "cobbler_profile.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 		},
 	})
 }
@@ -70,6 +80,11 @@ func TestAccCobblerProfile_withRepo(t *testing.T) {
 					testAccCobblerCheckDistroExists("cobbler_distro.foo", &distro),
 					testAccCobblerCheckProfileExists("cobbler_profile.foo", &profile),
 				),
+			},
+			{
+				ResourceName:      "cobbler_profile.foo",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})
