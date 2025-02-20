@@ -87,10 +87,22 @@ func resourceDistro() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 			},
+			"remote_boot_initrd": {
+				Description: "URL the bootloader directly retrieves and boots from",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+			},
 			"kernel": {
 				Description: "Absolute path to kernel on filesystem. This must already exist prior to creating the distro.",
 				Type:        schema.TypeString,
 				Required:    true,
+			},
+			"remote_boot_kernel": {
+				Description: "URL the bootloader directly retrieves and boots from",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 			},
 			"kernel_options": {
 				Description: "Kernel options to use with the kernel.",
@@ -242,6 +254,14 @@ func resourceDistroRead(ctx context.Context, d *schema.ResourceData, meta interf
 		return diag.FromErr(err)
 	}
 	err = d.Set("kernel", distro.Kernel)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("remote_boot_initrd", distro.RemoteBootInitrd)
+	if err != nil {
+		return diag.FromErr(err)
+	}
+	err = d.Set("remote_boot_kernel", distro.RemoteBootKernel)
 	if err != nil {
 		return diag.FromErr(err)
 	}

@@ -52,6 +52,8 @@ resource "cobbler_distro" "Ubuntu-2004-x86_64" {
 - `os_version` (String) The version of the distro you are creating. This varies with the version of Cobbler you are using. An updated signature list may need to be obtained in order to support a newer version. Example: `focal`.
 - `owners` (List of String) Owners list for authz_ownership.
 - `owners_inherit` (Boolean) Signal that owners should be set to inherit from its parent
+- `remote_boot_initrd` (String) URL the bootloader directly retrieves and boots from
+- `remote_boot_kernel` (String) URL the bootloader directly retrieves and boots from
 - `template_files` (Map of String) File mappings for built-in config management.
 - `template_files_inherit` (Boolean) Signal that template_files should be set to inherit from its parent
 
