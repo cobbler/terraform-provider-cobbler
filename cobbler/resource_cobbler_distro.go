@@ -382,6 +382,7 @@ func buildDistro(d *schema.ResourceData, meta interface{}) (cobbler.Distro, erro
 		IsInherited: IsOptionInherited(d, "fetchable_files"),
 	}
 	distro.Kernel = d.Get("kernel").(string)
+	distro.RemoteBootKernel = d.Get("remote_boot_kernel").(string)
 	distro.KernelOptions = cobbler.Value[map[string]interface{}]{
 		Data:        kernelOptions,
 		IsInherited: IsOptionInherited(d, "kernel_options"),
@@ -391,6 +392,7 @@ func buildDistro(d *schema.ResourceData, meta interface{}) (cobbler.Distro, erro
 		IsInherited: IsOptionInherited(d, "kernel_options_post"),
 	}
 	distro.Initrd = d.Get("initrd").(string)
+	distro.RemoteBootInitrd = d.Get("remote_boot_initrd").(string)
 	distro.MgmtClasses = cobbler.Value[[]string]{
 		Data:        mgmtClasses,
 		IsInherited: IsOptionInherited(d, "mgmt_classes"),
