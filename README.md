@@ -1,6 +1,7 @@
 # Cobbler Terraform Provider
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/d68c9aff2cd74b69afc9366ab4415f6a)](https://app.codacy.com/gh/cobbler/terraform-provider-cobbler/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/d68c9aff2cd74b69afc9366ab4415f6a)](https://app.codacy.com/gh/cobbler/terraform-provider-cobbler/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 
 The Cobbler provider is used to interact with a locally installed Cobbler service.\
 The provider needs to be configured with the proper credentials before it can be used.
@@ -9,8 +10,25 @@ Original code by [Joe Topjian](https://github.com/jtopjian).
 
 ## Prerequisites
 
-- [Terraform](https://terraform.io), 0.14 and above
+- [Terraform](https://terraform.io) 1.0 or above, **or** [OpenTofu](https://opentofu.org) 1.6 or above
 - [Cobbler](https://cobbler.github.io/), release 3.3.0 (or higher)
+
+## OpenTofu Support
+
+This provider uses [terraform-plugin-framework](https://github.com/hashicorp/terraform-plugin-framework) (protocol v6),
+which is fully compatible with OpenTofu. You can use the provider with OpenTofu by referencing it from the
+[OpenTofu Registry](https://search.opentofu.org/provider/cobbler/cobbler/latest).
+
+```hcl
+terraform {
+  required_providers {
+    cobbler = {
+      source  = "cobbler/cobbler"
+      version = "~> 4.0"
+    }
+  }
+}
+```
 
 ## Using the Provider
 

@@ -24,16 +24,14 @@ resource "cobbler_template_file" "my_template" {
 
 ### Required
 
-- `body` (String) The body of the template file. May also point to a file: `body = file("my_template.ks")`.
-- `name` (String) The name of the template file. This must be the name only, so without `/var/lib/cobbler/templates`.
-
-### Read-Only
-
-- `id` (String) The ID of this resource.
+- `body` (String) The body of the template file. May also point to a file: body = file("my_template.ks").
+- `name` (String) The name of the template file. This must be the name only, so without /var/lib/cobbler/templates.
 
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 terraform import cobbler_template_file.foo foo

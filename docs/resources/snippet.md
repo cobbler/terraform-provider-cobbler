@@ -27,13 +27,11 @@ resource "cobbler_snippet" "my_snippet" {
 - `body` (String) The body of the snippet. May also point to a file: `body = file("my_snippet")`.
 - `name` (String) The name of the snippet. This must be the name only, so without `/var/lib/cobbler/snippets`.
 
-### Read-Only
-
-- `id` (String) The ID of this resource.
-
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 terraform import cobbler_snippet.foo foo
