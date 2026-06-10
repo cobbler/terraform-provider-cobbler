@@ -46,9 +46,8 @@ func New(version string) func() *schema.Provider {
 				},
 			},
 			ResourcesMap: map[string]*schema.Resource{
-				"cobbler_distro":        resourceDistro(),
-				"cobbler_template_file": resourceTemplateFile(),
-				"cobbler_profile":       resourceProfile(),
+				"cobbler_distro":  resourceDistro(),
+				"cobbler_profile": resourceProfile(),
 				"cobbler_repo":          resourceRepo(),
 				"cobbler_system":        resourceSystem(),
 			},
