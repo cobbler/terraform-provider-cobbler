@@ -59,6 +59,7 @@ jobs:
           # - 3ed865b79ce69fca7464e0957f4bcadcc9917a9d # 3.3.4 - Testing Docker Image broken
           - 718e3256a5989941e8a678404fdea07364255637 # 3.3.5
           - df356046f3cf27be62a61001b982d5983800cfd9 # 3.3.6
+          - 758143e06c422caa411d9d37b8f90d0419625e90 # 3.3.7
       fail-fast: false
     steps:
       - name: Check out code into the Go module directory
