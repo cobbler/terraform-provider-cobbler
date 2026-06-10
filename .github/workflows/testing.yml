@@ -85,6 +85,8 @@ jobs:
             *.iso
           key: ${{ runner.os }}-${{ matrix.cobbler_version }}-iso
       - name: Make Test
+        env:
+          TF_ACC_PROVIDER_NAMESPACE: cobbler
         run: |
           make testacc
       - name: Save OS ISO
