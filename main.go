@@ -13,7 +13,7 @@ var (
 	version = "dev"
 
 	// goreleaser can also pass the specific commit if you want
-	commit = ""
+	commit = "" //nolint:unused
 )
 
 func main() {

@@ -38,6 +38,6 @@ jobs:
           go-version: stable
       - name: golangci-lint
         # https://github.com/golangci/golangci-lint-action
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v1.64.5
+          version: v2.9.0
