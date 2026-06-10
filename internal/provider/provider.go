@@ -2,11 +2,16 @@ package provider
 
 import (
 	"context"
+	"os"
 
+	clientpkg "github.com/cobbler/terraform-provider-cobbler/internal/client"
+	"github.com/cobbler/terraform-provider-cobbler/internal/util"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 var _ provider.Provider = &CobblerProvider{}
@@ -32,15 +37,15 @@ func (p *CobblerProvider) Schema(_ context.Context, _ provider.SchemaRequest, re
 		Attributes: map[string]schema.Attribute{
 			"url": schema.StringAttribute{
 				Description: "The url to the Cobbler service. This can also be specified with the `COBBLER_URL` shell environment variable.",
-				Required:    true,
+				Optional:    true,
 			},
 			"username": schema.StringAttribute{
 				Description: "The username to the Cobbler service. This can also be specified with the `COBBLER_USERNAME` shell environment variable.",
-				Required:    true,
+				Optional:    true,
 			},
 			"password": schema.StringAttribute{
 				Description: "The password to the Cobbler service. This can also be specified with the `COBBLER_PASSWORD` shell environment variable.",
-				Required:    true,
+				Optional:    true,
 				Sensitive:   true,
 			},
 			"insecure": schema.BoolAttribute{
@@ -55,8 +60,86 @@ func (p *CobblerProvider) Schema(_ context.Context, _ provider.SchemaRequest, re
 	}
 }
 
-func (p *CobblerProvider) Configure(_ context.Context, _ provider.ConfigureRequest, _ *provider.ConfigureResponse) {
-	// TODO: implement in Step 2
+// providerModel maps to the provider schema attributes.
+type providerModel struct {
+	URL        types.String `tfsdk:"url"`
+	Username   types.String `tfsdk:"username"`
+	Password   types.String `tfsdk:"password"`
+	Insecure   types.Bool   `tfsdk:"insecure"`
+	CACertFile types.String `tfsdk:"cacert_file"`
+}
+
+func (p *CobblerProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	var data providerModel
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	url := data.URL.ValueString()
+	if url == "" {
+		url = os.Getenv("COBBLER_URL")
+	}
+	username := data.Username.ValueString()
+	if username == "" {
+		username = os.Getenv("COBBLER_USERNAME")
+	}
+	password := data.Password.ValueString()
+	if password == "" {
+		password = os.Getenv("COBBLER_PASSWORD")
+	}
+	insecure := data.Insecure.ValueBool()
+	if !insecure && os.Getenv("COBBLER_INSECURE") == "true" {
+		insecure = true
+	}
+	cacertFile := data.CACertFile.ValueString()
+	if cacertFile == "" {
+		cacertFile = os.Getenv("COBBLER_CACERT_FILE")
+	}
+
+	if url == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("url"),
+			"Missing Cobbler URL",
+			"The provider cannot create the Cobbler client because there is a missing or empty value for the Cobbler URL. "+
+				"Set the url value in the configuration or use the COBBLER_URL environment variable.",
+		)
+	}
+	if username == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("username"),
+			"Missing Cobbler Username",
+			"The provider cannot create the Cobbler client because there is a missing or empty value for the Cobbler username. "+
+				"Set the username value in the configuration or use the COBBLER_USERNAME environment variable.",
+		)
+	}
+	if password == "" {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("password"),
+			"Missing Cobbler Password",
+			"The provider cannot create the Cobbler client because there is a missing or empty value for the Cobbler password. "+
+				"Set the password value in the configuration or use the COBBLER_PASSWORD environment variable.",
+		)
+	}
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	cfg := &clientpkg.Config{
+		URL:        url,
+		Username:   username,
+		Password:   password,
+		Insecure:   insecure,
+		CACertFile: cacertFile,
+	}
+
+	if err := cfg.LoadAndValidate(util.Read); err != nil {
+		resp.Diagnostics.AddError("Failed to configure Cobbler client", err.Error())
+		return
+	}
+
+	resp.ResourceData = cfg
+	resp.DataSourceData = cfg
 }
 
 func (p *CobblerProvider) Resources(_ context.Context) []func() resource.Resource {
