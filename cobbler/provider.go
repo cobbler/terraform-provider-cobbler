@@ -46,8 +46,7 @@ func New(version string) func() *schema.Provider {
 				},
 			},
 			ResourcesMap: map[string]*schema.Resource{
-				"cobbler_profile": resourceProfile(),
-				"cobbler_system":  resourceSystem(),
+				"cobbler_system": resourceSystem(),
 			},
 		}
 		p.ConfigureContextFunc = configure(version, p)
