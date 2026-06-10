@@ -9,6 +9,7 @@ import (
 	"github.com/cobbler/terraform-provider-cobbler/internal/profile"
 	"github.com/cobbler/terraform-provider-cobbler/internal/repo"
 	"github.com/cobbler/terraform-provider-cobbler/internal/snippet"
+	"github.com/cobbler/terraform-provider-cobbler/internal/system"
 	template_file "github.com/cobbler/terraform-provider-cobbler/internal/template_file"
 	"github.com/cobbler/terraform-provider-cobbler/internal/util"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -153,6 +154,7 @@ func (p *CobblerProvider) Resources(_ context.Context) []func() resource.Resourc
 		profile.NewResource,
 		repo.NewResource,
 		snippet.NewResource,
+		system.NewResource,
 		template_file.NewResource,
 	}
 }
@@ -163,6 +165,7 @@ func (p *CobblerProvider) DataSources(_ context.Context) []func() datasource.Dat
 		profile.NewDataSource,
 		repo.NewDataSource,
 		snippet.NewDataSource,
+		system.NewDataSource,
 		template_file.NewDataSource,
 	}
 }

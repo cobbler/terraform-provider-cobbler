@@ -5,6 +5,7 @@ go 1.25.8
 require (
 	github.com/cobbler/cobblerclient v0.5.3
 	github.com/hashicorp/terraform-plugin-framework v1.19.0
+	github.com/hashicorp/terraform-plugin-framework-validators v0.19.0
 	github.com/hashicorp/terraform-plugin-log v0.10.0
 	github.com/hashicorp/terraform-plugin-testing v1.10.0
 )

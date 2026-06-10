@@ -45,9 +45,7 @@ func New(version string) func() *schema.Provider {
 					DefaultFunc: schema.EnvDefaultFunc("COBBLER_CACERT_FILE", nil),
 				},
 			},
-			ResourcesMap: map[string]*schema.Resource{
-				"cobbler_system": resourceSystem(),
-			},
+			ResourcesMap: map[string]*schema.Resource{},
 		}
 		p.ConfigureContextFunc = configure(version, p)
 
