@@ -5,6 +5,8 @@ import (
 	"os"
 
 	clientpkg "github.com/cobbler/terraform-provider-cobbler/internal/client"
+	"github.com/cobbler/terraform-provider-cobbler/internal/distro"
+	"github.com/cobbler/terraform-provider-cobbler/internal/repo"
 	"github.com/cobbler/terraform-provider-cobbler/internal/snippet"
 	template_file "github.com/cobbler/terraform-provider-cobbler/internal/template_file"
 	"github.com/cobbler/terraform-provider-cobbler/internal/util"
@@ -146,6 +148,8 @@ func (p *CobblerProvider) Configure(ctx context.Context, req provider.ConfigureR
 
 func (p *CobblerProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		distro.NewResource,
+		repo.NewResource,
 		snippet.NewResource,
 		template_file.NewResource,
 	}
@@ -153,6 +157,8 @@ func (p *CobblerProvider) Resources(_ context.Context) []func() resource.Resourc
 
 func (p *CobblerProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
+		distro.NewDataSource,
+		repo.NewDataSource,
 		snippet.NewDataSource,
 		template_file.NewDataSource,
 	}
