@@ -43,11 +43,14 @@ jobs:
           go-version-file: 'go.mod'
       - run: go test -v -cover ./...
   test:
-    name: Integration Tests (Cobbler ${{ matrix.cobbler_version }})
+    name: Integration Tests (${{ matrix.tool }} / Cobbler ${{ matrix.cobbler_version }})
     needs: build
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        tool:
+          - terraform
+          - opentofu
         cobbler_version:
           # - d8f60bbf14a838c8c8a1dba98086b223e35fe70a # 3.3.0 - TypeError during import
           - f5b0599acce32de4288c76e4f601aece0c664fed # 3.3.1
@@ -66,8 +69,15 @@ jobs:
           go-version-file: 'go.mod'
         id: go
       - name: Set up Terraform
+        if: matrix.tool == 'terraform'
         # https://github.com/hashicorp/setup-terraform
         uses: hashicorp/setup-terraform@v3
+      - name: Set up OpenTofu
+        if: matrix.tool == 'opentofu'
+        uses: opentofu/setup-opentofu@v1
+      - name: Export TF_ACC_TERRAFORM_PATH for OpenTofu
+        if: matrix.tool == 'opentofu'
+        run: echo "TF_ACC_TERRAFORM_PATH=$(which tofu)" >> "$GITHUB_ENV"
       - name: Install system dependencies
         run: |
           sudo apt-get install -y xorriso
@@ -98,7 +108,7 @@ jobs:
           key: ${{ steps.cache-iso-restore.outputs.cache-primary-key }}
       # https://github.com/actions/upload-artifact
       - name: Upload coverage report to GH artifacts
-        if: matrix.cobbler_version == 'df356046f3cf27be62a61001b982d5983800cfd9'
+        if: matrix.cobbler_version == 'df356046f3cf27be62a61001b982d5983800cfd9' && matrix.tool == 'terraform'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
