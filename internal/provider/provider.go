@@ -5,6 +5,7 @@ import (
 	"os"
 
 	clientpkg "github.com/cobbler/terraform-provider-cobbler/internal/client"
+	"github.com/cobbler/terraform-provider-cobbler/internal/snippet"
 	"github.com/cobbler/terraform-provider-cobbler/internal/util"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -143,9 +144,13 @@ func (p *CobblerProvider) Configure(ctx context.Context, req provider.ConfigureR
 }
 
 func (p *CobblerProvider) Resources(_ context.Context) []func() resource.Resource {
-	return []func() resource.Resource{}
+	return []func() resource.Resource{
+		snippet.NewResource,
+	}
 }
 
 func (p *CobblerProvider) DataSources(_ context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{}
+	return []func() datasource.DataSource{
+		snippet.NewDataSource,
+	}
 }

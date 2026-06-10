@@ -50,7 +50,6 @@ func New(version string) func() *schema.Provider {
 				"cobbler_template_file": resourceTemplateFile(),
 				"cobbler_profile":       resourceProfile(),
 				"cobbler_repo":          resourceRepo(),
-				"cobbler_snippet":       resourceSnippet(),
 				"cobbler_system":        resourceSystem(),
 			},
 		}
