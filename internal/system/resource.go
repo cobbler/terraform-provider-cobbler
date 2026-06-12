@@ -12,8 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/float64planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -316,9 +314,6 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 						Description: "The value.",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Description: "If true, inherited from parent.",
@@ -510,9 +505,6 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 						Description: "The value.",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Description: "If true, inherited from parent.",
@@ -536,9 +528,6 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 						Description: "The value.",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Int64{
-							int64planmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Description: "If true, inherited from parent.",
@@ -562,9 +551,6 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 						Description: "The value.",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Float64{
-							float64planmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Description: "If true, inherited from parent.",
@@ -588,9 +574,6 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 						Description: "The value.",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Int64{
-							int64planmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Description: "If true, inherited from parent.",

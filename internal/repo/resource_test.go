@@ -94,3 +94,71 @@ resource "cobbler_repo" "foo" {
   mirror         = "http://us.archive.ubuntu.com/ubuntu/"
 }
 `
+
+// TestAccRepoResource_createrepoFlagsExplicit reproduces the "Provider produced inconsistent
+// result after apply" error for string-typed value sub-attributes of inherited nested objects.
+func TestAccRepoResource_createrepoFlagsExplicit(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccRepoResourceCreaterepoFlagsExplicit,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_repo.foo", "name", "foo-createrepo-flags"),
+					resource.TestCheckResourceAttr("cobbler_repo.foo", "createrepo_flags.inherited", "false"),
+					resource.TestCheckResourceAttr("cobbler_repo.foo", "createrepo_flags.value", "--no-database"),
+				),
+			},
+			{
+				Config: testAccRepoResourceCreaterepoFlagsInherited,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_repo.foo", "createrepo_flags.inherited", "true"),
+				),
+			},
+			{
+				Config: testAccRepoResourceCreaterepoFlagsExplicit,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_repo.foo", "createrepo_flags.inherited", "false"),
+					resource.TestCheckResourceAttr("cobbler_repo.foo", "createrepo_flags.value", "--no-database"),
+				),
+			},
+			{
+				ResourceName:                         "cobbler_repo.foo",
+				ImportState:                          true,
+				ImportStateVerify:                    true,
+				ImportStateId:                        "foo-createrepo-flags",
+				ImportStateVerifyIdentifierAttribute: "name",
+			},
+		},
+	})
+}
+
+const testAccRepoResourceCreaterepoFlagsExplicit = `
+resource "cobbler_repo" "foo" {
+  name           = "foo-createrepo-flags"
+  breed          = "apt"
+  arch           = "x86_64"
+  apt_components = ["main"]
+  apt_dists      = ["focal"]
+  mirror         = "http://us.archive.ubuntu.com/ubuntu/"
+  createrepo_flags = {
+    inherited = false
+    value     = "--no-database"
+  }
+}
+`
+
+const testAccRepoResourceCreaterepoFlagsInherited = `
+resource "cobbler_repo" "foo" {
+  name           = "foo-createrepo-flags"
+  breed          = "apt"
+  arch           = "x86_64"
+  apt_components = ["main"]
+  apt_dists      = ["focal"]
+  mirror         = "http://us.archive.ubuntu.com/ubuntu/"
+  createrepo_flags = {
+    inherited = true
+  }
+}
+`

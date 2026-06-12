@@ -138,9 +138,6 @@ func (r *RepoResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 					"value": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Optional: true,
@@ -184,9 +181,6 @@ func (r *RepoResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 					"value": schema.StringAttribute{
 						Optional: true,
 						Computed: true,
-						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Optional: true,
