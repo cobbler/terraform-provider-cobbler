@@ -36,26 +36,47 @@ resource "cobbler_repo" "my_repo" {
 - `apt_components` (List of String) List of Apt components such as main, restricted, universe. Applicable to apt breeds only.
 - `apt_dists` (List of String) List of Apt distribution names such as focal, focal-updates. Applicable to apt breeds only.
 - `arch` (String) The architecture of the repo. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.
-- `breed` (String) The "breed" of distribution. Valid options are: rsync, rhn, yum, apt, and wget. These choices may vary depending on the version of Cobbler in use.
+- `breed` (String) The "breed" of distribution. Valid options are: rsync, rhn, yum, apt, and wget.
 - `comment` (String) Free form text description.
-- `createrepo_flags` (String) Flags to use with `createrepo`.
-- `createrepo_flags_inherit` (Boolean) Signal that createrepo_flags should be set to inherit from its parent
-- `environment` (String) Environment variables to use during repo command execution.
+- `createrepo_flags` (Attributes) Flags to use with `createrepo`. (see [below for nested schema](#nestedatt--createrepo_flags))
+- `environment` (Map of String) Environment variables to use during repo command execution.
 - `keep_updated` (Boolean) Update the repo upon Cobbler sync. Valid values are true or false.
-- `mirror_locally` (Boolean) Whether to copy the files locally or just references to the external files. Valid values are true or false.
-- `owners` (List of String) List of Owners for authz_ownership.
-- `owners_inherit` (Boolean) Signal that owners should be set to inherit from its parent
-- `proxy` (String) Proxy to use for downloading the repo. This argument does not work on older versions of Cobbler.
-- `proxy_inherit` (Boolean) Signal that proxy should be set to inherit from its parent
+- `mirror_locally` (Boolean) Whether to copy the files locally or just references to the external files.
+- `owners` (Attributes) List of Owners for authz_ownership. (see [below for nested schema](#nestedatt--owners))
+- `proxy` (Attributes) Proxy to use for downloading the repo. (see [below for nested schema](#nestedatt--proxy))
 - `rpm_list` (List of String) List of specific RPMs to mirror.
 
-### Read-Only
+<a id="nestedatt--createrepo_flags"></a>
+### Nested Schema for `createrepo_flags`
 
-- `id` (String) The ID of this resource.
+Optional:
+
+- `inherited` (Boolean)
+- `value` (String)
+
+
+<a id="nestedatt--owners"></a>
+### Nested Schema for `owners`
+
+Optional:
+
+- `inherited` (Boolean)
+- `value` (List of String)
+
+
+<a id="nestedatt--proxy"></a>
+### Nested Schema for `proxy`
+
+Optional:
+
+- `inherited` (Boolean)
+- `value` (String)
 
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 terraform import cobbler_repo.foo foo

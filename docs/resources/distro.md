@@ -35,35 +35,87 @@ resource "cobbler_distro" "Ubuntu-2004-x86_64" {
 ### Optional
 
 - `arch` (String) The architecture of the distro. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.
-- `boot_files` (Map of String) Files copied into tftpboot beyond the kernel/initrd.
-- `boot_files_inherit` (Boolean) Signal that boot_files should be set to inherit from its parent
-- `boot_loaders` (List of String) Must be either 'grub', 'pxe', or 'ipxe'.
-- `boot_loaders_inherit` (Boolean) Signal that boot_loaders should be set to inherit from its parent
-- `breed` (String) The "breed" of distribution. Valid options are: redhat, fedora, centos, scientific linux, suse, debian, and ubuntu. These choices may vary depending on the version of Cobbler in use.
+- `boot_files` (Attributes) Files copied into tftpboot beyond the kernel/initrd. (see [below for nested schema](#nestedatt--boot_files))
+- `boot_loaders` (Attributes) Must be either 'grub', 'pxe', or 'ipxe'. (see [below for nested schema](#nestedatt--boot_loaders))
+- `breed` (String) The "breed" of distribution. Valid options are: redhat, fedora, centos, scientific linux, suse, debian, and ubuntu.
 - `comment` (String) Free form text description.
-- `fetchable_files` (Map of String) Templates for tftp or wget.
-- `fetchable_files_inherit` (Boolean) Signal that fetchable_files should be set to inherit from its parent
-- `kernel_options` (Map of String) Kernel options to use with the kernel.
-- `kernel_options_inherit` (Boolean) Signal that kernel_options should be set to inherit from its parent
-- `kernel_options_post` (Map of String) Post install Kernel options to use with the kernel after installation.
-- `kernel_options_post_inherit` (Boolean) Signal that kernel_options_post should be set to inherit from its parent
-- `mgmt_classes` (List of String) Management classes for external config management.
-- `mgmt_classes_inherit` (Boolean) Signal that mgmt_classes should be set to inherit from its parent
-- `os_version` (String) The version of the distro you are creating. This varies with the version of Cobbler you are using. An updated signature list may need to be obtained in order to support a newer version. Example: `focal`.
-- `owners` (List of String) Owners list for authz_ownership.
-- `owners_inherit` (Boolean) Signal that owners should be set to inherit from its parent
-- `remote_boot_initrd` (String) URL the bootloader directly retrieves and boots from
-- `remote_boot_kernel` (String) URL the bootloader directly retrieves and boots from
+- `fetchable_files` (Attributes) Templates for tftp or wget. (see [below for nested schema](#nestedatt--fetchable_files))
+- `kernel_options` (Attributes) Kernel options to use with the kernel. (see [below for nested schema](#nestedatt--kernel_options))
+- `kernel_options_post` (Attributes) Post install kernel options to use with the kernel after installation. (see [below for nested schema](#nestedatt--kernel_options_post))
+- `mgmt_classes` (Attributes) Management classes for external config management. (see [below for nested schema](#nestedatt--mgmt_classes))
+- `os_version` (String) The version of the distro you are creating. Example: `focal`.
+- `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
+- `remote_boot_initrd` (String) URL the bootloader directly retrieves and boots from.
+- `remote_boot_kernel` (String) URL the bootloader directly retrieves and boots from.
 - `template_files` (Map of String) File mappings for built-in config management.
-- `template_files_inherit` (Boolean) Signal that template_files should be set to inherit from its parent
 
-### Read-Only
+<a id="nestedatt--boot_files"></a>
+### Nested Schema for `boot_files`
 
-- `id` (String) The ID of this resource.
+Optional:
+
+- `inherited` (Boolean)
+- `value` (Map of String)
+
+
+<a id="nestedatt--boot_loaders"></a>
+### Nested Schema for `boot_loaders`
+
+Optional:
+
+- `inherited` (Boolean)
+- `value` (List of String)
+
+
+<a id="nestedatt--fetchable_files"></a>
+### Nested Schema for `fetchable_files`
+
+Optional:
+
+- `inherited` (Boolean)
+- `value` (Map of String)
+
+
+<a id="nestedatt--kernel_options"></a>
+### Nested Schema for `kernel_options`
+
+Optional:
+
+- `inherited` (Boolean)
+- `value` (Map of String)
+
+
+<a id="nestedatt--kernel_options_post"></a>
+### Nested Schema for `kernel_options_post`
+
+Optional:
+
+- `inherited` (Boolean)
+- `value` (Map of String)
+
+
+<a id="nestedatt--mgmt_classes"></a>
+### Nested Schema for `mgmt_classes`
+
+Optional:
+
+- `inherited` (Boolean)
+- `value` (List of String)
+
+
+<a id="nestedatt--owners"></a>
+### Nested Schema for `owners`
+
+Optional:
+
+- `inherited` (Boolean)
+- `value` (List of String)
 
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 terraform import cobbler_distro.foo foo

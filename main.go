@@ -1,19 +1,17 @@
 package main
 
 import (
+	"context"
 	"flag"
-	"fmt"
-	"github.com/cobbler/terraform-provider-cobbler/cobbler"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
+	"log"
+
+	"github.com/cobbler/terraform-provider-cobbler/internal/provider"
+	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
 
 var (
-	// these will be set by the goreleaser configuration
-	// to appropriate values for the compiled binary
 	version = "dev"
-
-	// goreleaser can also pass the specific commit if you want
-	commit = ""
+	commit  = "" //nolint:unused
 )
 
 func main() {
@@ -22,8 +20,13 @@ func main() {
 	flag.BoolVar(&debugMode, "debuggable", false, "set to true to run the provider with support for debuggers like delve")
 	flag.Parse()
 
-	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: cobbler.New(fmt.Sprintf("%s-%s", version, commit)),
-		Debug:        debugMode,
-	})
+	opts := providerserver.ServeOpts{
+		Address: "registry.terraform.io/cobbler/cobbler",
+		Debug:   debugMode,
+	}
+
+	err := providerserver.Serve(context.Background(), provider.New(version), opts)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }

@@ -31,59 +31,184 @@ resource "cobbler_profile" "my_profile" {
 ### Optional
 
 - `autoinstall` (String) Template remote kickstarts or preseeds.
-- `autoinstall_meta` (Map of String) Automatic installation template metadata, formerly Kickstart metadata.
-- `autoinstall_meta_inherit` (Boolean) Signal that autoinstall_meta should be set to inherit from its parent
-- `boot_files` (Map of String) Files copied into tftpboot beyond the kernel/initrd.
-- `boot_files_inherit` (Boolean) Signal that boot_files should be set to inherit from its parent
+- `autoinstall_meta` (Attributes) Automatic installation template metadata, formerly Kickstart metadata. (see [below for nested schema](#nestedatt--autoinstall_meta))
+- `boot_files` (Attributes) Files copied into tftpboot beyond the kernel/initrd. (see [below for nested schema](#nestedatt--boot_files))
 - `comment` (String) Free form text description.
 - `dhcp_tag` (String) DHCP tag.
-- `enable_ipxe` (Boolean) Use iPXE instead of PXELINUX for advanced booting options.
-- `enable_ipxe_inherit` (Boolean) Signal that enable_ipxe should be set to inherit from its parent
-- `enable_menu` (Boolean) Enable a boot menu.
-- `enable_menu_inherit` (Boolean) Signal that enable_menu should be set to inherit from its parent
-- `fetchable_files` (Map of String) Templates for tftp or wget.
-- `fetchable_files_inherit` (Boolean) Signal that fetchable_files should be set to inherit from its parent
-- `kernel_options` (Map of String) Kernel options for the profile.
-- `kernel_options_inherit` (Boolean) Signal that kernel_options should be set to inherit from its parent
-- `kernel_options_post` (Map of String) Post install kernel options.
-- `kernel_options_post_inherit` (Boolean) Signal that kernel_options_post should be set to inherit from its parent
-- `mgmt_classes` (List of String) For external configuration management.
-- `mgmt_classes_inherit` (Boolean) Signal that mgmt_classes should be set to inherit from its parent
-- `mgmt_parameters` (Map of String) Parameters which will be handed to your management application (Must be a valid YAML dictionary).
-- `mgmt_parameters_inherit` (Boolean) Signal that mgmt_parameters should be set to inherit from its parent
-- `name_servers` (List of String) Name servers.
-- `name_servers_inherit` (Boolean) Signal that name_servers should be set to inherit from its parent
-- `name_servers_search` (List of String) Name server search settings.
-- `name_servers_search_inherit` (Boolean) Signal that name_servers_search should be set to inherit from its parent
+- `enable_ipxe` (Attributes) Use iPXE instead of PXELINUX for advanced booting options. (see [below for nested schema](#nestedatt--enable_ipxe))
+- `enable_menu` (Attributes) Enable a boot menu. (see [below for nested schema](#nestedatt--enable_menu))
+- `fetchable_files` (Attributes) Templates for tftp or wget. (see [below for nested schema](#nestedatt--fetchable_files))
+- `kernel_options` (Attributes) Kernel options for the profile. (see [below for nested schema](#nestedatt--kernel_options))
+- `kernel_options_post` (Attributes) Post install kernel options. (see [below for nested schema](#nestedatt--kernel_options_post))
+- `mgmt_classes` (Attributes) For external configuration management. (see [below for nested schema](#nestedatt--mgmt_classes))
+- `mgmt_parameters` (Attributes) Parameters which will be handed to your management application (Must be a valid YAML dictionary). (see [below for nested schema](#nestedatt--mgmt_parameters))
+- `name_servers` (Attributes) Name servers. (see [below for nested schema](#nestedatt--name_servers))
+- `name_servers_search` (Attributes) Name server search settings. (see [below for nested schema](#nestedatt--name_servers_search))
 - `next_server_v4` (String) The next_server_v4 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
 - `next_server_v6` (String) The next_server_v6 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded. Usually, this will be the same IP as the server setting.
-- `owners` (List of String) Owners list for authz_ownership.
-- `owners_inherit` (Boolean) Signal that owners should be set to inherit from its parent
+- `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
 - `parent` (String) The parent this profile inherits settings from.
 - `proxy` (String) Proxy URL.
 - `repos` (List of String) Repos to auto-assign to this profile.
 - `server` (String) The server-override for the profile.
-- `template_files` (Map of String) File mappings for built-in config management.
-- `template_files_inherit` (Boolean) Signal that template_files should be set to inherit from its parent
-- `virt_auto_boot` (Boolean) Auto boot virtual machines.
-- `virt_auto_boot_inherit` (Boolean) Signal that virt_auto_boot should be set to inherit from its parent
+- `template_files` (Attributes) File mappings for built-in config management. (see [below for nested schema](#nestedatt--template_files))
+- `virt_auto_boot` (Attributes) Auto boot virtual machines. (see [below for nested schema](#nestedatt--virt_auto_boot))
 - `virt_bridge` (String) The bridge for virtual machines.
-- `virt_cpus` (Number) The number of virtual CPUs
+- `virt_cpus` (Number) The number of virtual CPUs.
 - `virt_disk_driver` (String) The virtual machine disk driver.
-- `virt_file_size` (Number) The virtual machine file size.
-- `virt_file_size_inherit` (Boolean) Signal that virt_file_size should be set to inherit from its parent
+- `virt_file_size` (Attributes) The virtual machine file size. (see [below for nested schema](#nestedatt--virt_file_size))
 - `virt_path` (String) The virtual machine path.
-- `virt_ram` (Number) The amount of RAM for the virtual machine.
-- `virt_ram_inherit` (Boolean) Signal that virt_ram should be set to inherit from its parent
+- `virt_ram` (Attributes) The amount of RAM for the virtual machine. (see [below for nested schema](#nestedatt--virt_ram))
 - `virt_type` (String) The type of virtual machine. Valid options are: xenpv, xenfv, qemu, kvm, vmware, openvz.
 
-### Read-Only
+<a id="nestedatt--autoinstall_meta"></a>
+### Nested Schema for `autoinstall_meta`
 
-- `id` (String) The ID of this resource.
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (Map of String) The value.
+
+
+<a id="nestedatt--boot_files"></a>
+### Nested Schema for `boot_files`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (Map of String) The value.
+
+
+<a id="nestedatt--enable_ipxe"></a>
+### Nested Schema for `enable_ipxe`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (Boolean) The value.
+
+
+<a id="nestedatt--enable_menu"></a>
+### Nested Schema for `enable_menu`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (Boolean) The value.
+
+
+<a id="nestedatt--fetchable_files"></a>
+### Nested Schema for `fetchable_files`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (Map of String) The value.
+
+
+<a id="nestedatt--kernel_options"></a>
+### Nested Schema for `kernel_options`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (Map of String) The value.
+
+
+<a id="nestedatt--kernel_options_post"></a>
+### Nested Schema for `kernel_options_post`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (Map of String) The value.
+
+
+<a id="nestedatt--mgmt_classes"></a>
+### Nested Schema for `mgmt_classes`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (List of String) The value.
+
+
+<a id="nestedatt--mgmt_parameters"></a>
+### Nested Schema for `mgmt_parameters`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (Map of String) The value.
+
+
+<a id="nestedatt--name_servers"></a>
+### Nested Schema for `name_servers`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (List of String) The value.
+
+
+<a id="nestedatt--name_servers_search"></a>
+### Nested Schema for `name_servers_search`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (List of String) The value.
+
+
+<a id="nestedatt--owners"></a>
+### Nested Schema for `owners`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (List of String) The value.
+
+
+<a id="nestedatt--template_files"></a>
+### Nested Schema for `template_files`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (Map of String) The value.
+
+
+<a id="nestedatt--virt_auto_boot"></a>
+### Nested Schema for `virt_auto_boot`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (Boolean) The value.
+
+
+<a id="nestedatt--virt_file_size"></a>
+### Nested Schema for `virt_file_size`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (Number) The value.
+
+
+<a id="nestedatt--virt_ram"></a>
+### Nested Schema for `virt_ram`
+
+Optional:
+
+- `inherited` (Boolean) If true, inherited from parent.
+- `value` (Number) The value.
 
 ## Import
 
 Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
 
 ```shell
 terraform import cobbler_profile.foo foo

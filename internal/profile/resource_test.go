@@ -1,0 +1,112 @@
+package profile_test
+
+import (
+	"testing"
+
+	"github.com/cobbler/terraform-provider-cobbler/internal/acctest"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+)
+
+func TestAccProfileResource_basic(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccProfileResourceBasic,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_profile.foo", "name", "foo-resource-profile-basic"),
+					resource.TestCheckResourceAttr("cobbler_profile.foo", "distro", "foo-resource-profile-basic"),
+				),
+			},
+			{
+				ResourceName:                         "cobbler_profile.foo",
+				ImportState:                          true,
+				ImportStateVerify:                    true,
+				ImportStateId:                        "foo-resource-profile-basic",
+				ImportStateVerifyIdentifierAttribute: "name",
+			},
+		},
+	})
+}
+
+func TestAccProfileResource_change(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccProfileResourceChange1,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_profile.foo", "comment", "I am a profile"),
+				),
+			},
+			{
+				Config: testAccProfileResourceChange2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_profile.foo", "comment", "I am a profile again"),
+				),
+			},
+			{
+				ResourceName:                         "cobbler_profile.foo",
+				ImportState:                          true,
+				ImportStateVerify:                    true,
+				ImportStateId:                        "foo-resource-profile-change",
+				ImportStateVerifyIdentifierAttribute: "name",
+			},
+		},
+	})
+}
+
+const testAccProfileResourceBasic = `
+resource "cobbler_distro" "foo" {
+  name       = "foo-resource-profile-basic"
+  breed      = "ubuntu"
+  comment    = "No comment"
+  os_version = "focal"
+  arch       = "x86_64"
+  kernel     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+  initrd     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
+}
+
+resource "cobbler_profile" "foo" {
+  name   = "foo-resource-profile-basic"
+  distro = cobbler_distro.foo.name
+}
+`
+
+const testAccProfileResourceChange1 = `
+resource "cobbler_distro" "foo" {
+  name       = "foo-resource-profile-change"
+  comment    = "I am a distro"
+  breed      = "ubuntu"
+  os_version = "focal"
+  arch       = "x86_64"
+  kernel     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+  initrd     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
+}
+
+resource "cobbler_profile" "foo" {
+  name    = "foo-resource-profile-change"
+  comment = "I am a profile"
+  distro  = cobbler_distro.foo.name
+}
+`
+
+const testAccProfileResourceChange2 = `
+resource "cobbler_distro" "foo" {
+  name       = "foo-resource-profile-change"
+  comment    = "I am a distro again"
+  breed      = "ubuntu"
+  os_version = "focal"
+  arch       = "x86_64"
+  kernel     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+  initrd     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
+}
+
+resource "cobbler_profile" "foo" {
+  name    = "foo-resource-profile-change"
+  comment = "I am a profile again"
+  distro  = cobbler_distro.foo.name
+}
+`
