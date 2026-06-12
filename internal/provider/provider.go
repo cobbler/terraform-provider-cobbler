@@ -7,6 +7,7 @@ import (
 	clientpkg "github.com/cobbler/terraform-provider-cobbler/internal/client"
 	"github.com/cobbler/terraform-provider-cobbler/internal/distro"
 	"github.com/cobbler/terraform-provider-cobbler/internal/image"
+	"github.com/cobbler/terraform-provider-cobbler/internal/menu"
 	"github.com/cobbler/terraform-provider-cobbler/internal/profile"
 	"github.com/cobbler/terraform-provider-cobbler/internal/repo"
 	"github.com/cobbler/terraform-provider-cobbler/internal/snippet"
@@ -153,6 +154,7 @@ func (p *CobblerProvider) Resources(_ context.Context) []func() resource.Resourc
 	return []func() resource.Resource{
 		distro.NewResource,
 		image.NewResource,
+		menu.NewResource,
 		profile.NewResource,
 		repo.NewResource,
 		snippet.NewResource,
@@ -165,6 +167,7 @@ func (p *CobblerProvider) DataSources(_ context.Context) []func() datasource.Dat
 	return []func() datasource.DataSource{
 		distro.NewDataSource,
 		image.NewDataSource,
+		menu.NewDataSource,
 		profile.NewDataSource,
 		repo.NewDataSource,
 		snippet.NewDataSource,
