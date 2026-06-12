@@ -1,6 +1,6 @@
-# Migration Guide: v3.x → v4.0
+# Migration Guide: v4.x → v5.0
 
-Version 4.0 migrates the provider from `terraform-plugin-sdk/v2` to `terraform-plugin-framework`. This is a
+Version 5.0 migrates the provider from `terraform-plugin-sdk/v2` to `terraform-plugin-framework`. This is a
 **protocol v6** provider and requires Terraform ≥ 1.0 or OpenTofu ≥ 1.6.
 
 ---
@@ -109,7 +109,7 @@ resource "cobbler_repo" "example" {
 ```
 
 **State impact:** If you have existing `cobbler_repo` resources in Terraform state that have `environment` set, the
-state will contain the old string encoding. Terraform will fail to deserialize the state after upgrading to v4.0.
+state will contain the old string encoding. Terraform will fail to deserialize the state after upgrading to v5.0.
 You must remove those resources from state and re-import them (see [State Migration Steps](#state-migration-steps)
 below).
 
@@ -147,7 +147,7 @@ terraform plan
 
 ### `cobbler_repo` resources with `environment` set
 
-If you have `cobbler_repo` resources that used the `environment` attribute under v3.x, those resources **must** be
+If you have `cobbler_repo` resources that used the `environment` attribute under v4.x, those resources **must** be
 removed from state and re-imported after upgrading. The attribute type changed from a string to `map(string)`, and no
 automatic state upgrade is performed.
 
@@ -168,14 +168,14 @@ terraform plan
 
 ## OpenTofu Usage
 
-This provider (v4.0+) uses protocol v6 and works with OpenTofu out of the box.
+This provider (v5.0+) uses protocol v6 and works with OpenTofu out of the box.
 
 ```hcl
 terraform {
   required_providers {
     cobbler = {
       source  = "cobbler/cobbler"
-      version = "~> 4.0"
+      version = "~> 5.0"
     }
   }
 }
