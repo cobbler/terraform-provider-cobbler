@@ -17,6 +17,8 @@ github.com/cloudflare/circl v1.6.3 h1:9GPOhQGF9MCYUeXyMYlqTR6a5gTrgR/fBLXvUgtVcg
 github.com/cloudflare/circl v1.6.3/go.mod h1:2eXP6Qfat4O/Yhh8BznvKnJ+uzEoTQ6jVKJRn81BiS4=
 github.com/cobbler/cobblerclient v0.5.3 h1:43STm8izD++BqHJIpxpYrHvNXXQvCtmcmlyO2gskNmg=
 github.com/cobbler/cobblerclient v0.5.3/go.mod h1:n6b8fTUOlg7BdMl6FeifUm4Uk1JY6/tlTlOClV4x2Wc=
+github.com/cobbler/cobblerclient v0.5.8 h1:4P5x3M0sy0PBgBY7uULI70FXUQqLC2RyTyFhVWusH8o=
+github.com/cobbler/cobblerclient v0.5.8/go.mod h1:n6b8fTUOlg7BdMl6FeifUm4Uk1JY6/tlTlOClV4x2Wc=
 github.com/cyphar/filepath-securejoin v0.4.1 h1:JyxxyPEaktOD+GAnqIqTf9A8tHyAG22rowi7HkoSU1s=
 github.com/cyphar/filepath-securejoin v0.4.1/go.mod h1:Sdj7gXlvMcPZsbhwhQ33GguGLDGQL7h7bg04C/+u9jI=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
