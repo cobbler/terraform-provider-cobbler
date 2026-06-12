@@ -108,6 +108,75 @@ resource "cobbler_distro" "foo" {
 }
 `
 
+// TestAccDistroResource_bootLoadersExplicit reproduces GH issue #20:
+// setting an explicit boot_loaders value (not inherited) should not error.
+func TestAccDistroResource_bootLoadersExplicit(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccDistroResourceBootLoadersExplicit,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_distro.foo", "name", "foo-resource-distro-boot-loaders"),
+					resource.TestCheckResourceAttr("cobbler_distro.foo", "boot_loaders.inherited", "false"),
+					resource.TestCheckResourceAttr("cobbler_distro.foo", "boot_loaders.value.0", "grub"),
+				),
+			},
+			{
+				// Switch to inherited and back to explicit to catch update-path regressions.
+				Config: testAccDistroResourceBootLoadersInherited,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_distro.foo", "boot_loaders.inherited", "true"),
+				),
+			},
+			{
+				Config: testAccDistroResourceBootLoadersExplicit,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_distro.foo", "boot_loaders.inherited", "false"),
+					resource.TestCheckResourceAttr("cobbler_distro.foo", "boot_loaders.value.0", "grub"),
+				),
+			},
+			{
+				ResourceName:                         "cobbler_distro.foo",
+				ImportState:                          true,
+				ImportStateVerify:                    true,
+				ImportStateId:                        "foo-resource-distro-boot-loaders",
+				ImportStateVerifyIdentifierAttribute: "name",
+			},
+		},
+	})
+}
+
+const testAccDistroResourceBootLoadersExplicit = `
+resource "cobbler_distro" "foo" {
+  name       = "foo-resource-distro-boot-loaders"
+  breed      = "ubuntu"
+  os_version = "focal"
+  arch       = "x86_64"
+  kernel     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+  initrd     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
+  boot_loaders = {
+    inherited = false
+    value     = ["grub"]
+  }
+}
+`
+
+const testAccDistroResourceBootLoadersInherited = `
+resource "cobbler_distro" "foo" {
+  name       = "foo-resource-distro-boot-loaders"
+  breed      = "ubuntu"
+  os_version = "focal"
+  arch       = "x86_64"
+  kernel     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+  initrd     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
+  boot_loaders = {
+    inherited = true
+  }
+}
+`
+
 const testAccDistroResourceChange1 = `
 resource "cobbler_distro" "foo" {
   name       = "foo-resource-distro-change"

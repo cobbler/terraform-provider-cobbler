@@ -163,9 +163,6 @@ func (r *RepoResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 						ElementType: types.StringType,
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.List{
-							listplanmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Optional: true,

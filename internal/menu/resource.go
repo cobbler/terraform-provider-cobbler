@@ -144,9 +144,6 @@ func inheritedMapAttrs() map[string]schema.Attribute {
 			ElementType: types.StringType,
 			Optional:    true,
 			Computed:    true,
-			PlanModifiers: []planmodifier.Map{
-				mapplanmodifier.UseStateForUnknown(),
-			},
 		},
 		"inherited": schema.BoolAttribute{
 			Optional: true,
