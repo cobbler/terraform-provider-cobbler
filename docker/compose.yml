@@ -4,8 +4,8 @@ services:
     container_name: cobbler-dev
     privileged: true  # Required for Cobbler 3.3.2 and newer
     volumes:
-      - ./cobbler_source:/code
-      - ../extracted_iso_image:/extracted_iso_image
+      - ./cobbler_source:/code:z
+      - ../extracted_iso_image:/extracted_iso_image:z
     ports:
       - 8081:80
     # We chmod the code, otherwise some files are read-only and cannot be cleaned up:
