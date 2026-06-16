@@ -294,28 +294,6 @@ func (r *ImageResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 					},
 				},
 			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "Management classes for external config management.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						ElementType: types.StringType,
-						Optional:    true,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Optional: true,
-						Computed: true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
 			"owners": schema.SingleNestedAttribute{
 				Description: "Owners list for authz_ownership.",
 				Optional:    true,
@@ -504,7 +482,6 @@ func modelToImage(ctx context.Context, data imageResourceModel, diags *diag.Diag
 	image.KernelOptionsPost = inherit.StringMapTo(ctx, data.KernelOptionsPost, diags)
 	image.FetchableFiles = inherit.StringMapTo(ctx, data.FetchableFiles, diags)
 	image.BootFiles = inherit.StringMapTo(ctx, data.BootFiles, diags)
-	image.MgmtClasses = inherit.StringListTo(ctx, data.MgmtClasses, diags)
 	image.Owners = inherit.StringListTo(ctx, data.Owners, diags)
 
 	// ElementsAs fails on null/unknown values; guard to avoid plan-time errors
@@ -546,7 +523,6 @@ func imageToModel(ctx context.Context, image cobbler.Image, data *imageResourceM
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, image.KernelOptionsPost, diags)
 	data.FetchableFiles = inherit.StringMapFrom(ctx, image.FetchableFiles, diags)
 	data.BootFiles = inherit.StringMapFrom(ctx, image.BootFiles, diags)
-	data.MgmtClasses = inherit.StringListFrom(ctx, image.MgmtClasses, diags)
 	data.Owners = inherit.StringListFrom(ctx, image.Owners, diags)
 
 	bootLoaders, d := types.ListValueFrom(ctx, types.StringType, image.BootLoaders)

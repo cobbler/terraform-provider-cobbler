@@ -46,6 +46,13 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this system. Use this as the value for `cobbler_network_interface.system`.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"autoinstall": schema.StringAttribute{
 				Description: "Template remote kickstarts or preseeds.",
 				Optional:    true,
@@ -229,7 +236,6 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"interface": InterfaceMapAttribute(),
 			"autoinstall_meta": schema.SingleNestedAttribute{
 				Description: "Automatic installation template metadata, formerly Kickstart metadata.",
 				Optional:    true,
@@ -375,54 +381,6 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 			},
 			"kernel_options_post": schema.SingleNestedAttribute{
 				Description: "Post install kernel options.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "For external configuration management.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"mgmt_parameters": schema.SingleNestedAttribute{
-				Description: "Parameters which will be handed to your management application (Must be a valid YAML dictionary).",
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.Object{
@@ -603,9 +561,6 @@ func (r *SystemResource) Configure(_ context.Context, req resource.ConfigureRequ
 }
 
 func (r *SystemResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	systemSyncLock.Lock()
-	defer systemSyncLock.Unlock()
-
 	var data systemResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
@@ -625,19 +580,6 @@ func (r *SystemResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	// Build and attach interfaces
-	planIfacesAPI := InterfaceMapToAPI(ctx, data.Interface, &resp.Diagnostics)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	for name, iface := range planIfacesAPI {
-		if err := newSystem.CreateInterface(name, iface); err != nil {
-			resp.Diagnostics.AddError("Error creating interface",
-				"Error adding interface "+name+" to system "+newSystem.Name+": "+err.Error())
-			return
-		}
-	}
-
 	tflog.Debug(ctx, "Cobbler System: syncing system")
 	if err := r.client.Sync(); err != nil {
 		resp.Diagnostics.AddError("Error syncing Cobbler", err.Error())
@@ -651,13 +593,7 @@ func (r *SystemResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	ifaces, err := readSystem.GetInterfaces()
-	if err != nil {
-		resp.Diagnostics.AddError("Error getting interfaces after create", err.Error())
-		return
-	}
-
-	systemToModel(ctx, *readSystem, ifaces, &data, &resp.Diagnostics)
+	systemToModel(ctx, *readSystem, &data, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -682,13 +618,7 @@ func (r *SystemResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	ifaces, err := system.GetInterfaces()
-	if err != nil {
-		resp.Diagnostics.AddError("Error getting interfaces", err.Error())
-		return
-	}
-
-	systemToModel(ctx, *system, ifaces, &data, &resp.Diagnostics)
+	systemToModel(ctx, *system, &data, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -697,25 +627,9 @@ func (r *SystemResource) Read(ctx context.Context, req resource.ReadRequest, res
 }
 
 func (r *SystemResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	systemSyncLock.Lock()
-	defer systemSyncLock.Unlock()
-
 	var plan systemResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	var state systemResourceModel
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	// Get the existing system to perform interface operations on it
-	system, err := r.client.GetSystem(plan.Name.ValueString(), false, false)
-	if err != nil {
-		resp.Diagnostics.AddError("Error reading Cobbler System", err.Error())
 		return
 	}
 
@@ -731,39 +645,6 @@ func (r *SystemResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
-	// Interface diff: delete removed interfaces, create/update all plan interfaces
-	var planIfaces map[string]types.Object
-	resp.Diagnostics.Append(plan.Interface.ElementsAs(ctx, &planIfaces, false)...)
-
-	var stateIfaces map[string]types.Object
-	resp.Diagnostics.Append(state.Interface.ElementsAs(ctx, &stateIfaces, false)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	// Delete interfaces that exist in state but not in plan
-	for name := range stateIfaces {
-		if _, exists := planIfaces[name]; !exists {
-			if err := system.DeleteInterface(name); err != nil {
-				resp.Diagnostics.AddError("Error deleting interface", err.Error())
-				return
-			}
-		}
-	}
-
-	// Create/update all interfaces from plan
-	planIfacesAPI := InterfaceMapToAPI(ctx, plan.Interface, &resp.Diagnostics)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	for name, iface := range planIfacesAPI {
-		if err := system.CreateInterface(name, iface); err != nil {
-			resp.Diagnostics.AddError("Error creating interface", err.Error())
-			return
-		}
-	}
-
 	tflog.Debug(ctx, "Cobbler System: syncing system")
 	if err := r.client.Sync(); err != nil {
 		resp.Diagnostics.AddError("Error syncing Cobbler", err.Error())
@@ -777,13 +658,7 @@ func (r *SystemResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
-	updatedIfaces, err := readSystem.GetInterfaces()
-	if err != nil {
-		resp.Diagnostics.AddError("Error getting interfaces after update", err.Error())
-		return
-	}
-
-	systemToModel(ctx, *readSystem, updatedIfaces, &plan, &resp.Diagnostics)
+	systemToModel(ctx, *readSystem, &plan, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -863,8 +738,6 @@ func modelToSystem(ctx context.Context, data systemResourceModel, diags *diag.Di
 	system.FetchableFiles = inherit.StringMapTo(ctx, data.FetchableFiles, diags)
 	system.KernelOptions = inherit.StringMapTo(ctx, data.KernelOptions, diags)
 	system.KernelOptionsPost = inherit.StringMapTo(ctx, data.KernelOptionsPost, diags)
-	system.MgmtClasses = inherit.StringListTo(ctx, data.MgmtClasses, diags)
-	system.MgmtParameters = inherit.StringMapTo(ctx, data.MgmtParameters, diags)
 	system.Owners = inherit.StringListTo(ctx, data.Owners, diags)
 	system.TemplateFiles = inherit.StringMapTo(ctx, data.TemplateFiles, diags)
 	system.VirtAutoBoot = inherit.BoolTo(ctx, data.VirtAutoBoot, diags)
@@ -875,9 +748,10 @@ func modelToSystem(ctx context.Context, data systemResourceModel, diags *diag.Di
 	return system
 }
 
-// systemToModel populates a systemResourceModel from a cobbler.System and interfaces.
-func systemToModel(ctx context.Context, system cobbler.System, ifaces cobbler.Interfaces, data *systemResourceModel, diags *diag.Diagnostics) {
+// systemToModel populates a systemResourceModel from a cobbler.System.
+func systemToModel(ctx context.Context, system cobbler.System, data *systemResourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(system.Name)
+	data.UID = types.StringValue(system.Uid)
 	data.Autoinstall = types.StringValue(system.Autoinstall)
 	data.Comment = types.StringValue(system.Comment)
 	data.Gateway = types.StringValue(system.Gateway)
@@ -908,8 +782,6 @@ func systemToModel(ctx context.Context, system cobbler.System, ifaces cobbler.In
 	diags.Append(d...)
 	data.NameServersSearch = nameServersSearchList
 
-	data.Interface = InterfaceMapFromAPI(ctx, ifaces, diags)
-
 	data.AutoinstallMeta = inherit.StringMapFrom(ctx, system.AutoinstallMeta, diags)
 	data.BootFiles = inherit.StringMapFrom(ctx, system.BootFiles, diags)
 	data.BootLoaders = inherit.StringListFrom(ctx, system.BootLoaders, diags)
@@ -917,8 +789,6 @@ func systemToModel(ctx context.Context, system cobbler.System, ifaces cobbler.In
 	data.FetchableFiles = inherit.StringMapFrom(ctx, system.FetchableFiles, diags)
 	data.KernelOptions = inherit.StringMapFrom(ctx, system.KernelOptions, diags)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, system.KernelOptionsPost, diags)
-	data.MgmtClasses = inherit.StringListFrom(ctx, system.MgmtClasses, diags)
-	data.MgmtParameters = inherit.StringMapFrom(ctx, system.MgmtParameters, diags)
 	data.Owners = inherit.StringListFrom(ctx, system.Owners, diags)
 	data.TemplateFiles = inherit.StringMapFrom(ctx, system.TemplateFiles, diags)
 	data.VirtAutoBoot = inherit.BoolFrom(ctx, system.VirtAutoBoot, diags)

@@ -4,6 +4,7 @@ import "github.com/hashicorp/terraform-plugin-framework/types"
 
 type systemResourceModel struct {
 	Name              types.String `tfsdk:"name"`
+	UID               types.String `tfsdk:"uid"`
 	Autoinstall       types.String `tfsdk:"autoinstall"`
 	Comment           types.String `tfsdk:"comment"`
 	Gateway           types.String `tfsdk:"gateway"`
@@ -27,8 +28,6 @@ type systemResourceModel struct {
 	VirtPath          types.String `tfsdk:"virt_path"`
 	VirtPXEBoot       types.Bool   `tfsdk:"virt_pxe_boot"`
 	VirtType          types.String `tfsdk:"virt_type"`
-	// Map of interface name -> interface config (key is interface name)
-	Interface types.Map `tfsdk:"interface"`
 	// Inheritable:
 	AutoinstallMeta   types.Object `tfsdk:"autoinstall_meta"`
 	BootFiles         types.Object `tfsdk:"boot_files"`
@@ -37,8 +36,6 @@ type systemResourceModel struct {
 	FetchableFiles    types.Object `tfsdk:"fetchable_files"`
 	KernelOptions     types.Object `tfsdk:"kernel_options"`
 	KernelOptionsPost types.Object `tfsdk:"kernel_options_post"`
-	MgmtClasses       types.Object `tfsdk:"mgmt_classes"`
-	MgmtParameters    types.Object `tfsdk:"mgmt_parameters"`
 	Owners            types.Object `tfsdk:"owners"`
 	TemplateFiles     types.Object `tfsdk:"template_files"`
 	VirtAutoBoot      types.Object `tfsdk:"virt_auto_boot"`

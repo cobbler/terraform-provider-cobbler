@@ -211,28 +211,6 @@ func (r *DistroResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					},
 				},
 			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "Management classes for external config management.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						ElementType: types.StringType,
-						Optional:    true,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Optional: true,
-						Computed: true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
 			"owners": schema.SingleNestedAttribute{
 				Description: "Owners list for authz_ownership.",
 				Optional:    true,
@@ -399,7 +377,6 @@ func modelToDistro(ctx context.Context, data distroResourceModel, diags *diag.Di
 	distro.FetchableFiles = inherit.StringMapTo(ctx, data.FetchableFiles, diags)
 	distro.KernelOptions = inherit.StringMapTo(ctx, data.KernelOptions, diags)
 	distro.KernelOptionsPost = inherit.StringMapTo(ctx, data.KernelOptionsPost, diags)
-	distro.MgmtClasses = inherit.StringListTo(ctx, data.MgmtClasses, diags)
 	distro.Owners = inherit.StringListTo(ctx, data.Owners, diags)
 
 	// ElementsAs fails on null/unknown values; guard to avoid plan-time errors
@@ -428,7 +405,6 @@ func distroToModel(ctx context.Context, distro cobbler.Distro, data *distroResou
 	data.FetchableFiles = inherit.StringMapFrom(ctx, distro.FetchableFiles, diags)
 	data.KernelOptions = inherit.StringMapFrom(ctx, distro.KernelOptions, diags)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, distro.KernelOptionsPost, diags)
-	data.MgmtClasses = inherit.StringListFrom(ctx, distro.MgmtClasses, diags)
 	data.Owners = inherit.StringListFrom(ctx, distro.Owners, diags)
 	templateFiles, d := types.MapValueFrom(ctx, types.StringType, distro.TemplateFiles.Data)
 	diags.Append(d...)

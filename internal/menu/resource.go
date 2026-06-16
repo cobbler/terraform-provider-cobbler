@@ -105,15 +105,6 @@ func (r *MenuResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 					mapplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "Management classes for external config management.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: inheritedListAttrs(),
-			},
 			"owners": schema.SingleNestedAttribute{
 				Description: "Owners list for authz_ownership.",
 				Optional:    true,
@@ -122,15 +113,6 @@ func (r *MenuResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 					objectplanmodifier.UseStateForUnknown(),
 				},
 				Attributes: inheritedListAttrs(),
-			},
-			"mgmt_parameters": schema.SingleNestedAttribute{
-				Description: "Parameters for external management systems.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: inheritedMapAttrs(),
 			},
 		},
 	}
@@ -295,9 +277,7 @@ func modelToMenu(ctx context.Context, data menuResourceModel, diags *diag.Diagno
 	menu.AutoinstallMeta = inherit.StringMapTo(ctx, data.AutoinstallMeta, diags)
 	menu.FetchableFiles = inherit.StringMapTo(ctx, data.FetchableFiles, diags)
 	menu.BootFiles = inherit.StringMapTo(ctx, data.BootFiles, diags)
-	menu.MgmtClasses = inherit.StringListTo(ctx, data.MgmtClasses, diags)
 	menu.Owners = inherit.StringListTo(ctx, data.Owners, diags)
-	menu.MgmtParameters = inherit.StringMapTo(ctx, data.MgmtParameters, diags)
 
 	var templateFiles map[string]interface{}
 	if !data.TemplateFiles.IsNull() && !data.TemplateFiles.IsUnknown() {
@@ -317,9 +297,7 @@ func menuToModel(ctx context.Context, menu cobbler.Menu, data *menuResourceModel
 	data.AutoinstallMeta = inherit.StringMapFrom(ctx, menu.AutoinstallMeta, diags)
 	data.FetchableFiles = inherit.StringMapFrom(ctx, menu.FetchableFiles, diags)
 	data.BootFiles = inherit.StringMapFrom(ctx, menu.BootFiles, diags)
-	data.MgmtClasses = inherit.StringListFrom(ctx, menu.MgmtClasses, diags)
 	data.Owners = inherit.StringListFrom(ctx, menu.Owners, diags)
-	data.MgmtParameters = inherit.StringMapFrom(ctx, menu.MgmtParameters, diags)
 
 	templateFiles, d := types.MapValueFrom(ctx, types.StringType, menu.TemplateFiles.Data)
 	diags.Append(d...)

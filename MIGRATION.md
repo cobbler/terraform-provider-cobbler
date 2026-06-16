@@ -1,3 +1,131 @@
+# Migration Guide: v5.0 → v6.0
+
+Version 6.0 targets Cobbler 4.0.x via `cobblerclient` v1.0.0. The provider will
+refuse to start against a Cobbler server older than 4.0.0 (the `Configure` step
+fails with a `cobbler server too old` diagnostic). Users still on Cobbler 3.3.x
+should stay on the v5.x line.
+
+---
+
+## Breaking Changes
+
+### 1. `cobbler_snippet` and `cobbler_template_file` removed
+
+Both resources are replaced by a single `cobbler_template` resource backed by the
+new first-class Cobbler 4.0.0 `Template` item type. Body/name was replaced by
+`content` + `name` + `template_type` + a `uri = { schema, path }` block.
+
+**Before (v5):**
+
+```hcl
+resource "cobbler_template_file" "preseed" {
+  name = "ubuntu.preseed"
+  body = file("ubuntu.preseed")
+}
+```
+
+**After (v6):**
+
+```hcl
+resource "cobbler_template" "preseed" {
+  name          = "ubuntu.preseed"
+  template_type = "jinja2"
+  uri = {
+    schema = "file"
+    path   = "ubuntu.preseed"
+  }
+  content = file("ubuntu.preseed")
+}
+```
+
+Re-import each snippet/template_file as a `cobbler_template`:
+
+```bash
+terraform state rm cobbler_template_file.preseed
+terraform import cobbler_template.preseed ubuntu.preseed
+```
+
+### 2. `cobbler_system.interface` map removed; use `cobbler_network_interface`
+
+Network interfaces are now first-class Cobbler 4.0.0 items, not nested attributes
+of `cobbler_system`. Each entry of the old `interface` map becomes its own
+`cobbler_network_interface` resource. The interface name now uses the
+`<ifname>@<systemname>` syntax upstream, and the per-interface IPv4/IPv6/DNS
+settings are nested objects.
+
+**Before (v5):**
+
+```hcl
+resource "cobbler_system" "foo" {
+  name    = "foo"
+  profile = "ubuntu"
+  interface = {
+    "eth0" = {
+      mac_address = "aa:bb:cc:dd:ee:ff"
+      static      = true
+      ip_address  = "10.0.0.5"
+      netmask     = "255.255.255.0"
+    }
+  }
+}
+```
+
+**After (v6):**
+
+```hcl
+resource "cobbler_system" "foo" {
+  name    = "foo"
+  profile = "ubuntu"
+}
+
+resource "cobbler_network_interface" "foo_eth0" {
+  name        = "eth0@${cobbler_system.foo.name}"
+  system      = cobbler_system.foo.uid
+  mac_address = "aa:bb:cc:dd:ee:ff"
+  static      = true
+  ipv4 = {
+    address = "10.0.0.5"
+    netmask = "255.255.255.0"
+  }
+}
+```
+
+To migrate state:
+
+```bash
+terraform state rm cobbler_system.foo
+terraform import cobbler_system.foo foo
+terraform import cobbler_network_interface.foo_eth0 eth0@foo
+```
+
+### 3. `mgmt_classes` and `mgmt_parameters` attributes removed
+
+The `MgmtClass` item type was removed from Cobbler 4.0.0 server-side, taking the
+`mgmt_classes` and `mgmt_parameters` fields with it. Remove these attributes from
+your HCL for `cobbler_distro`, `cobbler_image`, `cobbler_menu`, `cobbler_profile`,
+and `cobbler_system`.
+
+### 4. New `cobbler_system.uid` computed attribute
+
+A `uid` computed attribute has been added so that `cobbler_network_interface.system`
+can reference the parent system by its server-assigned UID.
+
+### 5. New resources
+
+- `cobbler_template` — replaces snippet + template_file
+- `cobbler_network_interface` — replaces the `interface` map on `cobbler_system`
+- `cobbler_distro_group`, `cobbler_profile_group`, `cobbler_system_group` —
+  named collections of distros/profiles/systems for bulk operations
+
+Each new resource has a matching data source.
+
+### 6. Server requirement
+
+Cobbler ≥ 4.0.0 required. The provider's `Configure` step will fail with
+`cobbler server too old` if the connected server reports a lower version.
+
+---
+
 # Migration Guide: v4.x → v5.0
 
 Version 5.0 migrates the provider from `terraform-plugin-sdk/v2` to `terraform-plugin-framework`. This is a

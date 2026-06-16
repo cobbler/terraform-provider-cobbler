@@ -11,7 +11,5 @@ type menuResourceModel struct {
 	FetchableFiles  types.Object `tfsdk:"fetchable_files"`
 	BootFiles       types.Object `tfsdk:"boot_files"`
 	TemplateFiles   types.Map    `tfsdk:"template_files"`
-	MgmtClasses     types.Object `tfsdk:"mgmt_classes"`
 	Owners          types.Object `tfsdk:"owners"`
-	MgmtParameters  types.Object `tfsdk:"mgmt_parameters"`
 }

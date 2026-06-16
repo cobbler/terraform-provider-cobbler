@@ -56,12 +56,9 @@ resource "cobbler_system" "my_system" {
 - `gateway` (String) Network gateway.
 - `hostname` (String) Hostname of the system.
 - `image` (String) Parent image (if no profile is used).
-- `interface` (Attributes Map) A map of network interfaces, keyed by interface name (e.g. "eth0"). (see [below for nested schema](#nestedatt--interface))
 - `ipv6_default_device` (String) IPv6 default device.
 - `kernel_options` (Attributes) Kernel options for the system. (see [below for nested schema](#nestedatt--kernel_options))
 - `kernel_options_post` (Attributes) Post install kernel options. (see [below for nested schema](#nestedatt--kernel_options_post))
-- `mgmt_classes` (Attributes) For external configuration management. (see [below for nested schema](#nestedatt--mgmt_classes))
-- `mgmt_parameters` (Attributes) Parameters which will be handed to your management application (Must be a valid YAML dictionary). (see [below for nested schema](#nestedatt--mgmt_parameters))
 - `name_servers` (List of String) Name servers.
 - `name_servers_search` (List of String) Name server search settings.
 - `netboot_enabled` (Boolean) (Re)install this machine at next boot.
@@ -84,6 +81,10 @@ resource "cobbler_system" "my_system" {
 - `virt_pxe_boot` (Boolean) Use PXE to build this virtual machine.
 - `virt_ram` (Attributes) The amount of RAM for the virtual machine. (see [below for nested schema](#nestedatt--virt_ram))
 - `virt_type` (String) The type of virtual machine. Valid options are: xenpv, xenfv, qemu, kvm, vmware, openvz.
+
+### Read-Only
+
+- `uid` (String) Server-assigned UID for this system. Use this as the value for `cobbler_network_interface.system`.
 
 <a id="nestedatt--autoinstall_meta"></a>
 ### Nested Schema for `autoinstall_meta`
@@ -130,33 +131,6 @@ Optional:
 - `value` (Map of String) The value.
 
 
-<a id="nestedatt--interface"></a>
-### Nested Schema for `interface`
-
-Optional:
-
-- `bonding_opts` (String) Options for bonded interfaces.
-- `bridge_opts` (String) Options for bridge interfaces.
-- `cnames` (List of String) Canonical name records.
-- `dhcp_tag` (String) DHCP tag.
-- `dns_name` (String) DNS name.
-- `gateway` (String) Per-interface gateway.
-- `interface_master` (String) The master interface when slave.
-- `interface_type` (String) The type of interface: NA, master, slave, bond, bond_slave, bridge, bridge_slave, bonded_bridge_slave, infiniband, bmc.
-- `ip_address` (String) The IP address of the interface.
-- `ipv6_address` (String) The IPv6 address of the interface.
-- `ipv6_default_gateway` (String) The default gateway for the IPv6 address / interface.
-- `ipv6_mtu` (String) The MTU of the IPv6 address.
-- `ipv6_secondaries` (List of String) IPv6 secondaries.
-- `ipv6_static_routes` (List of String) Static routes for the IPv6 interface.
-- `mac_address` (String) The MAC address of the interface.
-- `management` (Boolean) Whether this interface is a management interface.
-- `netmask` (String) The IPv4 netmask of the interface.
-- `static` (Boolean) Whether the interface should be static or DHCP.
-- `static_routes` (List of String) Static routes for the interface.
-- `virt_bridge` (String) The virtual bridge to attach to.
-
-
 <a id="nestedatt--kernel_options"></a>
 ### Nested Schema for `kernel_options`
 
@@ -168,24 +142,6 @@ Optional:
 
 <a id="nestedatt--kernel_options_post"></a>
 ### Nested Schema for `kernel_options_post`
-
-Optional:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (Map of String) The value.
-
-
-<a id="nestedatt--mgmt_classes"></a>
-### Nested Schema for `mgmt_classes`
-
-Optional:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (List of String) The value.
-
-
-<a id="nestedatt--mgmt_parameters"></a>
-### Nested Schema for `mgmt_parameters`
 
 Optional:
 

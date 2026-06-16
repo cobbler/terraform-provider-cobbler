@@ -6,9 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Terraform / OpenTofu provider for [Cobbler](https://cobbler.github.io/). Built on
 `terraform-plugin-framework` (protocol v6) — **not** `terraform-plugin-sdk/v2`. Wraps the
-`github.com/cobbler/cobblerclient` XML-RPC client. Requires a running Cobbler server (≥ 3.3.0) to do
+`github.com/cobbler/cobblerclient` XML-RPC client. Requires a running Cobbler server (≥ 4.0.0) to do
 anything useful; the provider's `Configure` calls `client.Login()` at provider start, so even unit-like flows
-that go through `Configure` need a reachable server.
+that go through `Configure` need a reachable server. Logging in against an older server returns a
+`cobbler server too old` diagnostic — the cobblerclient `Login()` enforces the 4.0.0 minimum.
 
 Module path: `github.com/cobbler/terraform-provider-cobbler`. Entry point is `main.go`, served at
 `registry.terraform.io/cobbler/cobbler`. All provider code lives under `internal/` (consumers cannot import it).
@@ -54,7 +55,7 @@ namespace which OpenTofu rejects.
 
 `xorriso` must be installed on the host (`apt-get install -y xorriso` etc.). The ISO and extracted dir
 are recreated only when their checksums no longer match — safe to leave in place between runs. CI tests
-across a matrix of Cobbler 3.3.x commits and both Terraform and OpenTofu (`.github/workflows/testing.yml`).
+against a single Cobbler 4.0.x commit and both Terraform and OpenTofu (`.github/workflows/testing.yml`).
 
 ## Architecture
 
@@ -72,10 +73,10 @@ internal/<thing>/
     data_source_test.go
 ```
 
-Current set: `distro`, `image`, `menu`, `profile`, `repo`, `snippet`, `system`, `template_file`. To add a
-new resource, copy an existing package, register `NewResource` / `NewDataSource` in
-`internal/provider/provider.go` (both the `Resources` and `DataSources` lists), and add docs under
-`docs/resources/` and `docs/data-sources/`.
+Current set: `distro`, `distro_group`, `image`, `menu`, `network_interface`, `profile`, `profile_group`,
+`repo`, `system`, `system_group`, `template`. To add a new resource, copy an existing package, register
+`NewResource` / `NewDataSource` in `internal/provider/provider.go` (both the `Resources` and `DataSources`
+lists), and add docs under `docs/resources/` and `docs/data-sources/`.
 
 The provider's `Configure` stores a `*client.Config` (with the logged-in `cobbler.Client` attached) into
 both `resp.ResourceData` and `resp.DataSourceData`. Each resource's `Configure` type-asserts to
@@ -95,10 +96,13 @@ fields also need the Unknown-in-plan handling described under **Provider-framewo
 
 ### System resource specifics
 
-- `internal/system/interface.go` — the `interface` attribute is a **map** keyed by interface name (not the
-  v3 set-of-blocks). The map key replaces the old `name` sub-attribute.
-- `internal/system/mutex.go` — a package-level `sync.Mutex` (`systemSyncLock`) serializes Cobbler system
-  mutations because the upstream API is not safe for concurrent edits to the same object.
+- `cobbler_system.uid` is a Computed attribute that surfaces the server-assigned UID; use it as the value
+  for `cobbler_network_interface.system` when wiring up interfaces.
+- Network interfaces are no longer nested under `cobbler_system`. Each interface is its own
+  `cobbler_network_interface` resource using the upstream `<ifname>@<systemname>` name syntax.
+- `internal/network_interface/mutex.go` keeps a per-system `sync.Mutex` map (`systemNetworkInterfaceLock`,
+  via `lockForSystem`) so concurrent interface mutations against the same parent system serialize, while
+  distinct systems still mutate in parallel. This replaces the v5 global `systemSyncLock`.
 
 ### Test helpers — `internal/acctest/`
 

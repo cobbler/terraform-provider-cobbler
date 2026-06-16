@@ -37,7 +37,6 @@ Use this data source to get the details of a Cobbler image.
 - `kernel_options` (Attributes) Kernel options to use with the kernel. (see [below for nested schema](#nestedatt--kernel_options))
 - `kernel_options_post` (Attributes) Post install kernel options. (see [below for nested schema](#nestedatt--kernel_options_post))
 - `menu` (String) Name of the parent Cobbler menu.
-- `mgmt_classes` (Attributes) Management classes for external config management. (see [below for nested schema](#nestedatt--mgmt_classes))
 - `os_version` (String) The OS version the image contains.
 - `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
 - `virt_auto_boot` (Boolean) Whether to auto-boot the virtual machine.
@@ -83,15 +82,6 @@ Read-Only:
 
 - `inherited` (Boolean)
 - `value` (Map of String)
-
-
-<a id="nestedatt--mgmt_classes"></a>
-### Nested Schema for `mgmt_classes`
-
-Read-Only:
-
-- `inherited` (Boolean)
-- `value` (List of String)
 
 
 <a id="nestedatt--owners"></a>

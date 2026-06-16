@@ -44,7 +44,6 @@ resource "cobbler_image" "Ubuntu-2004-x86_64" {
 - `kernel_options` (Attributes) Kernel options to use with the kernel. (see [below for nested schema](#nestedatt--kernel_options))
 - `kernel_options_post` (Attributes) Post install kernel options to use with the kernel after installation. (see [below for nested schema](#nestedatt--kernel_options_post))
 - `menu` (String) Name of the parent Cobbler menu that this image appears under.
-- `mgmt_classes` (Attributes) Management classes for external config management. (see [below for nested schema](#nestedatt--mgmt_classes))
 - `os_version` (String) The OS version the image contains. Example: `focal`.
 - `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
 - `template_files` (Map of String) File mappings for built-in config management.
@@ -91,15 +90,6 @@ Optional:
 
 - `inherited` (Boolean)
 - `value` (Map of String)
-
-
-<a id="nestedatt--mgmt_classes"></a>
-### Nested Schema for `mgmt_classes`
-
-Optional:
-
-- `inherited` (Boolean)
-- `value` (List of String)
 
 
 <a id="nestedatt--owners"></a>

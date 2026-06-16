@@ -130,19 +130,6 @@ func (d *DistroDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 					},
 				},
 			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "Management classes for external config management.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						ElementType: types.StringType,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Computed: true,
-					},
-				},
-			},
 			"owners": schema.SingleNestedAttribute{
 				Description: "Owners list for authz_ownership.",
 				Computed:    true,
@@ -207,7 +194,6 @@ func (d *DistroDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	data.FetchableFiles = inherit.StringMapFrom(ctx, distro.FetchableFiles, &resp.Diagnostics)
 	data.KernelOptions = inherit.StringMapFrom(ctx, distro.KernelOptions, &resp.Diagnostics)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, distro.KernelOptionsPost, &resp.Diagnostics)
-	data.MgmtClasses = inherit.StringListFrom(ctx, distro.MgmtClasses, &resp.Diagnostics)
 	data.Owners = inherit.StringListFrom(ctx, distro.Owners, &resp.Diagnostics)
 	templateFiles, d2 := types.MapValueFrom(ctx, types.StringType, distro.TemplateFiles.Data)
 	resp.Diagnostics.Append(d2...)

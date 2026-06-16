@@ -6,14 +6,14 @@ if [ -z "$1" ]
     echo "No cobbler server url supplied"
 fi
 
-cobbler_commit=df356046f3cf27be62a61001b982d5983800cfd9 # 3.3.6 as of 2024-10-09
-cobbler_branch=release33
+cobbler_commit=TODO_4_0_X_COMMIT # 4.0.x — fill in the commit hash before running
+cobbler_branch=release40
 iso_url=https://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso
 iso_os=ubuntu
 valid_iso_checksum=00a9d46306fbe9beb3581853a289490bc231c51f
 iso_filename=$(echo ${iso_url##*/})
 valid_extracted_iso_checksum=dd0b3148e1f071fb86aee4b0395fd63b
-valid_git_checksum=6c9511b26946dd3f1f072b9f40eaeccf  # master as of 4/2/2022
+valid_git_checksum=TODO_REGENERATE_AFTER_FIRST_4_0_X_RUN  # regenerate after the first clone of the 4.0.x commit
 
 [ -d "./docker/cobbler_source" ] && git_checksum=$(find ./docker/cobbler_source/ -type f -exec md5sum {} \; | sort -k 2 | md5sum | awk '{print $1}')
 if [ -d "./docker/cobbler_source" ] && [ $git_checksum == $valid_git_checksum ]; then

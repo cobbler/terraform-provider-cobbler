@@ -32,8 +32,6 @@ Use this data source to get the details of a Cobbler profile.
 - `fetchable_files` (Attributes) Templates for tftp or wget. (see [below for nested schema](#nestedatt--fetchable_files))
 - `kernel_options` (Attributes) Kernel options for the profile. (see [below for nested schema](#nestedatt--kernel_options))
 - `kernel_options_post` (Attributes) Post install kernel options. (see [below for nested schema](#nestedatt--kernel_options_post))
-- `mgmt_classes` (Attributes) For external configuration management. (see [below for nested schema](#nestedatt--mgmt_classes))
-- `mgmt_parameters` (Attributes) Parameters which will be handed to your management application. (see [below for nested schema](#nestedatt--mgmt_parameters))
 - `name_servers` (Attributes) Name servers. (see [below for nested schema](#nestedatt--name_servers))
 - `name_servers_search` (Attributes) Name server search settings. (see [below for nested schema](#nestedatt--name_servers_search))
 - `next_server_v4` (String) The next_server_v4 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded.
@@ -109,24 +107,6 @@ Read-Only:
 
 <a id="nestedatt--kernel_options_post"></a>
 ### Nested Schema for `kernel_options_post`
-
-Read-Only:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (Map of String) The value.
-
-
-<a id="nestedatt--mgmt_classes"></a>
-### Nested Schema for `mgmt_classes`
-
-Read-Only:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (List of String) The value.
-
-
-<a id="nestedatt--mgmt_parameters"></a>
-### Nested Schema for `mgmt_parameters`
 
 Read-Only:
 

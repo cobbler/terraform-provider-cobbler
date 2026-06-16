@@ -197,36 +197,6 @@ func (d *ProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 					},
 				},
 			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "For external configuration management.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
-			},
-			"mgmt_parameters": schema.SingleNestedAttribute{
-				Description: "Parameters which will be handed to your management application.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
-			},
 			"name_servers_search": schema.SingleNestedAttribute{
 				Description: "Name server search settings.",
 				Computed:    true,
@@ -387,8 +357,6 @@ func (d *ProfileDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	data.FetchableFiles = inherit.StringMapFrom(ctx, p.FetchableFiles, &resp.Diagnostics)
 	data.KernelOptions = inherit.StringMapFrom(ctx, p.KernelOptions, &resp.Diagnostics)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, p.KernelOptionsPost, &resp.Diagnostics)
-	data.MgmtClasses = inherit.StringListFrom(ctx, p.MgmtClasses, &resp.Diagnostics)
-	data.MgmtParameters = inherit.StringMapFrom(ctx, p.MgmtParameters, &resp.Diagnostics)
 	data.NameServersSearch = inherit.StringListFrom(ctx, p.NameServersSearch, &resp.Diagnostics)
 	data.NameServers = inherit.StringListFrom(ctx, p.NameServers, &resp.Diagnostics)
 	data.Owners = inherit.StringListFrom(ctx, p.Owners, &resp.Diagnostics)

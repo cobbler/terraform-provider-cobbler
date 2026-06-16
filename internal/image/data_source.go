@@ -170,19 +170,6 @@ func (d *ImageDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 					},
 				},
 			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "Management classes for external config management.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						ElementType: types.StringType,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Computed: true,
-					},
-				},
-			},
 			"owners": schema.SingleNestedAttribute{
 				Description: "Owners list for authz_ownership.",
 				Computed:    true,
@@ -254,7 +241,6 @@ func (d *ImageDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, image.KernelOptionsPost, &resp.Diagnostics)
 	data.FetchableFiles = inherit.StringMapFrom(ctx, image.FetchableFiles, &resp.Diagnostics)
 	data.BootFiles = inherit.StringMapFrom(ctx, image.BootFiles, &resp.Diagnostics)
-	data.MgmtClasses = inherit.StringListFrom(ctx, image.MgmtClasses, &resp.Diagnostics)
 	data.Owners = inherit.StringListFrom(ctx, image.Owners, &resp.Diagnostics)
 
 	bootLoaders, d2 := types.ListValueFrom(ctx, types.StringType, image.BootLoaders)
