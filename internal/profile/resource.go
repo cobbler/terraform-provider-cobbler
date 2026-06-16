@@ -576,7 +576,7 @@ func (r *ProfileResource) Create(ctx context.Context, req resource.CreateRequest
 
 	newProfile, err := r.client.CreateProfile(profile)
 	if err != nil {
-		resp.Diagnostics.AddError("Error creating Cobbler Profile", err.Error())
+		clientpkg.AddClientError(&resp.Diagnostics, "Error creating Cobbler Profile", err)
 		return
 	}
 
@@ -628,7 +628,7 @@ func (r *ProfileResource) Update(ctx context.Context, req resource.UpdateRequest
 	tflog.Debug(ctx, "Cobbler Profile: Update", map[string]interface{}{"name": profile.Name})
 
 	if err := r.client.UpdateProfile(&profile); err != nil {
-		resp.Diagnostics.AddError("Error updating Cobbler Profile", err.Error())
+		clientpkg.AddClientError(&resp.Diagnostics, "Error updating Cobbler Profile", err)
 		return
 	}
 

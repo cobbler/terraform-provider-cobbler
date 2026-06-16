@@ -621,7 +621,7 @@ func (r *SystemResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	newSystem, err := r.client.CreateSystem(system)
 	if err != nil {
-		resp.Diagnostics.AddError("Error creating Cobbler System", err.Error())
+		clientpkg.AddClientError(&resp.Diagnostics, "Error creating Cobbler System", err)
 		return
 	}
 
@@ -727,7 +727,7 @@ func (r *SystemResource) Update(ctx context.Context, req resource.UpdateRequest,
 	tflog.Debug(ctx, "Cobbler System: Update", map[string]interface{}{"name": newSystem.Name})
 
 	if err := r.client.UpdateSystem(&newSystem); err != nil {
-		resp.Diagnostics.AddError("Error updating Cobbler System", err.Error())
+		clientpkg.AddClientError(&resp.Diagnostics, "Error updating Cobbler System", err)
 		return
 	}
 

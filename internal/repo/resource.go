@@ -224,7 +224,7 @@ func (r *RepoResource) Create(ctx context.Context, req resource.CreateRequest, r
 
 	newRepo, err := r.client.CreateRepo(repo)
 	if err != nil {
-		resp.Diagnostics.AddError("Error creating Cobbler Repo", err.Error())
+		clientpkg.AddClientError(&resp.Diagnostics, "Error creating Cobbler Repo", err)
 		return
 	}
 
@@ -276,7 +276,7 @@ func (r *RepoResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	tflog.Debug(ctx, "Cobbler Repo: Update", map[string]interface{}{"name": repo.Name})
 
 	if err := r.client.UpdateRepo(&repo); err != nil {
-		resp.Diagnostics.AddError("Error updating Cobbler Repo", err.Error())
+		clientpkg.AddClientError(&resp.Diagnostics, "Error updating Cobbler Repo", err)
 		return
 	}
 
