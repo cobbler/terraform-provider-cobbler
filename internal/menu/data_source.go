@@ -83,33 +83,11 @@ func (d *MenuDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Computed:    true,
 				ElementType: types.StringType,
 			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "Management classes for external config management.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						ElementType: types.StringType,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{Computed: true},
-				},
-			},
 			"owners": schema.SingleNestedAttribute{
 				Description: "Owners list for authz_ownership.",
 				Computed:    true,
 				Attributes: map[string]schema.Attribute{
 					"value": schema.ListAttribute{
-						ElementType: types.StringType,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{Computed: true},
-				},
-			},
-			"mgmt_parameters": schema.SingleNestedAttribute{
-				Description: "Parameters for external management systems.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
 						ElementType: types.StringType,
 						Computed:    true,
 					},
@@ -154,9 +132,7 @@ func (d *MenuDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	data.AutoinstallMeta = inherit.StringMapFrom(ctx, menu.AutoinstallMeta, &resp.Diagnostics)
 	data.FetchableFiles = inherit.StringMapFrom(ctx, menu.FetchableFiles, &resp.Diagnostics)
 	data.BootFiles = inherit.StringMapFrom(ctx, menu.BootFiles, &resp.Diagnostics)
-	data.MgmtClasses = inherit.StringListFrom(ctx, menu.MgmtClasses, &resp.Diagnostics)
 	data.Owners = inherit.StringListFrom(ctx, menu.Owners, &resp.Diagnostics)
-	data.MgmtParameters = inherit.StringMapFrom(ctx, menu.MgmtParameters, &resp.Diagnostics)
 
 	templateFiles, d2 := types.MapValueFrom(ctx, types.StringType, menu.TemplateFiles.Data)
 	resp.Diagnostics.Append(d2...)

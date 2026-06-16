@@ -26,8 +26,6 @@ Use this data source to get the details of a Cobbler boot menu.
 - `comment` (String) Free form text description.
 - `display_name` (String) The display name shown in the boot menu.
 - `fetchable_files` (Attributes) Templates for tftp or wget. (see [below for nested schema](#nestedatt--fetchable_files))
-- `mgmt_classes` (Attributes) Management classes for external config management. (see [below for nested schema](#nestedatt--mgmt_classes))
-- `mgmt_parameters` (Attributes) Parameters for external management systems. (see [below for nested schema](#nestedatt--mgmt_parameters))
 - `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
 - `parent` (String) The name of the parent menu.
 - `template_files` (Map of String) File mappings for built-in config management.
@@ -52,24 +50,6 @@ Read-Only:
 
 <a id="nestedatt--fetchable_files"></a>
 ### Nested Schema for `fetchable_files`
-
-Read-Only:
-
-- `inherited` (Boolean)
-- `value` (Map of String)
-
-
-<a id="nestedatt--mgmt_classes"></a>
-### Nested Schema for `mgmt_classes`
-
-Read-Only:
-
-- `inherited` (Boolean)
-- `value` (List of String)
-
-
-<a id="nestedatt--mgmt_parameters"></a>
-### Nested Schema for `mgmt_parameters`
 
 Read-Only:
 

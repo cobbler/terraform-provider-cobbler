@@ -33,6 +33,10 @@ func (d *SystemDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 				Description: "The name of the system.",
 				Required:    true,
 			},
+			"uid": dsschema.StringAttribute{
+				Description: "Server-assigned UID for this system.",
+				Computed:    true,
+			},
 			"autoinstall": dsschema.StringAttribute{
 				Description: "Template remote kickstarts or preseeds.",
 				Computed:    true,
@@ -128,98 +132,6 @@ func (d *SystemDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 				Description: "The type of virtual machine.",
 				Computed:    true,
 			},
-			"interface": dsschema.MapNestedAttribute{
-				Description: "A map of network interfaces, keyed by interface name (e.g. \"eth0\").",
-				Computed:    true,
-				NestedObject: dsschema.NestedAttributeObject{
-					Attributes: map[string]dsschema.Attribute{
-						"cnames": dsschema.ListAttribute{
-							Description: "Canonical name records.",
-							Computed:    true,
-							ElementType: types.StringType,
-						},
-						"dhcp_tag": dsschema.StringAttribute{
-							Description: "DHCP tag.",
-							Computed:    true,
-						},
-						"dns_name": dsschema.StringAttribute{
-							Description: "DNS name.",
-							Computed:    true,
-						},
-						"bonding_opts": dsschema.StringAttribute{
-							Description: "Options for bonded interfaces.",
-							Computed:    true,
-						},
-						"bridge_opts": dsschema.StringAttribute{
-							Description: "Options for bridge interfaces.",
-							Computed:    true,
-						},
-						"gateway": dsschema.StringAttribute{
-							Description: "Per-interface gateway.",
-							Computed:    true,
-						},
-						"interface_type": dsschema.StringAttribute{
-							Description: "The type of interface.",
-							Computed:    true,
-						},
-						"interface_master": dsschema.StringAttribute{
-							Description: "The master interface when slave.",
-							Computed:    true,
-						},
-						"ip_address": dsschema.StringAttribute{
-							Description: "The IP address of the interface.",
-							Computed:    true,
-						},
-						"ipv6_address": dsschema.StringAttribute{
-							Description: "The IPv6 address of the interface.",
-							Computed:    true,
-						},
-						"ipv6_secondaries": dsschema.ListAttribute{
-							Description: "IPv6 secondaries.",
-							Computed:    true,
-							ElementType: types.StringType,
-						},
-						"ipv6_mtu": dsschema.StringAttribute{
-							Description: "The MTU of the IPv6 address.",
-							Computed:    true,
-						},
-						"ipv6_static_routes": dsschema.ListAttribute{
-							Description: "Static routes for the IPv6 interface.",
-							Computed:    true,
-							ElementType: types.StringType,
-						},
-						"ipv6_default_gateway": dsschema.StringAttribute{
-							Description: "The default gateway for the IPv6 address / interface.",
-							Computed:    true,
-						},
-						"mac_address": dsschema.StringAttribute{
-							Description: "The MAC address of the interface.",
-							Computed:    true,
-						},
-						"management": dsschema.BoolAttribute{
-							Description: "Whether this interface is a management interface.",
-							Computed:    true,
-						},
-						"netmask": dsschema.StringAttribute{
-							Description: "The IPv4 netmask of the interface.",
-							Computed:    true,
-						},
-						"static": dsschema.BoolAttribute{
-							Description: "Whether the interface should be static or DHCP.",
-							Computed:    true,
-						},
-						"static_routes": dsschema.ListAttribute{
-							Description: "Static routes for the interface.",
-							Computed:    true,
-							ElementType: types.StringType,
-						},
-						"virt_bridge": dsschema.StringAttribute{
-							Description: "The virtual bridge to attach to.",
-							Computed:    true,
-						},
-					},
-				},
-			},
 			"autoinstall_meta": dsschema.SingleNestedAttribute{
 				Description: "Automatic installation template metadata, formerly Kickstart metadata.",
 				Computed:    true,
@@ -311,36 +223,6 @@ func (d *SystemDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 			},
 			"kernel_options_post": dsschema.SingleNestedAttribute{
 				Description: "Post install kernel options.",
-				Computed:    true,
-				Attributes: map[string]dsschema.Attribute{
-					"value": dsschema.MapAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": dsschema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
-			},
-			"mgmt_classes": dsschema.SingleNestedAttribute{
-				Description: "For external configuration management.",
-				Computed:    true,
-				Attributes: map[string]dsschema.Attribute{
-					"value": dsschema.ListAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": dsschema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
-			},
-			"mgmt_parameters": dsschema.SingleNestedAttribute{
-				Description: "Parameters which will be handed to your management application.",
 				Computed:    true,
 				Attributes: map[string]dsschema.Attribute{
 					"value": dsschema.MapAttribute{
@@ -471,13 +353,8 @@ func (d *SystemDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	}
 	s := *systemPtr
 
-	ifaces, err := systemPtr.GetInterfaces()
-	if err != nil {
-		resp.Diagnostics.AddError("Error getting interfaces", err.Error())
-		return
-	}
-
 	data.Name = types.StringValue(s.Name)
+	data.UID = types.StringValue(s.Uid)
 	data.Autoinstall = types.StringValue(s.Autoinstall)
 	data.Comment = types.StringValue(s.Comment)
 	data.Gateway = types.StringValue(s.Gateway)
@@ -508,8 +385,6 @@ func (d *SystemDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	resp.Diagnostics.Append(diag...)
 	data.NameServersSearch = nameServersSearchList
 
-	data.Interface = InterfaceMapFromAPI(ctx, ifaces, &resp.Diagnostics)
-
 	data.AutoinstallMeta = inherit.StringMapFrom(ctx, s.AutoinstallMeta, &resp.Diagnostics)
 	data.BootFiles = inherit.StringMapFrom(ctx, s.BootFiles, &resp.Diagnostics)
 	data.BootLoaders = inherit.StringListFrom(ctx, s.BootLoaders, &resp.Diagnostics)
@@ -517,8 +392,6 @@ func (d *SystemDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	data.FetchableFiles = inherit.StringMapFrom(ctx, s.FetchableFiles, &resp.Diagnostics)
 	data.KernelOptions = inherit.StringMapFrom(ctx, s.KernelOptions, &resp.Diagnostics)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, s.KernelOptionsPost, &resp.Diagnostics)
-	data.MgmtClasses = inherit.StringListFrom(ctx, s.MgmtClasses, &resp.Diagnostics)
-	data.MgmtParameters = inherit.StringMapFrom(ctx, s.MgmtParameters, &resp.Diagnostics)
 	data.Owners = inherit.StringListFrom(ctx, s.Owners, &resp.Diagnostics)
 	data.TemplateFiles = inherit.StringMapFrom(ctx, s.TemplateFiles, &resp.Diagnostics)
 	data.VirtAutoBoot = inherit.BoolFrom(ctx, s.VirtAutoBoot, &resp.Diagnostics)
@@ -528,4 +401,3 @@ func (d *SystemDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
-

@@ -330,54 +330,6 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 					},
 				},
 			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "For external configuration management.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"mgmt_parameters": schema.SingleNestedAttribute{
-				Description: "Parameters which will be handed to your management application (Must be a valid YAML dictionary).",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
 			"name_servers_search": schema.SingleNestedAttribute{
 				Description: "Name server search settings.",
 				Optional:    true,
@@ -706,8 +658,6 @@ func modelToProfile(ctx context.Context, data profileResourceModel, diags *diag.
 	profile.FetchableFiles = inherit.StringMapTo(ctx, data.FetchableFiles, diags)
 	profile.KernelOptions = inherit.StringMapTo(ctx, data.KernelOptions, diags)
 	profile.KernelOptionsPost = inherit.StringMapTo(ctx, data.KernelOptionsPost, diags)
-	profile.MgmtClasses = inherit.StringListTo(ctx, data.MgmtClasses, diags)
-	profile.MgmtParameters = inherit.StringMapTo(ctx, data.MgmtParameters, diags)
 	profile.NameServersSearch = inherit.StringListTo(ctx, data.NameServersSearch, diags)
 	profile.NameServers = inherit.StringListTo(ctx, data.NameServers, diags)
 	profile.Owners = inherit.StringListTo(ctx, data.Owners, diags)
@@ -748,8 +698,6 @@ func profileToModel(ctx context.Context, profile cobbler.Profile, data *profileR
 	data.FetchableFiles = inherit.StringMapFrom(ctx, profile.FetchableFiles, diags)
 	data.KernelOptions = inherit.StringMapFrom(ctx, profile.KernelOptions, diags)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, profile.KernelOptionsPost, diags)
-	data.MgmtClasses = inherit.StringListFrom(ctx, profile.MgmtClasses, diags)
-	data.MgmtParameters = inherit.StringMapFrom(ctx, profile.MgmtParameters, diags)
 	data.NameServersSearch = inherit.StringListFrom(ctx, profile.NameServersSearch, diags)
 	data.NameServers = inherit.StringListFrom(ctx, profile.NameServers, diags)
 	data.Owners = inherit.StringListFrom(ctx, profile.Owners, diags)

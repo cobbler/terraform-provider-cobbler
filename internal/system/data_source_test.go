@@ -27,16 +27,6 @@ const testAccSystemDataSourceBasic = testAccSystemDistroProfile + `
 resource "cobbler_system" "foo" {
   name    = "foo"
   profile = cobbler_profile.foo.name
-
-  interface = {
-    "default" = {}
-    "eth0" = {
-      mac_address = "aa:bb:cc:dd:ee:ff"
-      static      = true
-      ip_address  = "1.2.3.4"
-      netmask     = "255.255.255.0"
-    }
-  }
 }
 
 data "cobbler_system" "foo" {

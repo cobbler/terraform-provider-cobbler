@@ -83,22 +83,6 @@ resource "cobbler_system" "foo" {
   name_servers = ["8.8.8.8", "8.8.4.4"]
   comment      = "I'm a system"
   power_id     = "foo"
-
-  interface = {
-    "default" = {}
-    "eth0" = {
-      mac_address = "aa:bb:cc:dd:ee:ff"
-      static      = true
-      ip_address  = "1.2.3.4"
-      netmask     = "255.255.255.0"
-    }
-    "eth1" = {
-      mac_address = "aa:bb:cc:dd:ee:fa"
-      static      = true
-      ip_address  = "1.2.3.5"
-      netmask     = "255.255.255.0"
-    }
-  }
 }
 `
 
@@ -109,16 +93,6 @@ resource "cobbler_system" "foo" {
   name_servers = ["8.8.8.8", "8.8.4.4"]
   comment      = "I'm a system"
   power_id     = "foo"
-
-  interface = {
-    "default" = {}
-    "eth0" = {
-      mac_address = "aa:bb:cc:dd:ee:ff"
-      static      = true
-      ip_address  = "1.2.3.4"
-      netmask     = "255.255.255.0"
-    }
-  }
 }
 `
 
@@ -129,15 +103,5 @@ resource "cobbler_system" "foo" {
   name_servers = ["8.8.8.8", "8.8.4.4"]
   comment      = "I'm a system again"
   power_id     = "foo"
-
-  interface = {
-    "default" = {}
-    "eth0" = {
-      mac_address = "aa:bb:cc:dd:ee:ff"
-      static      = true
-      ip_address  = "1.2.3.6"
-      netmask     = "255.255.255.0"
-    }
-  }
 }
 `

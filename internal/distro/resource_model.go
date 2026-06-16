@@ -17,7 +17,6 @@ type distroResourceModel struct {
 	FetchableFiles    types.Object `tfsdk:"fetchable_files"`
 	KernelOptions     types.Object `tfsdk:"kernel_options"`
 	KernelOptionsPost types.Object `tfsdk:"kernel_options_post"`
-	MgmtClasses       types.Object `tfsdk:"mgmt_classes"`
 	Owners            types.Object `tfsdk:"owners"`
 	TemplateFiles     types.Map    `tfsdk:"template_files"`
 }
