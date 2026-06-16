@@ -38,25 +38,6 @@ Full documentation can be found in the [`docs`](/docs) directory.
 
 You can use the provider via the [Terraform provider registry](https://registry.terraform.io/providers/cobbler/cobbler).
 
-### Manual installation
-
-You can download a pre-built binary from the [releases](https://github.com/cobbler/terraform-provider-cobbler/releases/)
- page.\
- These are built using [GoReleaser](https://goreleaser.com/) (the [configuration](.goreleaser.yml) is in the repo).
-
-Download and add the pre-built binary for your system (Linux or macOS) to `~/.terraform.d/plugins/`.\
-Replace `linux` with `darwin` for the macOS version.
-
-```console
-wget https://github.com/cobbler/terraform-provider-cobbler/releases/download/v5.0.0/terraform-provider-cobbler_5.0.0_linux_amd64.zip
-unzip terraform-provider-cobbler_5.0.0_linux_amd64.zip
-mkdir -p ~/.terraform.d/plugins/
-mv terraform-provider-cobbler_v5.0.0 ~/.terraform.d/plugins/
-chmod +x ~/.terraform.d/plugins/terraform-provider-cobbler_v5.0.0
-```
-
-Don't forget to run `terraform init` after installation of a new binary!
-
 Make sure the file `variables.tf` contains the right version in the provider block:
 
 ```hcl
