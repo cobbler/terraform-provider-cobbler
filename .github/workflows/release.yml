@@ -35,6 +35,8 @@ jobs:
       - name: Set up Go
         # https://github.com/actions/setup-go
         uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
       - name: Import GPG key
         id: import_gpg
         uses: crazy-max/ghaction-import-gpg@v7
