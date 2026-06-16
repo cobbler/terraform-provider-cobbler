@@ -33,6 +33,10 @@ func (d *SystemDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 				Description: "The name of the system.",
 				Required:    true,
 			},
+			"uid": dsschema.StringAttribute{
+				Description: "Server-assigned UID for this system.",
+				Computed:    true,
+			},
 			"autoinstall": dsschema.StringAttribute{
 				Description: "Template remote kickstarts or preseeds.",
 				Computed:    true,
@@ -50,7 +54,7 @@ func (d *SystemDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 				Computed:    true,
 			},
 			"image": dsschema.StringAttribute{
-				Description: "Parent image (if no profile is used).",
+				Description: "The Cobbler UID of the parent image (if no profile is used).",
 				Computed:    true,
 			},
 			"ipv6_default_device": dsschema.StringAttribute{
@@ -101,7 +105,7 @@ func (d *SystemDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 				Computed:    true,
 			},
 			"profile": dsschema.StringAttribute{
-				Description: "Parent profile.",
+				Description: "The Cobbler UID of the parent profile.",
 				Computed:    true,
 			},
 			"proxy": dsschema.StringAttribute{
@@ -128,115 +132,8 @@ func (d *SystemDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 				Description: "The type of virtual machine.",
 				Computed:    true,
 			},
-			"interface": dsschema.MapNestedAttribute{
-				Description: "A map of network interfaces, keyed by interface name (e.g. \"eth0\").",
-				Computed:    true,
-				NestedObject: dsschema.NestedAttributeObject{
-					Attributes: map[string]dsschema.Attribute{
-						"cnames": dsschema.ListAttribute{
-							Description: "Canonical name records.",
-							Computed:    true,
-							ElementType: types.StringType,
-						},
-						"dhcp_tag": dsschema.StringAttribute{
-							Description: "DHCP tag.",
-							Computed:    true,
-						},
-						"dns_name": dsschema.StringAttribute{
-							Description: "DNS name.",
-							Computed:    true,
-						},
-						"bonding_opts": dsschema.StringAttribute{
-							Description: "Options for bonded interfaces.",
-							Computed:    true,
-						},
-						"bridge_opts": dsschema.StringAttribute{
-							Description: "Options for bridge interfaces.",
-							Computed:    true,
-						},
-						"gateway": dsschema.StringAttribute{
-							Description: "Per-interface gateway.",
-							Computed:    true,
-						},
-						"interface_type": dsschema.StringAttribute{
-							Description: "The type of interface.",
-							Computed:    true,
-						},
-						"interface_master": dsschema.StringAttribute{
-							Description: "The master interface when slave.",
-							Computed:    true,
-						},
-						"ip_address": dsschema.StringAttribute{
-							Description: "The IP address of the interface.",
-							Computed:    true,
-						},
-						"ipv6_address": dsschema.StringAttribute{
-							Description: "The IPv6 address of the interface.",
-							Computed:    true,
-						},
-						"ipv6_secondaries": dsschema.ListAttribute{
-							Description: "IPv6 secondaries.",
-							Computed:    true,
-							ElementType: types.StringType,
-						},
-						"ipv6_mtu": dsschema.StringAttribute{
-							Description: "The MTU of the IPv6 address.",
-							Computed:    true,
-						},
-						"ipv6_static_routes": dsschema.ListAttribute{
-							Description: "Static routes for the IPv6 interface.",
-							Computed:    true,
-							ElementType: types.StringType,
-						},
-						"ipv6_default_gateway": dsschema.StringAttribute{
-							Description: "The default gateway for the IPv6 address / interface.",
-							Computed:    true,
-						},
-						"mac_address": dsschema.StringAttribute{
-							Description: "The MAC address of the interface.",
-							Computed:    true,
-						},
-						"management": dsschema.BoolAttribute{
-							Description: "Whether this interface is a management interface.",
-							Computed:    true,
-						},
-						"netmask": dsschema.StringAttribute{
-							Description: "The IPv4 netmask of the interface.",
-							Computed:    true,
-						},
-						"static": dsschema.BoolAttribute{
-							Description: "Whether the interface should be static or DHCP.",
-							Computed:    true,
-						},
-						"static_routes": dsschema.ListAttribute{
-							Description: "Static routes for the interface.",
-							Computed:    true,
-							ElementType: types.StringType,
-						},
-						"virt_bridge": dsschema.StringAttribute{
-							Description: "The virtual bridge to attach to.",
-							Computed:    true,
-						},
-					},
-				},
-			},
 			"autoinstall_meta": dsschema.SingleNestedAttribute{
 				Description: "Automatic installation template metadata, formerly Kickstart metadata.",
-				Computed:    true,
-				Attributes: map[string]dsschema.Attribute{
-					"value": dsschema.MapAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": dsschema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
-			},
-			"boot_files": dsschema.SingleNestedAttribute{
-				Description: "Files copied into tftpboot beyond the kernel/initrd.",
 				Computed:    true,
 				Attributes: map[string]dsschema.Attribute{
 					"value": dsschema.MapAttribute{
@@ -279,21 +176,6 @@ func (d *SystemDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 					},
 				},
 			},
-			"fetchable_files": dsschema.SingleNestedAttribute{
-				Description: "Templates for tftp or wget.",
-				Computed:    true,
-				Attributes: map[string]dsschema.Attribute{
-					"value": dsschema.MapAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": dsschema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
-			},
 			"kernel_options": dsschema.SingleNestedAttribute{
 				Description: "Kernel options for the system.",
 				Computed:    true,
@@ -324,36 +206,6 @@ func (d *SystemDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 					},
 				},
 			},
-			"mgmt_classes": dsschema.SingleNestedAttribute{
-				Description: "For external configuration management.",
-				Computed:    true,
-				Attributes: map[string]dsschema.Attribute{
-					"value": dsschema.ListAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": dsschema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
-			},
-			"mgmt_parameters": dsschema.SingleNestedAttribute{
-				Description: "Parameters which will be handed to your management application.",
-				Computed:    true,
-				Attributes: map[string]dsschema.Attribute{
-					"value": dsschema.MapAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": dsschema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
-			},
 			"owners": dsschema.SingleNestedAttribute{
 				Description: "Owners list for authz_ownership.",
 				Computed:    true,
@@ -369,20 +221,10 @@ func (d *SystemDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 					},
 				},
 			},
-			"template_files": dsschema.SingleNestedAttribute{
-				Description: "File mappings for built-in config management.",
+			"template_files": dsschema.MapAttribute{
+				Description: "File mappings for built-in config management. Not inheritable.",
 				Computed:    true,
-				Attributes: map[string]dsschema.Attribute{
-					"value": dsschema.MapAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": dsschema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
+				ElementType: types.StringType,
 			},
 			"virt_auto_boot": dsschema.SingleNestedAttribute{
 				Description: "Auto boot virtual machines.",
@@ -471,13 +313,8 @@ func (d *SystemDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	}
 	s := *systemPtr
 
-	ifaces, err := systemPtr.GetInterfaces()
-	if err != nil {
-		resp.Diagnostics.AddError("Error getting interfaces", err.Error())
-		return
-	}
-
 	data.Name = types.StringValue(s.Name)
+	data.UID = types.StringValue(s.Uid)
 	data.Autoinstall = types.StringValue(s.Autoinstall)
 	data.Comment = types.StringValue(s.Comment)
 	data.Gateway = types.StringValue(s.Gateway)
@@ -485,47 +322,43 @@ func (d *SystemDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	data.Image = types.StringValue(s.Image)
 	data.IPv6DefaultDevice = types.StringValue(s.IPv6DefaultDevice)
 	data.NetbootEnabled = types.BoolValue(s.NetbootEnabled)
-	data.NextServerV4 = types.StringValue(s.NextServerv4)
-	data.NextServerV6 = types.StringValue(s.NextServerv6)
-	data.PowerAddress = types.StringValue(s.PowerAddress)
-	data.PowerID = types.StringValue(s.PowerID)
-	data.PowerPass = types.StringValue(s.PowerPass)
-	data.PowerType = types.StringValue(s.PowerType)
-	data.PowerUser = types.StringValue(s.PowerUser)
+	data.NextServerV4 = types.StringValue(s.TFTP.NextServerV4)
+	data.NextServerV6 = types.StringValue(s.TFTP.NextServerV6)
+	data.PowerAddress = types.StringValue(s.Power.Address)
+	data.PowerID = types.StringValue(s.Power.ID)
+	data.PowerPass = types.StringValue(s.Power.Password)
+	data.PowerType = types.StringValue(s.Power.Type)
+	data.PowerUser = types.StringValue(s.Power.User)
 	data.Profile = types.StringValue(s.Profile)
 	data.Proxy = types.StringValue(s.Proxy)
 	data.Status = types.StringValue(s.Status)
-	data.VirtDiskDriver = types.StringValue(s.VirtDiskDriver)
-	data.VirtPath = types.StringValue(s.VirtPath)
+	data.VirtDiskDriver = types.StringValue(s.Virt.DiskDriver)
+	data.VirtPath = types.StringValue(s.Virt.Path)
 	data.VirtPXEBoot = types.BoolValue(s.VirtPXEBoot)
-	data.VirtType = types.StringValue(s.VirtType)
+	data.VirtType = types.StringValue(s.Virt.Type)
 
-	nameServersList, diag := types.ListValueFrom(ctx, types.StringType, s.NameServers)
+	nameServersList, diag := types.ListValueFrom(ctx, types.StringType, s.DNS.NameServers.Data)
 	resp.Diagnostics.Append(diag...)
 	data.NameServers = nameServersList
 
-	nameServersSearchList, diag := types.ListValueFrom(ctx, types.StringType, s.NameServersSearch)
+	nameServersSearchList, diag := types.ListValueFrom(ctx, types.StringType, s.DNS.NameServersSearch)
 	resp.Diagnostics.Append(diag...)
 	data.NameServersSearch = nameServersSearchList
 
-	data.Interface = InterfaceMapFromAPI(ctx, ifaces, &resp.Diagnostics)
+	templateFiles, diag := types.MapValueFrom(ctx, types.StringType, s.TemplateFiles)
+	resp.Diagnostics.Append(diag...)
+	data.TemplateFiles = templateFiles
 
 	data.AutoinstallMeta = inherit.StringMapFrom(ctx, s.AutoinstallMeta, &resp.Diagnostics)
-	data.BootFiles = inherit.StringMapFrom(ctx, s.BootFiles, &resp.Diagnostics)
 	data.BootLoaders = inherit.StringListFrom(ctx, s.BootLoaders, &resp.Diagnostics)
 	data.EnableIPXE = inherit.BoolFrom(ctx, s.EnableIPXE, &resp.Diagnostics)
-	data.FetchableFiles = inherit.StringMapFrom(ctx, s.FetchableFiles, &resp.Diagnostics)
 	data.KernelOptions = inherit.StringMapFrom(ctx, s.KernelOptions, &resp.Diagnostics)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, s.KernelOptionsPost, &resp.Diagnostics)
-	data.MgmtClasses = inherit.StringListFrom(ctx, s.MgmtClasses, &resp.Diagnostics)
-	data.MgmtParameters = inherit.StringMapFrom(ctx, s.MgmtParameters, &resp.Diagnostics)
 	data.Owners = inherit.StringListFrom(ctx, s.Owners, &resp.Diagnostics)
-	data.TemplateFiles = inherit.StringMapFrom(ctx, s.TemplateFiles, &resp.Diagnostics)
-	data.VirtAutoBoot = inherit.BoolFrom(ctx, s.VirtAutoBoot, &resp.Diagnostics)
-	data.VirtCPUs = inherit.IntFrom(ctx, s.VirtCPUs, &resp.Diagnostics)
-	data.VirtFileSize = inherit.Float64From(ctx, s.VirtFileSize, &resp.Diagnostics)
-	data.VirtRAM = inherit.IntFrom(ctx, s.VirtRAM, &resp.Diagnostics)
+	data.VirtAutoBoot = inherit.BoolFrom(ctx, s.Virt.AutoBoot, &resp.Diagnostics)
+	data.VirtCPUs = inherit.IntFrom(ctx, s.Virt.Cpus, &resp.Diagnostics)
+	data.VirtFileSize = inherit.Float64From(ctx, s.Virt.FileSize, &resp.Diagnostics)
+	data.VirtRAM = inherit.IntFrom(ctx, s.Virt.Ram, &resp.Diagnostics)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
-

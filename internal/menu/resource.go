@@ -45,6 +45,13 @@ func (r *MenuResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this menu. Use this as the value for `cobbler_image.menu`.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"comment": schema.StringAttribute{
 				Description: "Free form text description.",
 				Optional:    true,
@@ -78,24 +85,6 @@ func (r *MenuResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 				},
 				Attributes: inheritedMapAttrs(),
 			},
-			"fetchable_files": schema.SingleNestedAttribute{
-				Description: "Templates for tftp or wget.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: inheritedMapAttrs(),
-			},
-			"boot_files": schema.SingleNestedAttribute{
-				Description: "Files copied into tftpboot beyond the kernel/initrd.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: inheritedMapAttrs(),
-			},
 			"template_files": schema.MapAttribute{
 				Description: "File mappings for built-in config management.",
 				Optional:    true,
@@ -105,15 +94,6 @@ func (r *MenuResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 					mapplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "Management classes for external config management.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: inheritedListAttrs(),
-			},
 			"owners": schema.SingleNestedAttribute{
 				Description: "Owners list for authz_ownership.",
 				Optional:    true,
@@ -122,15 +102,6 @@ func (r *MenuResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 					objectplanmodifier.UseStateForUnknown(),
 				},
 				Attributes: inheritedListAttrs(),
-			},
-			"mgmt_parameters": schema.SingleNestedAttribute{
-				Description: "Parameters for external management systems.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: inheritedMapAttrs(),
 			},
 		},
 	}
@@ -293,17 +264,13 @@ func modelToMenu(ctx context.Context, data menuResourceModel, diags *diag.Diagno
 	menu.Parent = data.Parent.ValueString()
 	menu.DisplayName = data.DisplayName.ValueString()
 	menu.AutoinstallMeta = inherit.StringMapTo(ctx, data.AutoinstallMeta, diags)
-	menu.FetchableFiles = inherit.StringMapTo(ctx, data.FetchableFiles, diags)
-	menu.BootFiles = inherit.StringMapTo(ctx, data.BootFiles, diags)
-	menu.MgmtClasses = inherit.StringListTo(ctx, data.MgmtClasses, diags)
 	menu.Owners = inherit.StringListTo(ctx, data.Owners, diags)
-	menu.MgmtParameters = inherit.StringMapTo(ctx, data.MgmtParameters, diags)
 
-	var templateFiles map[string]interface{}
+	var templateFiles map[string]string
 	if !data.TemplateFiles.IsNull() && !data.TemplateFiles.IsUnknown() {
 		diags.Append(data.TemplateFiles.ElementsAs(ctx, &templateFiles, false)...)
 	}
-	menu.TemplateFiles = cobbler.Value[map[string]interface{}]{Data: templateFiles, IsInherited: false}
+	menu.TemplateFiles = templateFiles
 
 	return menu
 }
@@ -311,17 +278,14 @@ func modelToMenu(ctx context.Context, data menuResourceModel, diags *diag.Diagno
 // menuToModel populates a menuResourceModel from a cobbler.Menu.
 func menuToModel(ctx context.Context, menu cobbler.Menu, data *menuResourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(menu.Name)
+	data.UID = types.StringValue(menu.Uid)
 	data.Comment = types.StringValue(menu.Comment)
 	data.Parent = types.StringValue(menu.Parent)
 	data.DisplayName = types.StringValue(menu.DisplayName)
 	data.AutoinstallMeta = inherit.StringMapFrom(ctx, menu.AutoinstallMeta, diags)
-	data.FetchableFiles = inherit.StringMapFrom(ctx, menu.FetchableFiles, diags)
-	data.BootFiles = inherit.StringMapFrom(ctx, menu.BootFiles, diags)
-	data.MgmtClasses = inherit.StringListFrom(ctx, menu.MgmtClasses, diags)
 	data.Owners = inherit.StringListFrom(ctx, menu.Owners, diags)
-	data.MgmtParameters = inherit.StringMapFrom(ctx, menu.MgmtParameters, diags)
 
-	templateFiles, d := types.MapValueFrom(ctx, types.StringType, menu.TemplateFiles.Data)
+	templateFiles, d := types.MapValueFrom(ctx, types.StringType, menu.TemplateFiles)
 	diags.Append(d...)
 	data.TemplateFiles = templateFiles
 }

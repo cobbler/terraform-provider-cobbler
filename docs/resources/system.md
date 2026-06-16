@@ -13,25 +13,46 @@ description: |-
 ## Example Usage
 
 ```terraform
+resource "cobbler_distro" "ubuntu_2004" {
+  name       = "Ubuntu-2004-x86_64"
+  breed      = "ubuntu"
+  os_version = "focal"
+  arch       = "x86_64"
+  kernel     = "/var/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+  initrd     = "/var/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
+}
+
+resource "cobbler_profile" "my_profile" {
+  name   = "my_profile"
+  distro = cobbler_distro.ubuntu_2004.uid
+}
+
 resource "cobbler_system" "my_system" {
   name         = "my_system"
-  profile      = "my_profile"
+  profile      = cobbler_profile.my_profile.uid
   name_servers = ["8.8.8.8", "8.8.4.4"]
   comment      = "I'm a system"
+}
 
-  interface = {
-    "eth0" = {
-      mac_address = "aa:bb:cc:dd:ee:ff"
-      static      = true
-      ip_address  = "1.2.3.4"
-      netmask     = "255.255.255.0"
-    }
-    "eth1" = {
-      mac_address = "aa:bb:cc:dd:ee:fa"
-      static      = true
-      ip_address  = "1.2.3.5"
-      netmask     = "255.255.255.0"
-    }
+resource "cobbler_network_interface" "eth0" {
+  name        = "eth0-${cobbler_system.my_system.name}"
+  system      = cobbler_system.my_system.uid
+  mac_address = "aa:bb:cc:dd:ee:ff"
+  static      = true
+  ipv4 = {
+    address = "1.2.3.4"
+    netmask = "255.255.255.0"
+  }
+}
+
+resource "cobbler_network_interface" "eth1" {
+  name        = "eth1-${cobbler_system.my_system.name}"
+  system      = cobbler_system.my_system.uid
+  mac_address = "aa:bb:cc:dd:ee:fa"
+  static      = true
+  ipv4 = {
+    address = "1.2.3.5"
+    netmask = "255.255.255.0"
   }
 }
 ```
@@ -42,26 +63,21 @@ resource "cobbler_system" "my_system" {
 ### Required
 
 - `name` (String) The name of the system.
-- `profile` (String) Parent profile.
+- `profile` (String) The Cobbler UID of the parent profile. Use `cobbler_profile.foo.uid`.
 
 ### Optional
 
 - `autoinstall` (String) Template remote kickstarts or preseeds.
 - `autoinstall_meta` (Attributes) Automatic installation template metadata, formerly Kickstart metadata. (see [below for nested schema](#nestedatt--autoinstall_meta))
-- `boot_files` (Attributes) Files copied into tftpboot beyond the kernel/initrd. (see [below for nested schema](#nestedatt--boot_files))
 - `boot_loaders` (Attributes) Must be either `grub`, `pxe`, or `ipxe`. (see [below for nested schema](#nestedatt--boot_loaders))
 - `comment` (String) Free form text description.
 - `enable_ipxe` (Attributes) Use iPXE instead of PXELINUX for advanced booting options. (see [below for nested schema](#nestedatt--enable_ipxe))
-- `fetchable_files` (Attributes) Templates for tftp or wget. (see [below for nested schema](#nestedatt--fetchable_files))
 - `gateway` (String) Network gateway.
 - `hostname` (String) Hostname of the system.
-- `image` (String) Parent image (if no profile is used).
-- `interface` (Attributes Map) A map of network interfaces, keyed by interface name (e.g. "eth0"). (see [below for nested schema](#nestedatt--interface))
+- `image` (String) The Cobbler UID of the parent image (if no profile is used). Use `cobbler_image.foo.uid`.
 - `ipv6_default_device` (String) IPv6 default device.
 - `kernel_options` (Attributes) Kernel options for the system. (see [below for nested schema](#nestedatt--kernel_options))
 - `kernel_options_post` (Attributes) Post install kernel options. (see [below for nested schema](#nestedatt--kernel_options_post))
-- `mgmt_classes` (Attributes) For external configuration management. (see [below for nested schema](#nestedatt--mgmt_classes))
-- `mgmt_parameters` (Attributes) Parameters which will be handed to your management application (Must be a valid YAML dictionary). (see [below for nested schema](#nestedatt--mgmt_parameters))
 - `name_servers` (List of String) Name servers.
 - `name_servers_search` (List of String) Name server search settings.
 - `netboot_enabled` (Boolean) (Re)install this machine at next boot.
@@ -75,7 +91,7 @@ resource "cobbler_system" "my_system" {
 - `power_user` (String) Power management user.
 - `proxy` (String) Proxy URL.
 - `status` (String) System status (development, testing, acceptance, production).
-- `template_files` (Attributes) File mappings for built-in config management. (see [below for nested schema](#nestedatt--template_files))
+- `template_files` (Map of String) File mappings for built-in config management. Not inheritable.
 - `virt_auto_boot` (Attributes) Auto boot virtual machines. (see [below for nested schema](#nestedatt--virt_auto_boot))
 - `virt_cpus` (Attributes) The number of virtual CPUs. (see [below for nested schema](#nestedatt--virt_cpus))
 - `virt_disk_driver` (String) The virtual machine disk driver.
@@ -85,17 +101,12 @@ resource "cobbler_system" "my_system" {
 - `virt_ram` (Attributes) The amount of RAM for the virtual machine. (see [below for nested schema](#nestedatt--virt_ram))
 - `virt_type` (String) The type of virtual machine. Valid options are: xenpv, xenfv, qemu, kvm, vmware, openvz.
 
+### Read-Only
+
+- `uid` (String) Server-assigned UID for this system. Use this as the value for `cobbler_network_interface.system`.
+
 <a id="nestedatt--autoinstall_meta"></a>
 ### Nested Schema for `autoinstall_meta`
-
-Optional:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (Map of String) The value.
-
-
-<a id="nestedatt--boot_files"></a>
-### Nested Schema for `boot_files`
 
 Optional:
 
@@ -121,42 +132,6 @@ Optional:
 - `value` (Boolean) The value.
 
 
-<a id="nestedatt--fetchable_files"></a>
-### Nested Schema for `fetchable_files`
-
-Optional:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (Map of String) The value.
-
-
-<a id="nestedatt--interface"></a>
-### Nested Schema for `interface`
-
-Optional:
-
-- `bonding_opts` (String) Options for bonded interfaces.
-- `bridge_opts` (String) Options for bridge interfaces.
-- `cnames` (List of String) Canonical name records.
-- `dhcp_tag` (String) DHCP tag.
-- `dns_name` (String) DNS name.
-- `gateway` (String) Per-interface gateway.
-- `interface_master` (String) The master interface when slave.
-- `interface_type` (String) The type of interface: NA, master, slave, bond, bond_slave, bridge, bridge_slave, bonded_bridge_slave, infiniband, bmc.
-- `ip_address` (String) The IP address of the interface.
-- `ipv6_address` (String) The IPv6 address of the interface.
-- `ipv6_default_gateway` (String) The default gateway for the IPv6 address / interface.
-- `ipv6_mtu` (String) The MTU of the IPv6 address.
-- `ipv6_secondaries` (List of String) IPv6 secondaries.
-- `ipv6_static_routes` (List of String) Static routes for the IPv6 interface.
-- `mac_address` (String) The MAC address of the interface.
-- `management` (Boolean) Whether this interface is a management interface.
-- `netmask` (String) The IPv4 netmask of the interface.
-- `static` (Boolean) Whether the interface should be static or DHCP.
-- `static_routes` (List of String) Static routes for the interface.
-- `virt_bridge` (String) The virtual bridge to attach to.
-
-
 <a id="nestedatt--kernel_options"></a>
 ### Nested Schema for `kernel_options`
 
@@ -175,24 +150,6 @@ Optional:
 - `value` (Map of String) The value.
 
 
-<a id="nestedatt--mgmt_classes"></a>
-### Nested Schema for `mgmt_classes`
-
-Optional:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (List of String) The value.
-
-
-<a id="nestedatt--mgmt_parameters"></a>
-### Nested Schema for `mgmt_parameters`
-
-Optional:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (Map of String) The value.
-
-
 <a id="nestedatt--owners"></a>
 ### Nested Schema for `owners`
 
@@ -200,15 +157,6 @@ Optional:
 
 - `inherited` (Boolean) If true, inherited from parent.
 - `value` (List of String) The value.
-
-
-<a id="nestedatt--template_files"></a>
-### Nested Schema for `template_files`
-
-Optional:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (Map of String) The value.
 
 
 <a id="nestedatt--virt_auto_boot"></a>

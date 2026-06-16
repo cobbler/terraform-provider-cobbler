@@ -35,16 +35,13 @@ resource "cobbler_image" "Ubuntu-2004-x86_64" {
 
 - `arch` (String) The architecture of the image. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.
 - `autoinstall` (String) Path to an autoinstall file (e.g. kickstart, preseed). Leave empty to inherit from defaults.
-- `boot_files` (Attributes) Files copied into tftpboot beyond the kernel/initrd. (see [below for nested schema](#nestedatt--boot_files))
 - `boot_loaders` (List of String) Boot loaders supported by the image. Must be subset of: 'grub', 'pxe', 'ipxe'.
 - `breed` (String) The "breed" of distribution. Valid options are: redhat, fedora, centos, scientific linux, suse, debian, and ubuntu.
 - `comment` (String) Free form text description.
-- `fetchable_files` (Attributes) Templates for tftp or wget. (see [below for nested schema](#nestedatt--fetchable_files))
 - `image_type` (String) Type of image. Valid options are: direct, iso, memdisk, virt-clone.
 - `kernel_options` (Attributes) Kernel options to use with the kernel. (see [below for nested schema](#nestedatt--kernel_options))
 - `kernel_options_post` (Attributes) Post install kernel options to use with the kernel after installation. (see [below for nested schema](#nestedatt--kernel_options_post))
-- `menu` (String) Name of the parent Cobbler menu that this image appears under.
-- `mgmt_classes` (Attributes) Management classes for external config management. (see [below for nested schema](#nestedatt--mgmt_classes))
+- `menu` (String) The Cobbler UID of the parent menu that this image appears under. Use `cobbler_menu.foo.uid`.
 - `os_version` (String) The OS version the image contains. Example: `focal`.
 - `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
 - `template_files` (Map of String) File mappings for built-in config management.
@@ -57,23 +54,9 @@ resource "cobbler_image" "Ubuntu-2004-x86_64" {
 - `virt_ram` (Attributes) RAM in MB to allocate to the virtual machine. (see [below for nested schema](#nestedatt--virt_ram))
 - `virt_type` (String) Virtualization type. Valid options are: qemu, kvm, xenpv, xenfv, vmware, vmwarew, openvz, auto. Leave empty to inherit.
 
-<a id="nestedatt--boot_files"></a>
-### Nested Schema for `boot_files`
+### Read-Only
 
-Optional:
-
-- `inherited` (Boolean)
-- `value` (Map of String)
-
-
-<a id="nestedatt--fetchable_files"></a>
-### Nested Schema for `fetchable_files`
-
-Optional:
-
-- `inherited` (Boolean)
-- `value` (Map of String)
-
+- `uid` (String) Server-assigned UID for this image. Use this as the value for `cobbler_system.image`.
 
 <a id="nestedatt--kernel_options"></a>
 ### Nested Schema for `kernel_options`
@@ -91,15 +74,6 @@ Optional:
 
 - `inherited` (Boolean)
 - `value` (Map of String)
-
-
-<a id="nestedatt--mgmt_classes"></a>
-### Nested Schema for `mgmt_classes`
-
-Optional:
-
-- `inherited` (Boolean)
-- `value` (List of String)
 
 
 <a id="nestedatt--owners"></a>

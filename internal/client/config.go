@@ -3,6 +3,7 @@ package client
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -55,6 +56,10 @@ func (c *Config) LoadAndValidate(readFile func(string) (string, bool, error)) er
 	client := cobbler.NewClient(httpClient, config)
 	_, err := client.Login()
 	if err != nil {
+		var vErr *cobbler.UnsupportedServerVersionError
+		if errors.As(err, &vErr) {
+			return fmt.Errorf("cobbler server too old: %w (terraform-provider-cobbler v6 requires Cobbler 4.0.0+)", err)
+		}
 		return fmt.Errorf("failed to login: %s", err)
 	}
 

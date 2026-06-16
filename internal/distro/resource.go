@@ -45,6 +45,13 @@ func (r *DistroResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this distro. Use this as the value for `cobbler_profile.distro`.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"arch": schema.StringAttribute{
 				Description: "The architecture of the distro. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.",
 				Optional:    true,
@@ -101,28 +108,6 @@ func (r *DistroResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"boot_files": schema.SingleNestedAttribute{
-				Description: "Files copied into tftpboot beyond the kernel/initrd.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						ElementType: types.StringType,
-						Optional:    true,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Optional: true,
-						Computed: true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
 			"boot_loaders": schema.SingleNestedAttribute{
 				Description: "Must be either 'grub', 'pxe', or 'ipxe'.",
 				Optional:    true,
@@ -132,28 +117,6 @@ func (r *DistroResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 				},
 				Attributes: map[string]schema.Attribute{
 					"value": schema.ListAttribute{
-						ElementType: types.StringType,
-						Optional:    true,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Optional: true,
-						Computed: true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"fetchable_files": schema.SingleNestedAttribute{
-				Description: "Templates for tftp or wget.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
 						ElementType: types.StringType,
 						Optional:    true,
 						Computed:    true,
@@ -198,28 +161,6 @@ func (r *DistroResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 				},
 				Attributes: map[string]schema.Attribute{
 					"value": schema.MapAttribute{
-						ElementType: types.StringType,
-						Optional:    true,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Optional: true,
-						Computed: true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "Management classes for external config management.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
 						ElementType: types.StringType,
 						Optional:    true,
 						Computed:    true,
@@ -394,27 +335,25 @@ func modelToDistro(ctx context.Context, data distroResourceModel, diags *diag.Di
 	distro.RemoteBootInitrd = data.RemoteBootInitrd.ValueString()
 	distro.RemoteBootKernel = data.RemoteBootKernel.ValueString()
 	distro.OSVersion = data.OSVersion.ValueString()
-	distro.BootFiles = inherit.StringMapTo(ctx, data.BootFiles, diags)
 	distro.BootLoaders = inherit.StringListTo(ctx, data.BootLoaders, diags)
-	distro.FetchableFiles = inherit.StringMapTo(ctx, data.FetchableFiles, diags)
 	distro.KernelOptions = inherit.StringMapTo(ctx, data.KernelOptions, diags)
 	distro.KernelOptionsPost = inherit.StringMapTo(ctx, data.KernelOptionsPost, diags)
-	distro.MgmtClasses = inherit.StringListTo(ctx, data.MgmtClasses, diags)
 	distro.Owners = inherit.StringListTo(ctx, data.Owners, diags)
 
 	// ElementsAs fails on null/unknown values; guard to avoid plan-time errors
 	// for Optional+Computed fields not set in the configuration.
-	var templateFiles map[string]interface{}
+	var templateFiles map[string]string
 	if !data.TemplateFiles.IsNull() && !data.TemplateFiles.IsUnknown() {
 		diags.Append(data.TemplateFiles.ElementsAs(ctx, &templateFiles, false)...)
 	}
-	distro.TemplateFiles = cobbler.Value[map[string]interface{}]{Data: templateFiles, IsInherited: false}
+	distro.TemplateFiles = templateFiles
 	return distro
 }
 
 // distroToModel populates a distroResourceModel from a cobbler.Distro.
 func distroToModel(ctx context.Context, distro cobbler.Distro, data *distroResourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(distro.Name)
+	data.UID = types.StringValue(distro.Uid)
 	data.Arch = types.StringValue(distro.Arch)
 	data.Breed = types.StringValue(distro.Breed)
 	data.Comment = types.StringValue(distro.Comment)
@@ -423,14 +362,11 @@ func distroToModel(ctx context.Context, distro cobbler.Distro, data *distroResou
 	data.RemoteBootInitrd = types.StringValue(distro.RemoteBootInitrd)
 	data.RemoteBootKernel = types.StringValue(distro.RemoteBootKernel)
 	data.OSVersion = types.StringValue(distro.OSVersion)
-	data.BootFiles = inherit.StringMapFrom(ctx, distro.BootFiles, diags)
 	data.BootLoaders = inherit.StringListFrom(ctx, distro.BootLoaders, diags)
-	data.FetchableFiles = inherit.StringMapFrom(ctx, distro.FetchableFiles, diags)
 	data.KernelOptions = inherit.StringMapFrom(ctx, distro.KernelOptions, diags)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, distro.KernelOptionsPost, diags)
-	data.MgmtClasses = inherit.StringListFrom(ctx, distro.MgmtClasses, diags)
 	data.Owners = inherit.StringListFrom(ctx, distro.Owners, diags)
-	templateFiles, d := types.MapValueFrom(ctx, types.StringType, distro.TemplateFiles.Data)
+	templateFiles, d := types.MapValueFrom(ctx, types.StringType, distro.TemplateFiles)
 	diags.Append(d...)
 	data.TemplateFiles = templateFiles
 }

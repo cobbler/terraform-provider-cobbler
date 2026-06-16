@@ -6,13 +6,16 @@ import (
 
 	clientpkg "github.com/cobbler/terraform-provider-cobbler/internal/client"
 	"github.com/cobbler/terraform-provider-cobbler/internal/distro"
+	"github.com/cobbler/terraform-provider-cobbler/internal/distro_group"
 	"github.com/cobbler/terraform-provider-cobbler/internal/image"
 	"github.com/cobbler/terraform-provider-cobbler/internal/menu"
+	"github.com/cobbler/terraform-provider-cobbler/internal/network_interface"
 	"github.com/cobbler/terraform-provider-cobbler/internal/profile"
+	"github.com/cobbler/terraform-provider-cobbler/internal/profile_group"
 	"github.com/cobbler/terraform-provider-cobbler/internal/repo"
-	"github.com/cobbler/terraform-provider-cobbler/internal/snippet"
 	"github.com/cobbler/terraform-provider-cobbler/internal/system"
-	template_file "github.com/cobbler/terraform-provider-cobbler/internal/template_file"
+	"github.com/cobbler/terraform-provider-cobbler/internal/system_group"
+	"github.com/cobbler/terraform-provider-cobbler/internal/template"
 	"github.com/cobbler/terraform-provider-cobbler/internal/util"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -153,25 +156,31 @@ func (p *CobblerProvider) Configure(ctx context.Context, req provider.ConfigureR
 func (p *CobblerProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		distro.NewResource,
+		distro_group.NewResource,
 		image.NewResource,
 		menu.NewResource,
+		network_interface.NewResource,
 		profile.NewResource,
+		profile_group.NewResource,
 		repo.NewResource,
-		snippet.NewResource,
 		system.NewResource,
-		template_file.NewResource,
+		system_group.NewResource,
+		template.NewResource,
 	}
 }
 
 func (p *CobblerProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		distro.NewDataSource,
+		distro_group.NewDataSource,
 		image.NewDataSource,
 		menu.NewDataSource,
+		network_interface.NewDataSource,
 		profile.NewDataSource,
+		profile_group.NewDataSource,
 		repo.NewDataSource,
-		snippet.NewDataSource,
 		system.NewDataSource,
-		template_file.NewDataSource,
+		system_group.NewDataSource,
+		template.NewDataSource,
 	}
 }

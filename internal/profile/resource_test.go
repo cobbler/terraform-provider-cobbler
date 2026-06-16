@@ -16,7 +16,7 @@ func TestAccProfileResource_basic(t *testing.T) {
 				Config: testAccProfileResourceBasic,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("cobbler_profile.foo", "name", "foo-resource-profile-basic"),
-					resource.TestCheckResourceAttr("cobbler_profile.foo", "distro", "foo-resource-profile-basic"),
+					resource.TestCheckResourceAttrPair("cobbler_profile.foo", "distro", "cobbler_distro.foo", "uid"),
 				),
 			},
 			{
@@ -71,7 +71,7 @@ resource "cobbler_distro" "foo" {
 
 resource "cobbler_profile" "foo" {
   name   = "foo-resource-profile-basic"
-  distro = cobbler_distro.foo.name
+  distro = cobbler_distro.foo.uid
 }
 `
 
@@ -89,7 +89,7 @@ resource "cobbler_distro" "foo" {
 resource "cobbler_profile" "foo" {
   name    = "foo-resource-profile-change"
   comment = "I am a profile"
-  distro  = cobbler_distro.foo.name
+  distro  = cobbler_distro.foo.uid
 }
 `
 
@@ -107,7 +107,7 @@ resource "cobbler_distro" "foo" {
 resource "cobbler_profile" "foo" {
   name    = "foo-resource-profile-change"
   comment = "I am a profile again"
-  distro  = cobbler_distro.foo.name
+  distro  = cobbler_distro.foo.uid
 }
 `
 
@@ -167,7 +167,7 @@ resource "cobbler_distro" "foo" {
 
 resource "cobbler_profile" "foo" {
   name   = "foo-resource-profile-enable-ipxe"
-  distro = cobbler_distro.foo.name
+  distro = cobbler_distro.foo.uid
   enable_ipxe = {
     inherited = false
     value     = true
@@ -265,7 +265,7 @@ resource "cobbler_distro" "foo" {
 
 resource "cobbler_profile" "foo" {
   name   = "foo-resource-profile-virt-file-size"
-  distro = cobbler_distro.foo.name
+  distro = cobbler_distro.foo.uid
   virt_file_size = {
     inherited = false
     value     = 10
@@ -285,7 +285,7 @@ resource "cobbler_distro" "foo" {
 
 resource "cobbler_profile" "foo" {
   name   = "foo-resource-profile-virt-file-size"
-  distro = cobbler_distro.foo.name
+  distro = cobbler_distro.foo.uid
   virt_file_size = {
     inherited = true
   }
@@ -304,7 +304,7 @@ resource "cobbler_distro" "foo" {
 
 resource "cobbler_profile" "foo" {
   name   = "foo-resource-profile-virt-ram"
-  distro = cobbler_distro.foo.name
+  distro = cobbler_distro.foo.uid
   virt_ram = {
     inherited = false
     value     = 2048
@@ -324,7 +324,7 @@ resource "cobbler_distro" "foo" {
 
 resource "cobbler_profile" "foo" {
   name   = "foo-resource-profile-virt-ram"
-  distro = cobbler_distro.foo.name
+  distro = cobbler_distro.foo.uid
   virt_ram = {
     inherited = true
   }
@@ -343,7 +343,7 @@ resource "cobbler_distro" "foo" {
 
 resource "cobbler_profile" "foo" {
   name   = "foo-resource-profile-enable-ipxe"
-  distro = cobbler_distro.foo.name
+  distro = cobbler_distro.foo.uid
   enable_ipxe = {
     inherited = true
   }

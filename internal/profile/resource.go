@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -47,6 +48,13 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this profile. Use this as the value for `cobbler_profile.parent` or `cobbler_system.profile`.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"autoinstall": schema.StringAttribute{
 				Description: "Template remote kickstarts or preseeds.",
 				Optional:    true,
@@ -72,7 +80,7 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				},
 			},
 			"distro": schema.StringAttribute{
-				Description: "Parent distribution.",
+				Description: "The Cobbler UID of the parent distribution. Use `cobbler_distro.foo.uid`.",
 				Required:    true,
 			},
 			"next_server_v4": schema.StringAttribute{
@@ -92,7 +100,7 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 				},
 			},
 			"parent": schema.StringAttribute{
-				Description: "The parent this profile inherits settings from.",
+				Description: "The Cobbler UID of the parent profile this profile inherits settings from. Use `cobbler_profile.foo.uid`.",
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
@@ -188,30 +196,6 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 					},
 				},
 			},
-			"boot_files": schema.SingleNestedAttribute{
-				Description: "Files copied into tftpboot beyond the kernel/initrd.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
 			"enable_ipxe": schema.SingleNestedAttribute{
 				Description: "Use iPXE instead of PXELINUX for advanced booting options.",
 				Optional:    true,
@@ -247,30 +231,6 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						Description: "The value.",
 						Optional:    true,
 						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"fetchable_files": schema.SingleNestedAttribute{
-				Description: "Templates for tftp or wget.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
 					},
 					"inherited": schema.BoolAttribute{
 						Description: "If true, inherited from parent.",
@@ -330,76 +290,13 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 					},
 				},
 			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "For external configuration management.",
+			"name_servers_search": schema.ListAttribute{
+				Description: "Name server search settings. Not inheritable.",
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"mgmt_parameters": schema.SingleNestedAttribute{
-				Description: "Parameters which will be handed to your management application (Must be a valid YAML dictionary).",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"name_servers_search": schema.SingleNestedAttribute{
-				Description: "Name server search settings.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
+				ElementType: types.StringType,
+				PlanModifiers: []planmodifier.List{
+					listplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"name_servers": schema.SingleNestedAttribute{
@@ -450,28 +347,13 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 					},
 				},
 			},
-			"template_files": schema.SingleNestedAttribute{
-				Description: "File mappings for built-in config management.",
+			"template_files": schema.MapAttribute{
+				Description: "File mappings for built-in config management. Not inheritable.",
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
+				ElementType: types.StringType,
+				PlanModifiers: []planmodifier.Map{
+					mapplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"virt_auto_boot": schema.SingleNestedAttribute{
@@ -681,16 +563,16 @@ func modelToProfile(ctx context.Context, data profileResourceModel, diags *diag.
 	profile.Comment = data.Comment.ValueString()
 	profile.DHCPTag = data.DHCPTag.ValueString()
 	profile.Distro = data.Distro.ValueString()
-	profile.NextServerv4 = data.NextServerV4.ValueString()
-	profile.NextServerv6 = data.NextServerV6.ValueString()
+	profile.TFTP.NextServerV4 = data.NextServerV4.ValueString()
+	profile.TFTP.NextServerV6 = data.NextServerV6.ValueString()
 	profile.Parent = data.Parent.ValueString()
 	profile.Proxy = data.Proxy.ValueString()
 	profile.Server = data.Server.ValueString()
 	profile.VirtBridge = data.VirtBridge.ValueString()
-	profile.VirtCPUs = int(data.VirtCPUs.ValueInt64())
-	profile.VirtDiskDriver = stringOrInherit(data.VirtDiskDriver)
-	profile.VirtPath = data.VirtPath.ValueString()
-	profile.VirtType = stringOrInherit(data.VirtType)
+	profile.Virt.Cpus = cobbler.Value[int]{Data: int(data.VirtCPUs.ValueInt64())}
+	profile.Virt.DiskDriver = stringOrInherit(data.VirtDiskDriver)
+	profile.Virt.Path = data.VirtPath.ValueString()
+	profile.Virt.Type = stringOrInherit(data.VirtType)
 
 	// ElementsAs fails on null/unknown; guard for Optional+Computed fields not set in config.
 	var repos []string
@@ -699,22 +581,28 @@ func modelToProfile(ctx context.Context, data profileResourceModel, diags *diag.
 	}
 	profile.Repos = repos
 
+	var nameServersSearch []string
+	if !data.NameServersSearch.IsNull() && !data.NameServersSearch.IsUnknown() {
+		diags.Append(data.NameServersSearch.ElementsAs(ctx, &nameServersSearch, false)...)
+	}
+	profile.DNS.NameServersSearch = nameServersSearch
+
+	var templateFiles map[string]string
+	if !data.TemplateFiles.IsNull() && !data.TemplateFiles.IsUnknown() {
+		diags.Append(data.TemplateFiles.ElementsAs(ctx, &templateFiles, false)...)
+	}
+	profile.TemplateFiles = templateFiles
+
 	profile.AutoinstallMeta = inherit.StringMapTo(ctx, data.AutoinstallMeta, diags)
-	profile.BootFiles = inherit.StringMapTo(ctx, data.BootFiles, diags)
 	profile.EnableIPXE = inherit.BoolTo(ctx, data.EnableIPXE, diags)
 	profile.EnableMenu = inherit.BoolTo(ctx, data.EnableMenu, diags)
-	profile.FetchableFiles = inherit.StringMapTo(ctx, data.FetchableFiles, diags)
 	profile.KernelOptions = inherit.StringMapTo(ctx, data.KernelOptions, diags)
 	profile.KernelOptionsPost = inherit.StringMapTo(ctx, data.KernelOptionsPost, diags)
-	profile.MgmtClasses = inherit.StringListTo(ctx, data.MgmtClasses, diags)
-	profile.MgmtParameters = inherit.StringMapTo(ctx, data.MgmtParameters, diags)
-	profile.NameServersSearch = inherit.StringListTo(ctx, data.NameServersSearch, diags)
-	profile.NameServers = inherit.StringListTo(ctx, data.NameServers, diags)
+	profile.DNS.NameServers = inherit.StringListTo(ctx, data.NameServers, diags)
 	profile.Owners = inherit.StringListTo(ctx, data.Owners, diags)
-	profile.TemplateFiles = inherit.StringMapTo(ctx, data.TemplateFiles, diags)
-	profile.VirtAutoBoot = inherit.BoolTo(ctx, data.VirtAutoBoot, diags)
-	profile.VirtFileSize = inherit.Float64To(ctx, data.VirtFileSize, diags)
-	profile.VirtRAM = inherit.IntTo(ctx, data.VirtRAM, diags)
+	profile.Virt.AutoBoot = inherit.BoolTo(ctx, data.VirtAutoBoot, diags)
+	profile.Virt.FileSize = inherit.Float64To(ctx, data.VirtFileSize, diags)
+	profile.Virt.Ram = inherit.IntTo(ctx, data.VirtRAM, diags)
 
 	return profile
 }
@@ -722,39 +610,42 @@ func modelToProfile(ctx context.Context, data profileResourceModel, diags *diag.
 // profileToModel populates a profileResourceModel from a cobbler.Profile.
 func profileToModel(ctx context.Context, profile cobbler.Profile, data *profileResourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(profile.Name)
+	data.UID = types.StringValue(profile.Uid)
 	data.Autoinstall = types.StringValue(profile.Autoinstall)
 	data.Comment = types.StringValue(profile.Comment)
 	data.DHCPTag = types.StringValue(profile.DHCPTag)
 	data.Distro = types.StringValue(profile.Distro)
-	data.NextServerV4 = types.StringValue(profile.NextServerv4)
-	data.NextServerV6 = types.StringValue(profile.NextServerv6)
+	data.NextServerV4 = types.StringValue(profile.TFTP.NextServerV4)
+	data.NextServerV6 = types.StringValue(profile.TFTP.NextServerV6)
 	data.Parent = types.StringValue(profile.Parent)
 	data.Proxy = types.StringValue(profile.Proxy)
 	data.Server = types.StringValue(profile.Server)
 	data.VirtBridge = types.StringValue(profile.VirtBridge)
-	data.VirtCPUs = types.Int64Value(int64(profile.VirtCPUs))
-	data.VirtDiskDriver = types.StringValue(profile.VirtDiskDriver)
-	data.VirtPath = types.StringValue(profile.VirtPath)
-	data.VirtType = types.StringValue(profile.VirtType)
+	data.VirtCPUs = types.Int64Value(int64(profile.Virt.Cpus.Data))
+	data.VirtDiskDriver = types.StringValue(profile.Virt.DiskDriver)
+	data.VirtPath = types.StringValue(profile.Virt.Path)
+	data.VirtType = types.StringValue(profile.Virt.Type)
 
 	repoList, d := types.ListValueFrom(ctx, types.StringType, profile.Repos)
 	diags.Append(d...)
 	data.Repos = repoList
 
+	nameServersSearch, d := types.ListValueFrom(ctx, types.StringType, profile.DNS.NameServersSearch)
+	diags.Append(d...)
+	data.NameServersSearch = nameServersSearch
+
+	templateFiles, d := types.MapValueFrom(ctx, types.StringType, profile.TemplateFiles)
+	diags.Append(d...)
+	data.TemplateFiles = templateFiles
+
 	data.AutoinstallMeta = inherit.StringMapFrom(ctx, profile.AutoinstallMeta, diags)
-	data.BootFiles = inherit.StringMapFrom(ctx, profile.BootFiles, diags)
 	data.EnableIPXE = inherit.BoolFrom(ctx, profile.EnableIPXE, diags)
 	data.EnableMenu = inherit.BoolFrom(ctx, profile.EnableMenu, diags)
-	data.FetchableFiles = inherit.StringMapFrom(ctx, profile.FetchableFiles, diags)
 	data.KernelOptions = inherit.StringMapFrom(ctx, profile.KernelOptions, diags)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, profile.KernelOptionsPost, diags)
-	data.MgmtClasses = inherit.StringListFrom(ctx, profile.MgmtClasses, diags)
-	data.MgmtParameters = inherit.StringMapFrom(ctx, profile.MgmtParameters, diags)
-	data.NameServersSearch = inherit.StringListFrom(ctx, profile.NameServersSearch, diags)
-	data.NameServers = inherit.StringListFrom(ctx, profile.NameServers, diags)
+	data.NameServers = inherit.StringListFrom(ctx, profile.DNS.NameServers, diags)
 	data.Owners = inherit.StringListFrom(ctx, profile.Owners, diags)
-	data.TemplateFiles = inherit.StringMapFrom(ctx, profile.TemplateFiles, diags)
-	data.VirtAutoBoot = inherit.BoolFrom(ctx, profile.VirtAutoBoot, diags)
-	data.VirtFileSize = inherit.Float64From(ctx, profile.VirtFileSize, diags)
-	data.VirtRAM = inherit.IntFrom(ctx, profile.VirtRAM, diags)
+	data.VirtAutoBoot = inherit.BoolFrom(ctx, profile.Virt.AutoBoot, diags)
+	data.VirtFileSize = inherit.Float64From(ctx, profile.Virt.FileSize, diags)
+	data.VirtRAM = inherit.IntFrom(ctx, profile.Virt.Ram, diags)
 }

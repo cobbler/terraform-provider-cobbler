@@ -23,27 +23,24 @@ Use this data source to get the details of a Cobbler profile.
 
 - `autoinstall` (String) Template remote kickstarts or preseeds.
 - `autoinstall_meta` (Attributes) Automatic installation template metadata, formerly Kickstart metadata. (see [below for nested schema](#nestedatt--autoinstall_meta))
-- `boot_files` (Attributes) Files copied into tftpboot beyond the kernel/initrd. (see [below for nested schema](#nestedatt--boot_files))
 - `comment` (String) Free form text description.
 - `dhcp_tag` (String) DHCP tag.
-- `distro` (String) Parent distribution.
+- `distro` (String) The Cobbler UID of the parent distribution.
 - `enable_ipxe` (Attributes) Use iPXE instead of PXELINUX for advanced booting options. (see [below for nested schema](#nestedatt--enable_ipxe))
 - `enable_menu` (Attributes) Enable a boot menu. (see [below for nested schema](#nestedatt--enable_menu))
-- `fetchable_files` (Attributes) Templates for tftp or wget. (see [below for nested schema](#nestedatt--fetchable_files))
 - `kernel_options` (Attributes) Kernel options for the profile. (see [below for nested schema](#nestedatt--kernel_options))
 - `kernel_options_post` (Attributes) Post install kernel options. (see [below for nested schema](#nestedatt--kernel_options_post))
-- `mgmt_classes` (Attributes) For external configuration management. (see [below for nested schema](#nestedatt--mgmt_classes))
-- `mgmt_parameters` (Attributes) Parameters which will be handed to your management application. (see [below for nested schema](#nestedatt--mgmt_parameters))
 - `name_servers` (Attributes) Name servers. (see [below for nested schema](#nestedatt--name_servers))
-- `name_servers_search` (Attributes) Name server search settings. (see [below for nested schema](#nestedatt--name_servers_search))
+- `name_servers_search` (List of String) Name server search settings. Not inheritable.
 - `next_server_v4` (String) The next_server_v4 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded.
 - `next_server_v6` (String) The next_server_v6 option is used for DHCP/PXE as the IP of the TFTP server from which network boot files are downloaded.
 - `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
-- `parent` (String) The parent this profile inherits settings from.
+- `parent` (String) The Cobbler UID of the parent profile this profile inherits settings from.
 - `proxy` (String) Proxy URL.
 - `repos` (List of String) Repos to auto-assign to this profile.
 - `server` (String) The server-override for the profile.
-- `template_files` (Attributes) File mappings for built-in config management. (see [below for nested schema](#nestedatt--template_files))
+- `template_files` (Map of String) File mappings for built-in config management. Not inheritable.
+- `uid` (String) Server-assigned UID for this profile. Use this as the value for `cobbler_profile.parent` or `cobbler_system.profile`.
 - `virt_auto_boot` (Attributes) Auto boot virtual machines. (see [below for nested schema](#nestedatt--virt_auto_boot))
 - `virt_bridge` (String) The bridge for virtual machines.
 - `virt_cpus` (Number) The number of virtual CPUs.
@@ -55,15 +52,6 @@ Use this data source to get the details of a Cobbler profile.
 
 <a id="nestedatt--autoinstall_meta"></a>
 ### Nested Schema for `autoinstall_meta`
-
-Read-Only:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (Map of String) The value.
-
-
-<a id="nestedatt--boot_files"></a>
-### Nested Schema for `boot_files`
 
 Read-Only:
 
@@ -89,15 +77,6 @@ Read-Only:
 - `value` (Boolean) The value.
 
 
-<a id="nestedatt--fetchable_files"></a>
-### Nested Schema for `fetchable_files`
-
-Read-Only:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (Map of String) The value.
-
-
 <a id="nestedatt--kernel_options"></a>
 ### Nested Schema for `kernel_options`
 
@@ -116,35 +95,8 @@ Read-Only:
 - `value` (Map of String) The value.
 
 
-<a id="nestedatt--mgmt_classes"></a>
-### Nested Schema for `mgmt_classes`
-
-Read-Only:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (List of String) The value.
-
-
-<a id="nestedatt--mgmt_parameters"></a>
-### Nested Schema for `mgmt_parameters`
-
-Read-Only:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (Map of String) The value.
-
-
 <a id="nestedatt--name_servers"></a>
 ### Nested Schema for `name_servers`
-
-Read-Only:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (List of String) The value.
-
-
-<a id="nestedatt--name_servers_search"></a>
-### Nested Schema for `name_servers_search`
 
 Read-Only:
 
@@ -159,15 +111,6 @@ Read-Only:
 
 - `inherited` (Boolean) If true, inherited from parent.
 - `value` (List of String) The value.
-
-
-<a id="nestedatt--template_files"></a>
-### Nested Schema for `template_files`
-
-Read-Only:
-
-- `inherited` (Boolean) If true, inherited from parent.
-- `value` (Map of String) The value.
 
 
 <a id="nestedatt--virt_auto_boot"></a>

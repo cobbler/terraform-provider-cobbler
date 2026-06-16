@@ -16,7 +16,7 @@ func TestAccSystemResource_basic(t *testing.T) {
 				Config: testAccSystemResourceBasic,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("cobbler_system.foo", "name", "foo-resource-system-basic"),
-					resource.TestCheckResourceAttr("cobbler_system.foo", "profile", "foo-resource-profile"),
+					resource.TestCheckResourceAttrPair("cobbler_system.foo", "profile", "cobbler_profile.foo", "uid"),
 					resource.TestCheckResourceAttr("cobbler_system.foo", "comment", "I'm a system"),
 				),
 			},
@@ -72,72 +72,36 @@ resource "cobbler_distro" "foo" {
 
 resource "cobbler_profile" "foo" {
   name   = "foo-resource-profile"
-  distro = cobbler_distro.foo.name
+  distro = cobbler_distro.foo.uid
 }
 `
 
 const testAccSystemResourceBasic = testAccSystemDistroProfile + `
 resource "cobbler_system" "foo" {
   name         = "foo-resource-system-basic"
-  profile      = cobbler_profile.foo.name
+  profile      = cobbler_profile.foo.uid
   name_servers = ["8.8.8.8", "8.8.4.4"]
   comment      = "I'm a system"
   power_id     = "foo"
-
-  interface = {
-    "default" = {}
-    "eth0" = {
-      mac_address = "aa:bb:cc:dd:ee:ff"
-      static      = true
-      ip_address  = "1.2.3.4"
-      netmask     = "255.255.255.0"
-    }
-    "eth1" = {
-      mac_address = "aa:bb:cc:dd:ee:fa"
-      static      = true
-      ip_address  = "1.2.3.5"
-      netmask     = "255.255.255.0"
-    }
-  }
 }
 `
 
 const testAccSystemResourceChange1 = testAccSystemDistroProfile + `
 resource "cobbler_system" "foo" {
   name         = "foo-resource-system-change"
-  profile      = cobbler_profile.foo.name
+  profile      = cobbler_profile.foo.uid
   name_servers = ["8.8.8.8", "8.8.4.4"]
   comment      = "I'm a system"
   power_id     = "foo"
-
-  interface = {
-    "default" = {}
-    "eth0" = {
-      mac_address = "aa:bb:cc:dd:ee:ff"
-      static      = true
-      ip_address  = "1.2.3.4"
-      netmask     = "255.255.255.0"
-    }
-  }
 }
 `
 
 const testAccSystemResourceChange2 = testAccSystemDistroProfile + `
 resource "cobbler_system" "foo" {
   name         = "foo-resource-system-change"
-  profile      = cobbler_profile.foo.name
+  profile      = cobbler_profile.foo.uid
   name_servers = ["8.8.8.8", "8.8.4.4"]
   comment      = "I'm a system again"
   power_id     = "foo"
-
-  interface = {
-    "default" = {}
-    "eth0" = {
-      mac_address = "aa:bb:cc:dd:ee:ff"
-      static      = true
-      ip_address  = "1.2.3.6"
-      netmask     = "255.255.255.0"
-    }
-  }
 }
 `

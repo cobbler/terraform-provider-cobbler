@@ -30,54 +30,18 @@ resource "cobbler_menu" "example" {
 ### Optional
 
 - `autoinstall_meta` (Attributes) Autoinstall template metadata. (see [below for nested schema](#nestedatt--autoinstall_meta))
-- `boot_files` (Attributes) Files copied into tftpboot beyond the kernel/initrd. (see [below for nested schema](#nestedatt--boot_files))
 - `comment` (String) Free form text description.
 - `display_name` (String) The display name shown in the boot menu.
-- `fetchable_files` (Attributes) Templates for tftp or wget. (see [below for nested schema](#nestedatt--fetchable_files))
-- `mgmt_classes` (Attributes) Management classes for external config management. (see [below for nested schema](#nestedatt--mgmt_classes))
-- `mgmt_parameters` (Attributes) Parameters for external management systems. (see [below for nested schema](#nestedatt--mgmt_parameters))
 - `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
 - `parent` (String) The name of the parent menu. Used for hierarchical menus.
 - `template_files` (Map of String) File mappings for built-in config management.
 
+### Read-Only
+
+- `uid` (String) Server-assigned UID for this menu. Use this as the value for `cobbler_image.menu`.
+
 <a id="nestedatt--autoinstall_meta"></a>
 ### Nested Schema for `autoinstall_meta`
-
-Optional:
-
-- `inherited` (Boolean)
-- `value` (Map of String)
-
-
-<a id="nestedatt--boot_files"></a>
-### Nested Schema for `boot_files`
-
-Optional:
-
-- `inherited` (Boolean)
-- `value` (Map of String)
-
-
-<a id="nestedatt--fetchable_files"></a>
-### Nested Schema for `fetchable_files`
-
-Optional:
-
-- `inherited` (Boolean)
-- `value` (Map of String)
-
-
-<a id="nestedatt--mgmt_classes"></a>
-### Nested Schema for `mgmt_classes`
-
-Optional:
-
-- `inherited` (Boolean)
-- `value` (List of String)
-
-
-<a id="nestedatt--mgmt_parameters"></a>
-### Nested Schema for `mgmt_parameters`
 
 Optional:
 

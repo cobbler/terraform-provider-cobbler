@@ -338,13 +338,13 @@ func modelToRepo(ctx context.Context, data repoResourceModel, diags *diag.Diagno
 	if !data.AptComponents.IsNull() && !data.AptComponents.IsUnknown() {
 		diags.Append(data.AptComponents.ElementsAs(ctx, &aptComponents, false)...)
 	}
-	repo.AptComponents = aptComponents
+	repo.Apt.Components = aptComponents
 
 	var aptDists []string
 	if !data.AptDists.IsNull() && !data.AptDists.IsUnknown() {
 		diags.Append(data.AptDists.ElementsAs(ctx, &aptDists, false)...)
 	}
-	repo.AptDists = aptDists
+	repo.Apt.Dists = aptDists
 
 	var rpmList []string
 	if !data.RpmList.IsNull() && !data.RpmList.IsUnknown() {
@@ -372,11 +372,11 @@ func repoToModel(ctx context.Context, repo cobbler.Repo, data *repoResourceModel
 	diags.Append(d...)
 	data.Environment = env
 
-	aptComponents, d := types.ListValueFrom(ctx, types.StringType, repo.AptComponents)
+	aptComponents, d := types.ListValueFrom(ctx, types.StringType, repo.Apt.Components)
 	diags.Append(d...)
 	data.AptComponents = aptComponents
 
-	aptDists, d := types.ListValueFrom(ctx, types.StringType, repo.AptDists)
+	aptDists, d := types.ListValueFrom(ctx, types.StringType, repo.Apt.Dists)
 	diags.Append(d...)
 	data.AptDists = aptDists
 
