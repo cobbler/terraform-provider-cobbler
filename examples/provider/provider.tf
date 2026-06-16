@@ -2,7 +2,7 @@ terraform {
   required_providers {
     cobbler = {
       source = "cobbler/cobbler"
-      version = "5.0.0"
+      version = "~> 5.0"
     }
   }
 }
