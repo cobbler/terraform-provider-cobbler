@@ -3,7 +3,7 @@ module github.com/cobbler/terraform-provider-cobbler
 go 1.25.8
 
 require (
-	github.com/cobbler/cobblerclient v0.5.8
+	github.com/cobbler/cobblerclient v0.5.9
 	github.com/hashicorp/terraform-plugin-framework v1.19.0
 	github.com/hashicorp/terraform-plugin-framework-validators v0.19.0
 	github.com/hashicorp/terraform-plugin-go v0.31.0
