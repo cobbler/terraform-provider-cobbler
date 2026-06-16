@@ -19,9 +19,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: 'go.mod'
         id: go
@@ -37,8 +37,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
         with:
           go-version-file: 'go.mod'
       - run: go test -v -cover ./...
@@ -63,19 +63,19 @@ jobs:
       fail-fast: false
     steps:
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: 'go.mod'
         id: go
       - name: Set up Terraform
         if: matrix.tool == 'terraform'
         # https://github.com/hashicorp/setup-terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
       - name: Set up OpenTofu
         if: matrix.tool == 'opentofu'
-        uses: opentofu/setup-opentofu@v1
+        uses: opentofu/setup-opentofu@v2
       - name: Export TF_ACC_TERRAFORM_PATH for OpenTofu
         if: matrix.tool == 'opentofu'
         run: echo "TF_ACC_TERRAFORM_PATH=$(which tofu)" >> "$GITHUB_ENV"
@@ -90,7 +90,7 @@ jobs:
           sed -i "s/cobbler_commit=.*/cobbler_commit=${{ matrix.cobbler_version }}/" docker/start.sh
       - name: Restore OS ISO
         id: cache-iso-restore
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             *.iso
@@ -102,15 +102,15 @@ jobs:
           make testacc
       - name: Save OS ISO
         id: cache-iso-save
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: |
             *.iso
           key: ${{ steps.cache-iso-restore.outputs.cache-primary-key }}
       # https://github.com/actions/upload-artifact
       - name: Upload coverage report to GH artifacts
-        if: matrix.cobbler_version == 'df356046f3cf27be62a61001b982d5983800cfd9' && matrix.tool == 'terraform'
-        uses: actions/upload-artifact@v4
+        if: matrix.cobbler_version == '758143e06c422caa411d9d37b8f90d0419625e90' && matrix.tool == 'terraform'
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: coverage.out

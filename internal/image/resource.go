@@ -377,7 +377,7 @@ func (r *ImageResource) Create(ctx context.Context, req resource.CreateRequest, 
 
 	newImage, err := r.client.CreateImage(image)
 	if err != nil {
-		resp.Diagnostics.AddError("Error creating Cobbler Image", err.Error())
+		clientpkg.AddClientError(&resp.Diagnostics, "Error creating Cobbler Image", err)
 		return
 	}
 
@@ -429,7 +429,7 @@ func (r *ImageResource) Update(ctx context.Context, req resource.UpdateRequest, 
 	tflog.Debug(ctx, "Cobbler Image: Update", map[string]interface{}{"name": image.Name})
 
 	if err := r.client.UpdateImage(&image); err != nil {
-		resp.Diagnostics.AddError("Error updating Cobbler Image", err.Error())
+		clientpkg.AddClientError(&resp.Diagnostics, "Error updating Cobbler Image", err)
 		return
 	}
 

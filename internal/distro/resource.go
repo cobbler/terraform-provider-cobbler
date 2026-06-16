@@ -294,7 +294,7 @@ func (r *DistroResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	newDistro, err := r.client.CreateDistro(distro)
 	if err != nil {
-		resp.Diagnostics.AddError("Error creating Cobbler Distro", err.Error())
+		clientpkg.AddClientError(&resp.Diagnostics, "Error creating Cobbler Distro", err)
 		return
 	}
 
@@ -346,7 +346,7 @@ func (r *DistroResource) Update(ctx context.Context, req resource.UpdateRequest,
 	tflog.Debug(ctx, "Cobbler Distro: Update", map[string]interface{}{"name": distro.Name})
 
 	if err := r.client.UpdateDistro(&distro); err != nil {
-		resp.Diagnostics.AddError("Error updating Cobbler Distro", err.Error())
+		clientpkg.AddClientError(&resp.Diagnostics, "Error updating Cobbler Distro", err)
 		return
 	}
 

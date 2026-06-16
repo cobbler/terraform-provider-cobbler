@@ -1,6 +1,7 @@
 package acctest
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"testing"
@@ -39,5 +40,25 @@ func PreCheck(t *testing.T) {
 		if os.Getenv(env) == "" {
 			t.Fatalf("%s must be set for acceptance tests", env)
 		}
+	}
+}
+
+// SkipIfCobblerVersionLessThan skips the test if the running Cobbler server's version
+// is older than the given major.minor.patch. Use this to gate tests on features that
+// were introduced in a specific Cobbler release.
+func SkipIfCobblerVersionLessThan(t *testing.T, major, minor, patch int) {
+	t.Helper()
+	ev, err := CobblerApiClient.ExtendedVersion()
+	if err != nil {
+		t.Skipf("could not determine Cobbler version: %v", err)
+	}
+	required := &cobbler.CobblerVersion{Major: major, Minor: minor, Patch: patch}
+	tuple := ev.VersionTuple
+	if len(tuple) < 3 {
+		t.Skipf("unexpected Cobbler version tuple %v", tuple)
+	}
+	actual := &cobbler.CobblerVersion{Major: tuple[0], Minor: tuple[1], Patch: tuple[2]}
+	if actual.LessThan(required) {
+		t.Skipf("test requires Cobbler >= %s, server is %s", required, fmt.Sprintf("%d.%d.%d", tuple[0], tuple[1], tuple[2]))
 	}
 }

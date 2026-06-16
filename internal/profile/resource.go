@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/float64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
@@ -225,9 +224,6 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						Description: "The value.",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Description: "If true, inherited from parent.",
@@ -251,9 +247,6 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						Description: "The value.",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Description: "If true, inherited from parent.",
@@ -493,9 +486,6 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						Description: "The value.",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Description: "If true, inherited from parent.",
@@ -519,9 +509,6 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						Description: "The value.",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Float64{
-							float64planmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Description: "If true, inherited from parent.",
@@ -545,9 +532,6 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 						Description: "The value.",
 						Optional:    true,
 						Computed:    true,
-						PlanModifiers: []planmodifier.Int64{
-							int64planmodifier.UseStateForUnknown(),
-						},
 					},
 					"inherited": schema.BoolAttribute{
 						Description: "If true, inherited from parent.",
@@ -592,7 +576,7 @@ func (r *ProfileResource) Create(ctx context.Context, req resource.CreateRequest
 
 	newProfile, err := r.client.CreateProfile(profile)
 	if err != nil {
-		resp.Diagnostics.AddError("Error creating Cobbler Profile", err.Error())
+		clientpkg.AddClientError(&resp.Diagnostics, "Error creating Cobbler Profile", err)
 		return
 	}
 
@@ -644,7 +628,7 @@ func (r *ProfileResource) Update(ctx context.Context, req resource.UpdateRequest
 	tflog.Debug(ctx, "Cobbler Profile: Update", map[string]interface{}{"name": profile.Name})
 
 	if err := r.client.UpdateProfile(&profile); err != nil {
-		resp.Diagnostics.AddError("Error updating Cobbler Profile", err.Error())
+		clientpkg.AddClientError(&resp.Diagnostics, "Error updating Cobbler Profile", err)
 		return
 	}
 
