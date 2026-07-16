@@ -22,7 +22,7 @@ test: fmtcheck
 .PHONY: testacc
 testacc:
 	@COBBLER_VERSION=v3.3.0 sh -c "'./docker/start.sh' $(COBBLER_SERVER_URL)"
-	TF_LOG=TRACE TF_ACC_LOG=TRACE TF_LOG_PATH_MASK="test-%s.log" TF_ACC=1 TF_ACC_PROVIDER_NAMESPACE=cobbler COBBLER_URL=$(COBBLER_SERVER_URL) COBBLER_USERNAME=cobbler COBBLER_PASSWORD=cobbler go test -v -coverprofile="coverage.out" -covermode="atomic" './...'
+	TF_LOG=TRACE TF_ACC_LOG=TRACE TF_LOG_PATH_MASK="test-%s.log" TF_ACC=1 TF_ACC_PROVIDER_NAMESPACE=cobbler COBBLER_URL=$(COBBLER_SERVER_URL) COBBLER_USERNAME=cobbler COBBLER_PASSWORD=cobbler go test -v -p 1 -coverprofile="coverage.out" -covermode="atomic" './...'
 
 .PHONY: docs
 docs:

@@ -33,6 +33,10 @@ func (d *MenuDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Description: "The name of the menu.",
 				Required:    true,
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this menu. Use this as the value for `cobbler_image.menu`.",
+				Computed:    true,
+			},
 			"comment": schema.StringAttribute{
 				Description: "Free form text description.",
 				Computed:    true,
@@ -56,60 +60,16 @@ func (d *MenuDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 					"inherited": schema.BoolAttribute{Computed: true},
 				},
 			},
-			"fetchable_files": schema.SingleNestedAttribute{
-				Description: "Templates for tftp or wget.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						ElementType: types.StringType,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{Computed: true},
-				},
-			},
-			"boot_files": schema.SingleNestedAttribute{
-				Description: "Files copied into tftpboot beyond the kernel/initrd.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						ElementType: types.StringType,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{Computed: true},
-				},
-			},
 			"template_files": schema.MapAttribute{
 				Description: "File mappings for built-in config management.",
 				Computed:    true,
 				ElementType: types.StringType,
-			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "Management classes for external config management.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						ElementType: types.StringType,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{Computed: true},
-				},
 			},
 			"owners": schema.SingleNestedAttribute{
 				Description: "Owners list for authz_ownership.",
 				Computed:    true,
 				Attributes: map[string]schema.Attribute{
 					"value": schema.ListAttribute{
-						ElementType: types.StringType,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{Computed: true},
-				},
-			},
-			"mgmt_parameters": schema.SingleNestedAttribute{
-				Description: "Parameters for external management systems.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
 						ElementType: types.StringType,
 						Computed:    true,
 					},
@@ -148,17 +108,14 @@ func (d *MenuDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	menu := *menuPtr
 
 	data.Name = types.StringValue(menu.Name)
+	data.UID = types.StringValue(menu.Uid)
 	data.Comment = types.StringValue(menu.Comment)
 	data.Parent = types.StringValue(menu.Parent)
 	data.DisplayName = types.StringValue(menu.DisplayName)
 	data.AutoinstallMeta = inherit.StringMapFrom(ctx, menu.AutoinstallMeta, &resp.Diagnostics)
-	data.FetchableFiles = inherit.StringMapFrom(ctx, menu.FetchableFiles, &resp.Diagnostics)
-	data.BootFiles = inherit.StringMapFrom(ctx, menu.BootFiles, &resp.Diagnostics)
-	data.MgmtClasses = inherit.StringListFrom(ctx, menu.MgmtClasses, &resp.Diagnostics)
 	data.Owners = inherit.StringListFrom(ctx, menu.Owners, &resp.Diagnostics)
-	data.MgmtParameters = inherit.StringMapFrom(ctx, menu.MgmtParameters, &resp.Diagnostics)
 
-	templateFiles, d2 := types.MapValueFrom(ctx, types.StringType, menu.TemplateFiles.Data)
+	templateFiles, d2 := types.MapValueFrom(ctx, types.StringType, menu.TemplateFiles)
 	resp.Diagnostics.Append(d2...)
 	data.TemplateFiles = templateFiles
 

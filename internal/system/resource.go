@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/mapplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -44,6 +45,13 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 				Required:    true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
+				},
+			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this system. Use this as the value for `cobbler_network_interface.system`.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"autoinstall": schema.StringAttribute{
@@ -79,7 +87,7 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 				},
 			},
 			"image": schema.StringAttribute{
-				Description: "Parent image (if no profile is used).",
+				Description: "The Cobbler UID of the parent image (if no profile is used). Use `cobbler_image.foo.uid`.",
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
@@ -178,7 +186,7 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 				},
 			},
 			"profile": schema.StringAttribute{
-				Description: "Parent profile.",
+				Description: "The Cobbler UID of the parent profile. Use `cobbler_profile.foo.uid`.",
 				Required:    true,
 			},
 			"proxy": schema.StringAttribute{
@@ -229,33 +237,8 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"interface": InterfaceMapAttribute(),
 			"autoinstall_meta": schema.SingleNestedAttribute{
 				Description: "Automatic installation template metadata, formerly Kickstart metadata.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"boot_files": schema.SingleNestedAttribute{
-				Description: "Files copied into tftpboot beyond the kernel/initrd.",
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.Object{
@@ -325,30 +308,6 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					},
 				},
 			},
-			"fetchable_files": schema.SingleNestedAttribute{
-				Description: "Templates for tftp or wget.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
 			"kernel_options": schema.SingleNestedAttribute{
 				Description: "Kernel options for the system.",
 				Optional:    true,
@@ -397,54 +356,6 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					},
 				},
 			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "For external configuration management.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"mgmt_parameters": schema.SingleNestedAttribute{
-				Description: "Parameters which will be handed to your management application (Must be a valid YAML dictionary).",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
 			"owners": schema.SingleNestedAttribute{
 				Description: "Owners list for authz_ownership.",
 				Optional:    true,
@@ -469,28 +380,13 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					},
 				},
 			},
-			"template_files": schema.SingleNestedAttribute{
-				Description: "File mappings for built-in config management.",
+			"template_files": schema.MapAttribute{
+				Description: "File mappings for built-in config management. Not inheritable.",
 				Optional:    true,
 				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Optional:    true,
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Optional:    true,
-						Computed:    true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
+				ElementType: types.StringType,
+				PlanModifiers: []planmodifier.Map{
+					mapplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"virt_auto_boot": schema.SingleNestedAttribute{
@@ -603,9 +499,6 @@ func (r *SystemResource) Configure(_ context.Context, req resource.ConfigureRequ
 }
 
 func (r *SystemResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
-	systemSyncLock.Lock()
-	defer systemSyncLock.Unlock()
-
 	var data systemResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
@@ -625,19 +518,6 @@ func (r *SystemResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	// Build and attach interfaces
-	planIfacesAPI := InterfaceMapToAPI(ctx, data.Interface, &resp.Diagnostics)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	for name, iface := range planIfacesAPI {
-		if err := newSystem.CreateInterface(name, iface); err != nil {
-			resp.Diagnostics.AddError("Error creating interface",
-				"Error adding interface "+name+" to system "+newSystem.Name+": "+err.Error())
-			return
-		}
-	}
-
 	tflog.Debug(ctx, "Cobbler System: syncing system")
 	if err := r.client.Sync(); err != nil {
 		resp.Diagnostics.AddError("Error syncing Cobbler", err.Error())
@@ -651,13 +531,7 @@ func (r *SystemResource) Create(ctx context.Context, req resource.CreateRequest,
 		return
 	}
 
-	ifaces, err := readSystem.GetInterfaces()
-	if err != nil {
-		resp.Diagnostics.AddError("Error getting interfaces after create", err.Error())
-		return
-	}
-
-	systemToModel(ctx, *readSystem, ifaces, &data, &resp.Diagnostics)
+	systemToModel(ctx, *readSystem, &data, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -682,13 +556,7 @@ func (r *SystemResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	ifaces, err := system.GetInterfaces()
-	if err != nil {
-		resp.Diagnostics.AddError("Error getting interfaces", err.Error())
-		return
-	}
-
-	systemToModel(ctx, *system, ifaces, &data, &resp.Diagnostics)
+	systemToModel(ctx, *system, &data, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -697,25 +565,9 @@ func (r *SystemResource) Read(ctx context.Context, req resource.ReadRequest, res
 }
 
 func (r *SystemResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
-	systemSyncLock.Lock()
-	defer systemSyncLock.Unlock()
-
 	var plan systemResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	var state systemResourceModel
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	// Get the existing system to perform interface operations on it
-	system, err := r.client.GetSystem(plan.Name.ValueString(), false, false)
-	if err != nil {
-		resp.Diagnostics.AddError("Error reading Cobbler System", err.Error())
 		return
 	}
 
@@ -731,39 +583,6 @@ func (r *SystemResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
-	// Interface diff: delete removed interfaces, create/update all plan interfaces
-	var planIfaces map[string]types.Object
-	resp.Diagnostics.Append(plan.Interface.ElementsAs(ctx, &planIfaces, false)...)
-
-	var stateIfaces map[string]types.Object
-	resp.Diagnostics.Append(state.Interface.ElementsAs(ctx, &stateIfaces, false)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	// Delete interfaces that exist in state but not in plan
-	for name := range stateIfaces {
-		if _, exists := planIfaces[name]; !exists {
-			if err := system.DeleteInterface(name); err != nil {
-				resp.Diagnostics.AddError("Error deleting interface", err.Error())
-				return
-			}
-		}
-	}
-
-	// Create/update all interfaces from plan
-	planIfacesAPI := InterfaceMapToAPI(ctx, plan.Interface, &resp.Diagnostics)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-	for name, iface := range planIfacesAPI {
-		if err := system.CreateInterface(name, iface); err != nil {
-			resp.Diagnostics.AddError("Error creating interface", err.Error())
-			return
-		}
-	}
-
 	tflog.Debug(ctx, "Cobbler System: syncing system")
 	if err := r.client.Sync(); err != nil {
 		resp.Diagnostics.AddError("Error syncing Cobbler", err.Error())
@@ -777,13 +596,7 @@ func (r *SystemResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
-	updatedIfaces, err := readSystem.GetInterfaces()
-	if err != nil {
-		resp.Diagnostics.AddError("Error getting interfaces after update", err.Error())
-		return
-	}
-
-	systemToModel(ctx, *readSystem, updatedIfaces, &plan, &resp.Diagnostics)
+	systemToModel(ctx, *readSystem, &plan, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -829,55 +642,57 @@ func modelToSystem(ctx context.Context, data systemResourceModel, diags *diag.Di
 	system.Image = data.Image.ValueString()
 	system.IPv6DefaultDevice = data.IPv6DefaultDevice.ValueString()
 	system.NetbootEnabled = data.NetbootEnabled.ValueBool()
-	system.NextServerv4 = data.NextServerV4.ValueString()
-	system.NextServerv6 = data.NextServerV6.ValueString()
-	system.PowerAddress = data.PowerAddress.ValueString()
-	system.PowerID = data.PowerID.ValueString()
-	system.PowerPass = data.PowerPass.ValueString()
-	system.PowerType = data.PowerType.ValueString()
-	system.PowerUser = data.PowerUser.ValueString()
+	system.TFTP.NextServerV4 = data.NextServerV4.ValueString()
+	system.TFTP.NextServerV6 = data.NextServerV6.ValueString()
+	system.Power.Address = data.PowerAddress.ValueString()
+	system.Power.ID = data.PowerID.ValueString()
+	system.Power.Password = data.PowerPass.ValueString()
+	system.Power.Type = data.PowerType.ValueString()
+	system.Power.User = data.PowerUser.ValueString()
 	system.Profile = data.Profile.ValueString()
 	system.Proxy = data.Proxy.ValueString()
 	system.Status = data.Status.ValueString()
-	system.VirtDiskDriver = systemStringOrInherit(data.VirtDiskDriver)
-	system.VirtPath = data.VirtPath.ValueString()
+	system.Virt.DiskDriver = systemStringOrInherit(data.VirtDiskDriver)
+	system.Virt.Path = data.VirtPath.ValueString()
 	system.VirtPXEBoot = data.VirtPXEBoot.ValueBool()
-	system.VirtType = systemStringOrInherit(data.VirtType)
+	system.Virt.Type = systemStringOrInherit(data.VirtType)
 
 	var nameServers []string
 	if !data.NameServers.IsNull() && !data.NameServers.IsUnknown() {
 		diags.Append(data.NameServers.ElementsAs(ctx, &nameServers, false)...)
 	}
-	system.NameServers = nameServers
+	system.DNS.NameServers = cobbler.Value[[]string]{Data: nameServers}
 
 	var nameServersSearch []string
 	if !data.NameServersSearch.IsNull() && !data.NameServersSearch.IsUnknown() {
 		diags.Append(data.NameServersSearch.ElementsAs(ctx, &nameServersSearch, false)...)
 	}
-	system.NameServersSearch = nameServersSearch
+	system.DNS.NameServersSearch = nameServersSearch
+
+	var templateFiles map[string]string
+	if !data.TemplateFiles.IsNull() && !data.TemplateFiles.IsUnknown() {
+		diags.Append(data.TemplateFiles.ElementsAs(ctx, &templateFiles, false)...)
+	}
+	system.TemplateFiles = templateFiles
 
 	system.AutoinstallMeta = inherit.StringMapTo(ctx, data.AutoinstallMeta, diags)
-	system.BootFiles = inherit.StringMapTo(ctx, data.BootFiles, diags)
 	system.BootLoaders = inherit.StringListTo(ctx, data.BootLoaders, diags)
 	system.EnableIPXE = inherit.BoolTo(ctx, data.EnableIPXE, diags)
-	system.FetchableFiles = inherit.StringMapTo(ctx, data.FetchableFiles, diags)
 	system.KernelOptions = inherit.StringMapTo(ctx, data.KernelOptions, diags)
 	system.KernelOptionsPost = inherit.StringMapTo(ctx, data.KernelOptionsPost, diags)
-	system.MgmtClasses = inherit.StringListTo(ctx, data.MgmtClasses, diags)
-	system.MgmtParameters = inherit.StringMapTo(ctx, data.MgmtParameters, diags)
 	system.Owners = inherit.StringListTo(ctx, data.Owners, diags)
-	system.TemplateFiles = inherit.StringMapTo(ctx, data.TemplateFiles, diags)
-	system.VirtAutoBoot = inherit.BoolTo(ctx, data.VirtAutoBoot, diags)
-	system.VirtCPUs = inherit.IntTo(ctx, data.VirtCPUs, diags)
-	system.VirtFileSize = inherit.Float64To(ctx, data.VirtFileSize, diags)
-	system.VirtRAM = inherit.IntTo(ctx, data.VirtRAM, diags)
+	system.Virt.AutoBoot = inherit.BoolTo(ctx, data.VirtAutoBoot, diags)
+	system.Virt.Cpus = inherit.IntTo(ctx, data.VirtCPUs, diags)
+	system.Virt.FileSize = inherit.Float64To(ctx, data.VirtFileSize, diags)
+	system.Virt.Ram = inherit.IntTo(ctx, data.VirtRAM, diags)
 
 	return system
 }
 
-// systemToModel populates a systemResourceModel from a cobbler.System and interfaces.
-func systemToModel(ctx context.Context, system cobbler.System, ifaces cobbler.Interfaces, data *systemResourceModel, diags *diag.Diagnostics) {
+// systemToModel populates a systemResourceModel from a cobbler.System.
+func systemToModel(ctx context.Context, system cobbler.System, data *systemResourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(system.Name)
+	data.UID = types.StringValue(system.Uid)
 	data.Autoinstall = types.StringValue(system.Autoinstall)
 	data.Comment = types.StringValue(system.Comment)
 	data.Gateway = types.StringValue(system.Gateway)
@@ -885,44 +700,41 @@ func systemToModel(ctx context.Context, system cobbler.System, ifaces cobbler.In
 	data.Image = types.StringValue(system.Image)
 	data.IPv6DefaultDevice = types.StringValue(system.IPv6DefaultDevice)
 	data.NetbootEnabled = types.BoolValue(system.NetbootEnabled)
-	data.NextServerV4 = types.StringValue(system.NextServerv4)
-	data.NextServerV6 = types.StringValue(system.NextServerv6)
-	data.PowerAddress = types.StringValue(system.PowerAddress)
-	data.PowerID = types.StringValue(system.PowerID)
-	data.PowerPass = types.StringValue(system.PowerPass)
-	data.PowerType = types.StringValue(system.PowerType)
-	data.PowerUser = types.StringValue(system.PowerUser)
+	data.NextServerV4 = types.StringValue(system.TFTP.NextServerV4)
+	data.NextServerV6 = types.StringValue(system.TFTP.NextServerV6)
+	data.PowerAddress = types.StringValue(system.Power.Address)
+	data.PowerID = types.StringValue(system.Power.ID)
+	data.PowerPass = types.StringValue(system.Power.Password)
+	data.PowerType = types.StringValue(system.Power.Type)
+	data.PowerUser = types.StringValue(system.Power.User)
 	data.Profile = types.StringValue(system.Profile)
 	data.Proxy = types.StringValue(system.Proxy)
 	data.Status = types.StringValue(system.Status)
-	data.VirtDiskDriver = types.StringValue(system.VirtDiskDriver)
-	data.VirtPath = types.StringValue(system.VirtPath)
+	data.VirtDiskDriver = types.StringValue(system.Virt.DiskDriver)
+	data.VirtPath = types.StringValue(system.Virt.Path)
 	data.VirtPXEBoot = types.BoolValue(system.VirtPXEBoot)
-	data.VirtType = types.StringValue(system.VirtType)
+	data.VirtType = types.StringValue(system.Virt.Type)
 
-	nameServersList, d := types.ListValueFrom(ctx, types.StringType, system.NameServers)
+	nameServersList, d := types.ListValueFrom(ctx, types.StringType, system.DNS.NameServers.Data)
 	diags.Append(d...)
 	data.NameServers = nameServersList
 
-	nameServersSearchList, d := types.ListValueFrom(ctx, types.StringType, system.NameServersSearch)
+	nameServersSearchList, d := types.ListValueFrom(ctx, types.StringType, system.DNS.NameServersSearch)
 	diags.Append(d...)
 	data.NameServersSearch = nameServersSearchList
 
-	data.Interface = InterfaceMapFromAPI(ctx, ifaces, diags)
+	templateFiles, d := types.MapValueFrom(ctx, types.StringType, system.TemplateFiles)
+	diags.Append(d...)
+	data.TemplateFiles = templateFiles
 
 	data.AutoinstallMeta = inherit.StringMapFrom(ctx, system.AutoinstallMeta, diags)
-	data.BootFiles = inherit.StringMapFrom(ctx, system.BootFiles, diags)
 	data.BootLoaders = inherit.StringListFrom(ctx, system.BootLoaders, diags)
 	data.EnableIPXE = inherit.BoolFrom(ctx, system.EnableIPXE, diags)
-	data.FetchableFiles = inherit.StringMapFrom(ctx, system.FetchableFiles, diags)
 	data.KernelOptions = inherit.StringMapFrom(ctx, system.KernelOptions, diags)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, system.KernelOptionsPost, diags)
-	data.MgmtClasses = inherit.StringListFrom(ctx, system.MgmtClasses, diags)
-	data.MgmtParameters = inherit.StringMapFrom(ctx, system.MgmtParameters, diags)
 	data.Owners = inherit.StringListFrom(ctx, system.Owners, diags)
-	data.TemplateFiles = inherit.StringMapFrom(ctx, system.TemplateFiles, diags)
-	data.VirtAutoBoot = inherit.BoolFrom(ctx, system.VirtAutoBoot, diags)
-	data.VirtCPUs = inherit.IntFrom(ctx, system.VirtCPUs, diags)
-	data.VirtFileSize = inherit.Float64From(ctx, system.VirtFileSize, diags)
-	data.VirtRAM = inherit.IntFrom(ctx, system.VirtRAM, diags)
+	data.VirtAutoBoot = inherit.BoolFrom(ctx, system.Virt.AutoBoot, diags)
+	data.VirtCPUs = inherit.IntFrom(ctx, system.Virt.Cpus, diags)
+	data.VirtFileSize = inherit.Float64From(ctx, system.Virt.FileSize, diags)
+	data.VirtRAM = inherit.IntFrom(ctx, system.Virt.Ram, diags)
 }

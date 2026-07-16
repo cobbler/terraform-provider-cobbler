@@ -33,6 +33,10 @@ func (d *ProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Description: "The name of the profile.",
 				Required:    true,
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this profile. Use this as the value for `cobbler_profile.parent` or `cobbler_system.profile`.",
+				Computed:    true,
+			},
 			"autoinstall": schema.StringAttribute{
 				Description: "Template remote kickstarts or preseeds.",
 				Computed:    true,
@@ -46,7 +50,7 @@ func (d *ProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Computed:    true,
 			},
 			"distro": schema.StringAttribute{
-				Description: "Parent distribution.",
+				Description: "The Cobbler UID of the parent distribution.",
 				Computed:    true,
 			},
 			"next_server_v4": schema.StringAttribute{
@@ -58,7 +62,7 @@ func (d *ProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Computed:    true,
 			},
 			"parent": schema.StringAttribute{
-				Description: "The parent this profile inherits settings from.",
+				Description: "The Cobbler UID of the parent profile this profile inherits settings from.",
 				Computed:    true,
 			},
 			"proxy": schema.StringAttribute{
@@ -109,21 +113,6 @@ func (d *ProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 					},
 				},
 			},
-			"boot_files": schema.SingleNestedAttribute{
-				Description: "Files copied into tftpboot beyond the kernel/initrd.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
-			},
 			"enable_ipxe": schema.SingleNestedAttribute{
 				Description: "Use iPXE instead of PXELINUX for advanced booting options.",
 				Computed:    true,
@@ -145,21 +134,6 @@ func (d *ProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 					"value": schema.BoolAttribute{
 						Description: "The value.",
 						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
-			},
-			"fetchable_files": schema.SingleNestedAttribute{
-				Description: "Templates for tftp or wget.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
 					},
 					"inherited": schema.BoolAttribute{
 						Description: "If true, inherited from parent.",
@@ -197,50 +171,10 @@ func (d *ProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 					},
 				},
 			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "For external configuration management.",
+			"name_servers_search": schema.ListAttribute{
+				Description: "Name server search settings. Not inheritable.",
 				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
-			},
-			"mgmt_parameters": schema.SingleNestedAttribute{
-				Description: "Parameters which will be handed to your management application.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
-			},
-			"name_servers_search": schema.SingleNestedAttribute{
-				Description: "Name server search settings.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
+				ElementType: types.StringType,
 			},
 			"name_servers": schema.SingleNestedAttribute{
 				Description: "Name servers.",
@@ -272,20 +206,10 @@ func (d *ProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 					},
 				},
 			},
-			"template_files": schema.SingleNestedAttribute{
-				Description: "File mappings for built-in config management.",
+			"template_files": schema.MapAttribute{
+				Description: "File mappings for built-in config management. Not inheritable.",
 				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						Description: "The value.",
-						Computed:    true,
-						ElementType: types.StringType,
-					},
-					"inherited": schema.BoolAttribute{
-						Description: "If true, inherited from parent.",
-						Computed:    true,
-					},
-				},
+				ElementType: types.StringType,
 			},
 			"virt_auto_boot": schema.SingleNestedAttribute{
 				Description: "Auto boot virtual machines.",
@@ -361,41 +285,44 @@ func (d *ProfileDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	p := *profilePtr
 
 	data.Name = types.StringValue(p.Name)
+	data.UID = types.StringValue(p.Uid)
 	data.Autoinstall = types.StringValue(p.Autoinstall)
 	data.Comment = types.StringValue(p.Comment)
 	data.DHCPTag = types.StringValue(p.DHCPTag)
 	data.Distro = types.StringValue(p.Distro)
-	data.NextServerV4 = types.StringValue(p.NextServerv4)
-	data.NextServerV6 = types.StringValue(p.NextServerv6)
+	data.NextServerV4 = types.StringValue(p.TFTP.NextServerV4)
+	data.NextServerV6 = types.StringValue(p.TFTP.NextServerV6)
 	data.Parent = types.StringValue(p.Parent)
 	data.Proxy = types.StringValue(p.Proxy)
 	data.Server = types.StringValue(p.Server)
 	data.VirtBridge = types.StringValue(p.VirtBridge)
-	data.VirtCPUs = types.Int64Value(int64(p.VirtCPUs))
-	data.VirtDiskDriver = types.StringValue(p.VirtDiskDriver)
-	data.VirtPath = types.StringValue(p.VirtPath)
-	data.VirtType = types.StringValue(p.VirtType)
+	data.VirtCPUs = types.Int64Value(int64(p.Virt.Cpus.Data))
+	data.VirtDiskDriver = types.StringValue(p.Virt.DiskDriver)
+	data.VirtPath = types.StringValue(p.Virt.Path)
+	data.VirtType = types.StringValue(p.Virt.Type)
 
 	repoList, diag := types.ListValueFrom(ctx, types.StringType, p.Repos)
 	resp.Diagnostics.Append(diag...)
 	data.Repos = repoList
 
+	nameServersSearch, diag2 := types.ListValueFrom(ctx, types.StringType, p.DNS.NameServersSearch)
+	resp.Diagnostics.Append(diag2...)
+	data.NameServersSearch = nameServersSearch
+
+	templateFiles, diag3 := types.MapValueFrom(ctx, types.StringType, p.TemplateFiles)
+	resp.Diagnostics.Append(diag3...)
+	data.TemplateFiles = templateFiles
+
 	data.AutoinstallMeta = inherit.StringMapFrom(ctx, p.AutoinstallMeta, &resp.Diagnostics)
-	data.BootFiles = inherit.StringMapFrom(ctx, p.BootFiles, &resp.Diagnostics)
 	data.EnableIPXE = inherit.BoolFrom(ctx, p.EnableIPXE, &resp.Diagnostics)
 	data.EnableMenu = inherit.BoolFrom(ctx, p.EnableMenu, &resp.Diagnostics)
-	data.FetchableFiles = inherit.StringMapFrom(ctx, p.FetchableFiles, &resp.Diagnostics)
 	data.KernelOptions = inherit.StringMapFrom(ctx, p.KernelOptions, &resp.Diagnostics)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, p.KernelOptionsPost, &resp.Diagnostics)
-	data.MgmtClasses = inherit.StringListFrom(ctx, p.MgmtClasses, &resp.Diagnostics)
-	data.MgmtParameters = inherit.StringMapFrom(ctx, p.MgmtParameters, &resp.Diagnostics)
-	data.NameServersSearch = inherit.StringListFrom(ctx, p.NameServersSearch, &resp.Diagnostics)
-	data.NameServers = inherit.StringListFrom(ctx, p.NameServers, &resp.Diagnostics)
+	data.NameServers = inherit.StringListFrom(ctx, p.DNS.NameServers, &resp.Diagnostics)
 	data.Owners = inherit.StringListFrom(ctx, p.Owners, &resp.Diagnostics)
-	data.TemplateFiles = inherit.StringMapFrom(ctx, p.TemplateFiles, &resp.Diagnostics)
-	data.VirtAutoBoot = inherit.BoolFrom(ctx, p.VirtAutoBoot, &resp.Diagnostics)
-	data.VirtFileSize = inherit.Float64From(ctx, p.VirtFileSize, &resp.Diagnostics)
-	data.VirtRAM = inherit.IntFrom(ctx, p.VirtRAM, &resp.Diagnostics)
+	data.VirtAutoBoot = inherit.BoolFrom(ctx, p.Virt.AutoBoot, &resp.Diagnostics)
+	data.VirtFileSize = inherit.Float64From(ctx, p.Virt.FileSize, &resp.Diagnostics)
+	data.VirtRAM = inherit.IntFrom(ctx, p.Virt.Ram, &resp.Diagnostics)
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

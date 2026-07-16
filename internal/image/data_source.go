@@ -33,6 +33,10 @@ func (d *ImageDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 				Description: "The name of the image.",
 				Required:    true,
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this image. Use this as the value for `cobbler_system.image`.",
+				Computed:    true,
+			},
 			"file": schema.StringAttribute{
 				Description: "Path to the image media.",
 				Computed:    true,
@@ -67,7 +71,7 @@ func (d *ImageDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 				Computed:    true,
 			},
 			"menu": schema.StringAttribute{
-				Description: "Name of the parent Cobbler menu.",
+				Description: "The Cobbler UID of the parent menu.",
 				Computed:    true,
 			},
 			"virt_auto_boot": schema.BoolAttribute{
@@ -144,45 +148,6 @@ func (d *ImageDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 					},
 				},
 			},
-			"fetchable_files": schema.SingleNestedAttribute{
-				Description: "Templates for tftp or wget.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						ElementType: types.StringType,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Computed: true,
-					},
-				},
-			},
-			"boot_files": schema.SingleNestedAttribute{
-				Description: "Files copied into tftpboot beyond the kernel/initrd.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						ElementType: types.StringType,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Computed: true,
-					},
-				},
-			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "Management classes for external config management.",
-				Computed:    true,
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
-						ElementType: types.StringType,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Computed: true,
-					},
-				},
-			},
 			"owners": schema.SingleNestedAttribute{
 				Description: "Owners list for authz_ownership.",
 				Computed:    true,
@@ -234,6 +199,7 @@ func (d *ImageDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 	image := *imagePtr
 
 	data.Name = types.StringValue(image.Name)
+	data.UID = types.StringValue(image.Uid)
 	data.File = types.StringValue(image.File)
 	data.Arch = types.StringValue(image.Arch)
 	data.Autoinstall = types.StringValue(image.Autoinstall)
@@ -242,26 +208,23 @@ func (d *ImageDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 	data.ImageType = types.StringValue(image.ImageType)
 	data.OSVersion = types.StringValue(image.OsVersion)
 	data.Menu = types.StringValue(image.Menu)
-	data.VirtAutoBoot = types.BoolValue(image.VirtAutoBoot)
+	data.VirtAutoBoot = types.BoolValue(image.Virt.AutoBoot.Data)
 	data.VirtBridge = types.StringValue(image.VirtBridge)
-	data.VirtCpus = types.Int64Value(int64(image.VirtCpus))
-	data.VirtDiskDriver = types.StringValue(image.VirtDiskDriver)
-	data.VirtFileSize = inherit.Float64From(ctx, image.VirtFileSize, &resp.Diagnostics)
-	data.VirtPath = types.StringValue(image.VirtPath)
-	data.VirtRam = inherit.IntFrom(ctx, image.VirtRam, &resp.Diagnostics)
-	data.VirtType = types.StringValue(image.VirtType)
+	data.VirtCpus = types.Int64Value(int64(image.Virt.Cpus.Data))
+	data.VirtDiskDriver = types.StringValue(image.Virt.DiskDriver)
+	data.VirtFileSize = inherit.Float64From(ctx, image.Virt.FileSize, &resp.Diagnostics)
+	data.VirtPath = types.StringValue(image.Virt.Path)
+	data.VirtRam = inherit.IntFrom(ctx, image.Virt.Ram, &resp.Diagnostics)
+	data.VirtType = types.StringValue(image.Virt.Type)
 	data.KernelOptions = inherit.StringMapFrom(ctx, image.KernelOptions, &resp.Diagnostics)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, image.KernelOptionsPost, &resp.Diagnostics)
-	data.FetchableFiles = inherit.StringMapFrom(ctx, image.FetchableFiles, &resp.Diagnostics)
-	data.BootFiles = inherit.StringMapFrom(ctx, image.BootFiles, &resp.Diagnostics)
-	data.MgmtClasses = inherit.StringListFrom(ctx, image.MgmtClasses, &resp.Diagnostics)
 	data.Owners = inherit.StringListFrom(ctx, image.Owners, &resp.Diagnostics)
 
 	bootLoaders, d2 := types.ListValueFrom(ctx, types.StringType, image.BootLoaders)
 	resp.Diagnostics.Append(d2...)
 	data.BootLoaders = bootLoaders
 
-	templateFiles, d3 := types.MapValueFrom(ctx, types.StringType, image.TemplateFiles.Data)
+	templateFiles, d3 := types.MapValueFrom(ctx, types.StringType, image.TemplateFiles)
 	resp.Diagnostics.Append(d3...)
 	data.TemplateFiles = templateFiles
 

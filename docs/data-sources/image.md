@@ -27,19 +27,17 @@ Use this data source to get the details of a Cobbler image.
 
 - `arch` (String) The architecture of the image.
 - `autoinstall` (String) Path to an autoinstall file.
-- `boot_files` (Attributes) Files copied into tftpboot beyond the kernel/initrd. (see [below for nested schema](#nestedatt--boot_files))
 - `boot_loaders` (List of String) Boot loaders supported by the image.
 - `breed` (String) The "breed" of distribution.
 - `comment` (String) Free form text description.
-- `fetchable_files` (Attributes) Templates for tftp or wget. (see [below for nested schema](#nestedatt--fetchable_files))
 - `file` (String) Path to the image media.
 - `image_type` (String) Type of image (direct, iso, memdisk, virt-clone).
 - `kernel_options` (Attributes) Kernel options to use with the kernel. (see [below for nested schema](#nestedatt--kernel_options))
 - `kernel_options_post` (Attributes) Post install kernel options. (see [below for nested schema](#nestedatt--kernel_options_post))
-- `menu` (String) Name of the parent Cobbler menu.
-- `mgmt_classes` (Attributes) Management classes for external config management. (see [below for nested schema](#nestedatt--mgmt_classes))
+- `menu` (String) The Cobbler UID of the parent menu.
 - `os_version` (String) The OS version the image contains.
 - `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
+- `uid` (String) Server-assigned UID for this image. Use this as the value for `cobbler_system.image`.
 - `virt_auto_boot` (Boolean) Whether to auto-boot the virtual machine.
 - `virt_bridge` (String) Bridge for the virtual machine.
 - `virt_cpus` (Number) Number of CPUs for the virtual machine.
@@ -48,24 +46,6 @@ Use this data source to get the details of a Cobbler image.
 - `virt_path` (String) Path on the virtualization host.
 - `virt_ram` (Attributes) RAM in MB for the virtual machine. (see [below for nested schema](#nestedatt--virt_ram))
 - `virt_type` (String) Virtualization type.
-
-<a id="nestedatt--boot_files"></a>
-### Nested Schema for `boot_files`
-
-Read-Only:
-
-- `inherited` (Boolean)
-- `value` (Map of String)
-
-
-<a id="nestedatt--fetchable_files"></a>
-### Nested Schema for `fetchable_files`
-
-Read-Only:
-
-- `inherited` (Boolean)
-- `value` (Map of String)
-
 
 <a id="nestedatt--kernel_options"></a>
 ### Nested Schema for `kernel_options`
@@ -83,15 +63,6 @@ Read-Only:
 
 - `inherited` (Boolean)
 - `value` (Map of String)
-
-
-<a id="nestedatt--mgmt_classes"></a>
-### Nested Schema for `mgmt_classes`
-
-Read-Only:
-
-- `inherited` (Boolean)
-- `value` (List of String)
 
 
 <a id="nestedatt--owners"></a>

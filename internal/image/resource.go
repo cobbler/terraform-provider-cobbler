@@ -47,6 +47,13 @@ func (r *ImageResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this image. Use this as the value for `cobbler_system.image`.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"file": schema.StringAttribute{
 				Description: "Path to the image media. Format depends on `image_type`.",
 				Required:    true,
@@ -109,7 +116,7 @@ func (r *ImageResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 				},
 			},
 			"menu": schema.StringAttribute{
-				Description: "Name of the parent Cobbler menu that this image appears under.",
+				Description: "The Cobbler UID of the parent menu that this image appears under. Use `cobbler_menu.foo.uid`.",
 				Optional:    true,
 				Computed:    true,
 				PlanModifiers: []planmodifier.String{
@@ -237,72 +244,6 @@ func (r *ImageResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 				},
 				Attributes: map[string]schema.Attribute{
 					"value": schema.MapAttribute{
-						ElementType: types.StringType,
-						Optional:    true,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Optional: true,
-						Computed: true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"fetchable_files": schema.SingleNestedAttribute{
-				Description: "Templates for tftp or wget.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						ElementType: types.StringType,
-						Optional:    true,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Optional: true,
-						Computed: true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"boot_files": schema.SingleNestedAttribute{
-				Description: "Files copied into tftpboot beyond the kernel/initrd.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.MapAttribute{
-						ElementType: types.StringType,
-						Optional:    true,
-						Computed:    true,
-					},
-					"inherited": schema.BoolAttribute{
-						Optional: true,
-						Computed: true,
-						PlanModifiers: []planmodifier.Bool{
-							boolplanmodifier.UseStateForUnknown(),
-						},
-					},
-				},
-			},
-			"mgmt_classes": schema.SingleNestedAttribute{
-				Description: "Management classes for external config management.",
-				Optional:    true,
-				Computed:    true,
-				PlanModifiers: []planmodifier.Object{
-					objectplanmodifier.UseStateForUnknown(),
-				},
-				Attributes: map[string]schema.Attribute{
-					"value": schema.ListAttribute{
 						ElementType: types.StringType,
 						Optional:    true,
 						Computed:    true,
@@ -492,19 +433,16 @@ func modelToImage(ctx context.Context, data imageResourceModel, diags *diag.Diag
 	image.ImageType = data.ImageType.ValueString()
 	image.OsVersion = data.OSVersion.ValueString()
 	image.Menu = data.Menu.ValueString()
-	image.VirtAutoBoot = data.VirtAutoBoot.ValueBool()
+	image.Virt.AutoBoot = cobbler.Value[bool]{Data: data.VirtAutoBoot.ValueBool()}
 	image.VirtBridge = data.VirtBridge.ValueString()
-	image.VirtCpus = int(data.VirtCpus.ValueInt64())
-	image.VirtDiskDriver = stringOrInherit(data.VirtDiskDriver)
-	image.VirtFileSize = inherit.Float64To(ctx, data.VirtFileSize, diags)
-	image.VirtPath = data.VirtPath.ValueString()
-	image.VirtRam = inherit.IntTo(ctx, data.VirtRam, diags)
-	image.VirtType = stringOrInherit(data.VirtType)
+	image.Virt.Cpus = cobbler.Value[int]{Data: int(data.VirtCpus.ValueInt64())}
+	image.Virt.DiskDriver = stringOrInherit(data.VirtDiskDriver)
+	image.Virt.FileSize = inherit.Float64To(ctx, data.VirtFileSize, diags)
+	image.Virt.Path = data.VirtPath.ValueString()
+	image.Virt.Ram = inherit.IntTo(ctx, data.VirtRam, diags)
+	image.Virt.Type = stringOrInherit(data.VirtType)
 	image.KernelOptions = inherit.StringMapTo(ctx, data.KernelOptions, diags)
 	image.KernelOptionsPost = inherit.StringMapTo(ctx, data.KernelOptionsPost, diags)
-	image.FetchableFiles = inherit.StringMapTo(ctx, data.FetchableFiles, diags)
-	image.BootFiles = inherit.StringMapTo(ctx, data.BootFiles, diags)
-	image.MgmtClasses = inherit.StringListTo(ctx, data.MgmtClasses, diags)
 	image.Owners = inherit.StringListTo(ctx, data.Owners, diags)
 
 	// ElementsAs fails on null/unknown values; guard to avoid plan-time errors
@@ -515,17 +453,18 @@ func modelToImage(ctx context.Context, data imageResourceModel, diags *diag.Diag
 	}
 	image.BootLoaders = bootLoaders
 
-	var templateFiles map[string]interface{}
+	var templateFiles map[string]string
 	if !data.TemplateFiles.IsNull() && !data.TemplateFiles.IsUnknown() {
 		diags.Append(data.TemplateFiles.ElementsAs(ctx, &templateFiles, false)...)
 	}
-	image.TemplateFiles = cobbler.Value[map[string]interface{}]{Data: templateFiles, IsInherited: false}
+	image.TemplateFiles = templateFiles
 	return image
 }
 
 // imageToModel populates an imageResourceModel from a cobbler.Image.
 func imageToModel(ctx context.Context, image cobbler.Image, data *imageResourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(image.Name)
+	data.UID = types.StringValue(image.Uid)
 	data.File = types.StringValue(image.File)
 	data.Arch = types.StringValue(image.Arch)
 	data.Autoinstall = types.StringValue(image.Autoinstall)
@@ -534,26 +473,23 @@ func imageToModel(ctx context.Context, image cobbler.Image, data *imageResourceM
 	data.ImageType = types.StringValue(image.ImageType)
 	data.OSVersion = types.StringValue(image.OsVersion)
 	data.Menu = types.StringValue(image.Menu)
-	data.VirtAutoBoot = types.BoolValue(image.VirtAutoBoot)
+	data.VirtAutoBoot = types.BoolValue(image.Virt.AutoBoot.Data)
 	data.VirtBridge = types.StringValue(image.VirtBridge)
-	data.VirtCpus = types.Int64Value(int64(image.VirtCpus))
-	data.VirtDiskDriver = types.StringValue(image.VirtDiskDriver)
-	data.VirtFileSize = inherit.Float64From(ctx, image.VirtFileSize, diags)
-	data.VirtPath = types.StringValue(image.VirtPath)
-	data.VirtRam = inherit.IntFrom(ctx, image.VirtRam, diags)
-	data.VirtType = types.StringValue(image.VirtType)
+	data.VirtCpus = types.Int64Value(int64(image.Virt.Cpus.Data))
+	data.VirtDiskDriver = types.StringValue(image.Virt.DiskDriver)
+	data.VirtFileSize = inherit.Float64From(ctx, image.Virt.FileSize, diags)
+	data.VirtPath = types.StringValue(image.Virt.Path)
+	data.VirtRam = inherit.IntFrom(ctx, image.Virt.Ram, diags)
+	data.VirtType = types.StringValue(image.Virt.Type)
 	data.KernelOptions = inherit.StringMapFrom(ctx, image.KernelOptions, diags)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, image.KernelOptionsPost, diags)
-	data.FetchableFiles = inherit.StringMapFrom(ctx, image.FetchableFiles, diags)
-	data.BootFiles = inherit.StringMapFrom(ctx, image.BootFiles, diags)
-	data.MgmtClasses = inherit.StringListFrom(ctx, image.MgmtClasses, diags)
 	data.Owners = inherit.StringListFrom(ctx, image.Owners, diags)
 
 	bootLoaders, d := types.ListValueFrom(ctx, types.StringType, image.BootLoaders)
 	diags.Append(d...)
 	data.BootLoaders = bootLoaders
 
-	templateFiles, d := types.MapValueFrom(ctx, types.StringType, image.TemplateFiles.Data)
+	templateFiles, d := types.MapValueFrom(ctx, types.StringType, image.TemplateFiles)
 	diags.Append(d...)
 	data.TemplateFiles = templateFiles
 }

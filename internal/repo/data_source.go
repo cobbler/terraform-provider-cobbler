@@ -159,11 +159,11 @@ func (d *RepoDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	resp.Diagnostics.Append(d2...)
 	data.Environment = env
 
-	aptComponents, d2 := types.ListValueFrom(ctx, types.StringType, repo.AptComponents)
+	aptComponents, d2 := types.ListValueFrom(ctx, types.StringType, repo.Apt.Components)
 	resp.Diagnostics.Append(d2...)
 	data.AptComponents = aptComponents
 
-	aptDists, d2 := types.ListValueFrom(ctx, types.StringType, repo.AptDists)
+	aptDists, d2 := types.ListValueFrom(ctx, types.StringType, repo.Apt.Dists)
 	resp.Diagnostics.Append(d2...)
 	data.AptDists = aptDists
 

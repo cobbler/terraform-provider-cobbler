@@ -35,7 +35,7 @@ resource "cobbler_distro" "foo" {
 
 resource "cobbler_profile" "foo" {
   name   = "foo-data-source-profile-basic"
-  distro = cobbler_distro.foo.name
+  distro = cobbler_distro.foo.uid
 }
 
 data "cobbler_profile" "foo" {

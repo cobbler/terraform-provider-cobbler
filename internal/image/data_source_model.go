@@ -4,6 +4,7 @@ import "github.com/hashicorp/terraform-plugin-framework/types"
 
 type imageDataSourceModel struct {
 	Name              types.String `tfsdk:"name"`
+	UID               types.String `tfsdk:"uid"`
 	File              types.String `tfsdk:"file"`
 	Arch              types.String `tfsdk:"arch"`
 	Autoinstall       types.String `tfsdk:"autoinstall"`
@@ -23,9 +24,6 @@ type imageDataSourceModel struct {
 	VirtType          types.String `tfsdk:"virt_type"`
 	KernelOptions     types.Object `tfsdk:"kernel_options"`
 	KernelOptionsPost types.Object `tfsdk:"kernel_options_post"`
-	FetchableFiles    types.Object `tfsdk:"fetchable_files"`
-	BootFiles         types.Object `tfsdk:"boot_files"`
-	MgmtClasses       types.Object `tfsdk:"mgmt_classes"`
 	Owners            types.Object `tfsdk:"owners"`
 	TemplateFiles     types.Map    `tfsdk:"template_files"`
 }

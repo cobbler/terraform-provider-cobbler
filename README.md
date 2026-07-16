@@ -11,7 +11,7 @@ Original code by [Joe Topjian](https://github.com/jtopjian).
 ## Prerequisites
 
 - [Terraform](https://terraform.io) 1.0 or above, **or** [OpenTofu](https://opentofu.org) 1.6 or above
-- [Cobbler](https://cobbler.github.io/), release 3.3.0 (or higher)
+- [Cobbler](https://cobbler.github.io/), release 4.0.0 (or higher)
 
 ## OpenTofu Support
 
@@ -24,7 +24,7 @@ terraform {
   required_providers {
     cobbler = {
       source  = "cobbler/cobbler"
-      version = "~> 5.0"
+      version = "~> 6.0"
     }
   }
 }
@@ -42,7 +42,7 @@ Make sure the file `variables.tf` contains the right version in the provider blo
 
 ```hcl
 provider "cobbler" {
-  version  = "~> 5.0.0"
+  version  = "~> 6.0.0"
   username = var.cobbler_username
   password = var.cobbler_password
   url      = var.cobbler_url

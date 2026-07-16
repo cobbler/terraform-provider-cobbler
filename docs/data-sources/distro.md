@@ -26,29 +26,18 @@ Use this data source to get the details of a Cobbler distro.
 ### Read-Only
 
 - `arch` (String) The architecture of the distro.
-- `boot_files` (Attributes) Files copied into tftpboot beyond the kernel/initrd. (see [below for nested schema](#nestedatt--boot_files))
 - `boot_loaders` (Attributes) Boot loaders. (see [below for nested schema](#nestedatt--boot_loaders))
 - `breed` (String) The "breed" of distribution.
 - `comment` (String) Free form text description.
-- `fetchable_files` (Attributes) Templates for tftp or wget. (see [below for nested schema](#nestedatt--fetchable_files))
 - `initrd` (String) Absolute path to initrd on filesystem.
 - `kernel` (String) Absolute path to kernel on filesystem.
 - `kernel_options` (Attributes) Kernel options to use with the kernel. (see [below for nested schema](#nestedatt--kernel_options))
 - `kernel_options_post` (Attributes) Post install kernel options. (see [below for nested schema](#nestedatt--kernel_options_post))
-- `mgmt_classes` (Attributes) Management classes for external config management. (see [below for nested schema](#nestedatt--mgmt_classes))
 - `os_version` (String) The version of the distro.
 - `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
 - `remote_boot_initrd` (String) URL the bootloader directly retrieves and boots from.
 - `remote_boot_kernel` (String) URL the bootloader directly retrieves and boots from.
-
-<a id="nestedatt--boot_files"></a>
-### Nested Schema for `boot_files`
-
-Read-Only:
-
-- `inherited` (Boolean)
-- `value` (Map of String)
-
+- `uid` (String) Server-assigned UID for this distro. Use this as the value for `cobbler_profile.distro`.
 
 <a id="nestedatt--boot_loaders"></a>
 ### Nested Schema for `boot_loaders`
@@ -57,15 +46,6 @@ Read-Only:
 
 - `inherited` (Boolean)
 - `value` (List of String)
-
-
-<a id="nestedatt--fetchable_files"></a>
-### Nested Schema for `fetchable_files`
-
-Read-Only:
-
-- `inherited` (Boolean)
-- `value` (Map of String)
 
 
 <a id="nestedatt--kernel_options"></a>
@@ -84,15 +64,6 @@ Read-Only:
 
 - `inherited` (Boolean)
 - `value` (Map of String)
-
-
-<a id="nestedatt--mgmt_classes"></a>
-### Nested Schema for `mgmt_classes`
-
-Read-Only:
-
-- `inherited` (Boolean)
-- `value` (List of String)
 
 
 <a id="nestedatt--owners"></a>

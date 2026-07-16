@@ -6,12 +6,20 @@ services:
     volumes:
       - ./cobbler_source:/code:z
       - ../extracted_iso_image:/extracted_iso_image:z
+      - ./import.py:/import.py:ro,z
     ports:
       - 8081:80
     # We chmod the code, otherwise some files are read-only and cannot be cleaned up:
+    # The Cobbler 4.0.0 container no longer ships the `cobbler` CLI (superseded by
+    # https://github.com/cobbler/cli), so the import is done via a direct XML-RPC call
+    # instead (see import.py).
+    # Cobbler's Template.uri.path validator (cobbler/items/options/uri.py) requires the file to
+    # already exist under autoinstall_templates_dir - it never creates one - so the internal/template
+    # acceptance tests' backing files are touched into existence below.
     command: bash -c "
       /code/docker/develop/scripts/setup-supervisor.sh &&
       chmod -R o+w /code &&
-      cobbler import --name Ubuntu-20.04 --breed ubuntu --path /extracted_iso_image/ &&
+      python3 /import.py &&
+      touch /var/lib/cobbler/templates/foo-resource-template-basic.j2 /var/lib/cobbler/templates/foo-resource-template-change.j2 /var/lib/cobbler/templates/foo-ds-template.j2 &&
       tail -F /dev/null
       "

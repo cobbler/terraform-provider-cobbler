@@ -35,28 +35,20 @@ resource "cobbler_distro" "Ubuntu-2004-x86_64" {
 ### Optional
 
 - `arch` (String) The architecture of the distro. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.
-- `boot_files` (Attributes) Files copied into tftpboot beyond the kernel/initrd. (see [below for nested schema](#nestedatt--boot_files))
 - `boot_loaders` (Attributes) Must be either 'grub', 'pxe', or 'ipxe'. (see [below for nested schema](#nestedatt--boot_loaders))
 - `breed` (String) The "breed" of distribution. Valid options are: redhat, fedora, centos, scientific linux, suse, debian, and ubuntu.
 - `comment` (String) Free form text description.
-- `fetchable_files` (Attributes) Templates for tftp or wget. (see [below for nested schema](#nestedatt--fetchable_files))
 - `kernel_options` (Attributes) Kernel options to use with the kernel. (see [below for nested schema](#nestedatt--kernel_options))
 - `kernel_options_post` (Attributes) Post install kernel options to use with the kernel after installation. (see [below for nested schema](#nestedatt--kernel_options_post))
-- `mgmt_classes` (Attributes) Management classes for external config management. (see [below for nested schema](#nestedatt--mgmt_classes))
 - `os_version` (String) The version of the distro you are creating. Example: `focal`.
 - `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
 - `remote_boot_initrd` (String) URL the bootloader directly retrieves and boots from.
 - `remote_boot_kernel` (String) URL the bootloader directly retrieves and boots from.
 - `template_files` (Map of String) File mappings for built-in config management.
 
-<a id="nestedatt--boot_files"></a>
-### Nested Schema for `boot_files`
+### Read-Only
 
-Optional:
-
-- `inherited` (Boolean)
-- `value` (Map of String)
-
+- `uid` (String) Server-assigned UID for this distro. Use this as the value for `cobbler_profile.distro`.
 
 <a id="nestedatt--boot_loaders"></a>
 ### Nested Schema for `boot_loaders`
@@ -65,15 +57,6 @@ Optional:
 
 - `inherited` (Boolean)
 - `value` (List of String)
-
-
-<a id="nestedatt--fetchable_files"></a>
-### Nested Schema for `fetchable_files`
-
-Optional:
-
-- `inherited` (Boolean)
-- `value` (Map of String)
 
 
 <a id="nestedatt--kernel_options"></a>
@@ -92,15 +75,6 @@ Optional:
 
 - `inherited` (Boolean)
 - `value` (Map of String)
-
-
-<a id="nestedatt--mgmt_classes"></a>
-### Nested Schema for `mgmt_classes`
-
-Optional:
-
-- `inherited` (Boolean)
-- `value` (List of String)
 
 
 <a id="nestedatt--owners"></a>
