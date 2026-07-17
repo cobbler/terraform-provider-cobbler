@@ -13,3 +13,7 @@ updates:
         applies-to: version-updates
         patterns:
           - "actions/cache/*"
+    commit-message:
+      prefix: "build"
+      prefix-development: "chore"
+      include: "scope"
