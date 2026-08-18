@@ -1,25 +1,11 @@
 services:
   cobbler:
-    image: cobbler-dev
+    image: ghcr.io/cobbler/cobblerd:${COBBLER_IMAGE_TAG:-latest}
     container_name: cobbler-dev
-    privileged: true  # Required for Cobbler 3.3.2 and newer
+    environment:
+      - COBBLER_XMLRPC_BIND_ADDRESS=0.0.0.0
     volumes:
-      - ./cobbler_source:/code:z
-      - ../extracted_iso_image:/extracted_iso_image:z
-      - ./import.py:/import.py:ro,z
+      - ../extracted_iso_image:/extracted_iso_image:ro,z
     ports:
-      - 8081:80
-    # We chmod the code, otherwise some files are read-only and cannot be cleaned up:
-    # The Cobbler 4.0.0 container no longer ships the `cobbler` CLI (superseded by
-    # https://github.com/cobbler/cli), so the import is done via a direct XML-RPC call
-    # instead (see import.py).
-    # Cobbler's Template.uri.path validator (cobbler/items/options/uri.py) requires the file to
-    # already exist under autoinstall_templates_dir - it never creates one - so the internal/template
-    # acceptance tests' backing files are touched into existence below.
-    command: bash -c "
-      /code/docker/develop/scripts/setup-supervisor.sh &&
-      chmod -R o+w /code &&
-      python3 /import.py &&
-      touch /var/lib/cobbler/templates/foo-resource-template-basic.j2 /var/lib/cobbler/templates/foo-resource-template-change.j2 /var/lib/cobbler/templates/foo-ds-template.j2 &&
-      tail -F /dev/null
-      "
+      - 25151:25151
+    command: cobblerd -F

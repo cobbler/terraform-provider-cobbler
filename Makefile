@@ -1,7 +1,7 @@
 TEST?=$$(go list ./... |grep -v 'vendor')
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
 PKG_NAME=cobbler
-COBBLER_SERVER_URL=http://localhost:8081/cobbler_api
+COBBLER_SERVER_URL=http://localhost:25151/
 
 default: build
 
@@ -21,7 +21,7 @@ test: fmtcheck
 # Run acceptance tests
 .PHONY: testacc
 testacc:
-	@COBBLER_VERSION=v3.3.0 sh -c "'./docker/start.sh' $(COBBLER_SERVER_URL)"
+	@sh -c "'./docker/start.sh' $(COBBLER_SERVER_URL)"
 	TF_LOG=TRACE TF_ACC_LOG=TRACE TF_LOG_PATH_MASK="test-%s.log" TF_ACC=1 TF_ACC_PROVIDER_NAMESPACE=cobbler COBBLER_URL=$(COBBLER_SERVER_URL) COBBLER_USERNAME=cobbler COBBLER_PASSWORD=cobbler go test -v -p 1 -coverprofile="coverage.out" -covermode="atomic" './...'
 
 .PHONY: docs

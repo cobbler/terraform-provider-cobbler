@@ -6,32 +6,12 @@ if [ -z "$1" ]
     echo "No cobbler server url supplied"
 fi
 
-cobbler_commit=fedf73120ff1d5018e1635d5677d868caac34a78 # v4.0.0b1
-cobbler_branch=main
+cobbler_image_tag=v4.0.0b1
 iso_url=https://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso
 iso_os=ubuntu
 valid_iso_checksum=00a9d46306fbe9beb3581853a289490bc231c51f
 iso_filename=$(echo ${iso_url##*/})
 valid_extracted_iso_checksum=dd0b3148e1f071fb86aee4b0395fd63b
-
-# Cobbler's build (`make man`, setuptools_scm) determines its version from git metadata, so
-# the cloned checkout must keep its .git directory intact - do not strip it for caching purposes,
-# doing so causes `make man` (and the whole cobblerd install) to fail with "no version found for".
-if [ -d "./docker/cobbler_source" ]; then
-  current_commit=$(cd ./docker/cobbler_source && git rev-parse HEAD 2>/dev/null || echo unknown)
-  if [ "$current_commit" = "$cobbler_commit" ]; then
-    echo "Cobbler code already cloned and the correct commit is checked out"
-  else
-    rm -rf ./docker/cobbler_source
-  fi
-fi
-if [ ! -d "./docker/cobbler_source" ]; then
-  git clone https://github.com/cobbler/cobbler.git -b $cobbler_branch docker/cobbler_source
-  cd ./docker/cobbler_source
-  printf "Changing to version of Cobbler being tested.\n\n"
-  git checkout $cobbler_commit > /dev/null 2>&1
-  cd -
-fi
 
 echo $(pwd)
 if [ -f "$iso_filename" ] && [ $(sha1sum $iso_filename | awk '{print $1}') == "$valid_iso_checksum" ]; then
@@ -48,8 +28,7 @@ else
    xorriso -osirrox on -indev $iso_filename -extract / extracted_iso_image
 fi
 
-docker build -f ./docker/cobbler_source/docker/develop/develop.dockerfile -t cobbler-dev .
-docker compose -f docker/compose.yml up -d
+COBBLER_IMAGE_TAG=$cobbler_image_tag docker compose -f docker/compose.yml up -d
 
 SERVER_URL=$1
 printf "### Waiting for Cobbler to become available on ${SERVER_URL} \n\n"
@@ -69,7 +48,17 @@ until $(curl --connect-timeout 1 --output /dev/null --silent ${SERVER_URL}); do
   sleep 5
 done
 
-# Sleep 10 seconds to let the "cobbler import" succeed
-sleep 10
+# Cobbler 4.0.0 no longer ships the Python `cobbler` CLI (superseded by
+# https://github.com/cobbler/cli), so seed the test distro via a direct XML-RPC call from the
+# host instead of `cobbler import` - see import.py.
+python3 docker/import.py
+
+# Cobbler's Template.uri.path validator (cobbler/items/options/uri.py) requires the file to
+# already exist under autoinstall_templates_dir - it never creates one - so the internal/template
+# acceptance tests' backing files are touched into existence here.
+docker compose -f docker/compose.yml exec cobbler touch \
+  /var/lib/cobbler/templates/foo-resource-template-basic.j2 \
+  /var/lib/cobbler/templates/foo-resource-template-change.j2 \
+  /var/lib/cobbler/templates/foo-ds-template.j2
 
 docker compose -f docker/compose.yml logs
