@@ -213,6 +213,14 @@ func (r *ImageResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"virt_uefi": schema.BoolAttribute{
+				Description: "Boot this virtual machine via UEFI firmware instead of legacy BIOS.",
+				Optional:    true,
+				Computed:    true,
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"kernel_options": schema.SingleNestedAttribute{
 				Description: "Kernel options to use with the kernel.",
 				Optional:    true,
@@ -441,6 +449,7 @@ func modelToImage(ctx context.Context, data imageResourceModel, diags *diag.Diag
 	image.Virt.Path = data.VirtPath.ValueString()
 	image.Virt.Ram = inherit.IntTo(ctx, data.VirtRam, diags)
 	image.Virt.Type = stringOrInherit(data.VirtType)
+	image.Virt.UEFI = data.VirtUEFI.ValueBool()
 	image.KernelOptions = inherit.StringMapTo(ctx, data.KernelOptions, diags)
 	image.KernelOptionsPost = inherit.StringMapTo(ctx, data.KernelOptionsPost, diags)
 	image.Owners = inherit.StringListTo(ctx, data.Owners, diags)
@@ -481,6 +490,7 @@ func imageToModel(ctx context.Context, image cobbler.Image, data *imageResourceM
 	data.VirtPath = types.StringValue(image.Virt.Path)
 	data.VirtRam = inherit.IntFrom(ctx, image.Virt.Ram, diags)
 	data.VirtType = types.StringValue(image.Virt.Type)
+	data.VirtUEFI = types.BoolValue(image.Virt.UEFI)
 	data.KernelOptions = inherit.StringMapFrom(ctx, image.KernelOptions, diags)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, image.KernelOptionsPost, diags)
 	data.Owners = inherit.StringListFrom(ctx, image.Owners, diags)

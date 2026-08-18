@@ -237,6 +237,14 @@ func (r *SystemResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"virt_uefi": schema.BoolAttribute{
+				Description: "Boot this virtual machine via UEFI firmware instead of legacy BIOS.",
+				Optional:    true,
+				Computed:    true,
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"autoinstall_meta": schema.SingleNestedAttribute{
 				Description: "Automatic installation template metadata, formerly Kickstart metadata.",
 				Optional:    true,
@@ -656,6 +664,7 @@ func modelToSystem(ctx context.Context, data systemResourceModel, diags *diag.Di
 	system.Virt.Path = data.VirtPath.ValueString()
 	system.VirtPXEBoot = data.VirtPXEBoot.ValueBool()
 	system.Virt.Type = systemStringOrInherit(data.VirtType)
+	system.Virt.UEFI = data.VirtUEFI.ValueBool()
 
 	var nameServers []string
 	if !data.NameServers.IsNull() && !data.NameServers.IsUnknown() {
@@ -714,6 +723,7 @@ func systemToModel(ctx context.Context, system cobbler.System, data *systemResou
 	data.VirtPath = types.StringValue(system.Virt.Path)
 	data.VirtPXEBoot = types.BoolValue(system.VirtPXEBoot)
 	data.VirtType = types.StringValue(system.Virt.Type)
+	data.VirtUEFI = types.BoolValue(system.Virt.UEFI)
 
 	nameServersList, d := types.ListValueFrom(ctx, types.StringType, system.DNS.NameServers.Data)
 	diags.Append(d...)

@@ -44,6 +44,7 @@ resource "cobbler_distro" "Ubuntu-2004-x86_64" {
 - `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
 - `remote_boot_initrd` (String) URL the bootloader directly retrieves and boots from.
 - `remote_boot_kernel` (String) URL the bootloader directly retrieves and boots from.
+- `source_tree_path` (String) The original location of the distro's source tree on disk, for use by the optional dynamic_httpd manager.
 - `template_files` (Map of String) File mappings for built-in config management.
 
 ### Read-Only

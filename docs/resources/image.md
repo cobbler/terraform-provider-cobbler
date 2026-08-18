@@ -53,6 +53,7 @@ resource "cobbler_image" "Ubuntu-2004-x86_64" {
 - `virt_path` (String) Path on the virtualization host where the image is stored.
 - `virt_ram` (Attributes) RAM in MB to allocate to the virtual machine. (see [below for nested schema](#nestedatt--virt_ram))
 - `virt_type` (String) Virtualization type. Valid options are: qemu, kvm, xenpv, xenfv, vmware, vmwarew, openvz, auto. Leave empty to inherit.
+- `virt_uefi` (Boolean) Boot this virtual machine via UEFI firmware instead of legacy BIOS.
 
 ### Read-Only
 

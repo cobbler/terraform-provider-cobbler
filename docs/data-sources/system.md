@@ -56,6 +56,7 @@ Use this data source to get the details of a Cobbler system.
 - `virt_pxe_boot` (Boolean) Use PXE to build this virtual machine.
 - `virt_ram` (Attributes) The amount of RAM for the virtual machine. (see [below for nested schema](#nestedatt--virt_ram))
 - `virt_type` (String) The type of virtual machine.
+- `virt_uefi` (Boolean) Boot this virtual machine via UEFI firmware instead of legacy BIOS.
 
 <a id="nestedatt--autoinstall_meta"></a>
 ### Nested Schema for `autoinstall_meta`

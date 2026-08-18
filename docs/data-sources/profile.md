@@ -49,6 +49,7 @@ Use this data source to get the details of a Cobbler profile.
 - `virt_path` (String) The virtual machine path.
 - `virt_ram` (Attributes) The amount of RAM for the virtual machine. (see [below for nested schema](#nestedatt--virt_ram))
 - `virt_type` (String) The type of virtual machine.
+- `virt_uefi` (Boolean) Boot this virtual machine via UEFI firmware instead of legacy BIOS.
 
 <a id="nestedatt--autoinstall_meta"></a>
 ### Nested Schema for `autoinstall_meta`

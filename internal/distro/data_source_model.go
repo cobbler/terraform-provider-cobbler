@@ -13,6 +13,7 @@ type distroDataSourceModel struct {
 	RemoteBootInitrd  types.String `tfsdk:"remote_boot_initrd"`
 	RemoteBootKernel  types.String `tfsdk:"remote_boot_kernel"`
 	OSVersion         types.String `tfsdk:"os_version"`
+	SourceTreePath    types.String `tfsdk:"source_tree_path"`
 	BootLoaders       types.Object `tfsdk:"boot_loaders"`
 	KernelOptions     types.Object `tfsdk:"kernel_options"`
 	KernelOptionsPost types.Object `tfsdk:"kernel_options_post"`

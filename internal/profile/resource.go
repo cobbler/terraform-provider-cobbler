@@ -163,6 +163,14 @@ func (r *ProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, re
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"virt_uefi": schema.BoolAttribute{
+				Description: "Boot this virtual machine via UEFI firmware instead of legacy BIOS.",
+				Optional:    true,
+				Computed:    true,
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"repos": schema.ListAttribute{
 				Description: "Repos to auto-assign to this profile.",
 				Optional:    true,
@@ -573,6 +581,7 @@ func modelToProfile(ctx context.Context, data profileResourceModel, diags *diag.
 	profile.Virt.DiskDriver = stringOrInherit(data.VirtDiskDriver)
 	profile.Virt.Path = data.VirtPath.ValueString()
 	profile.Virt.Type = stringOrInherit(data.VirtType)
+	profile.Virt.UEFI = data.VirtUEFI.ValueBool()
 
 	// ElementsAs fails on null/unknown; guard for Optional+Computed fields not set in config.
 	var repos []string
@@ -625,6 +634,7 @@ func profileToModel(ctx context.Context, profile cobbler.Profile, data *profileR
 	data.VirtDiskDriver = types.StringValue(profile.Virt.DiskDriver)
 	data.VirtPath = types.StringValue(profile.Virt.Path)
 	data.VirtType = types.StringValue(profile.Virt.Type)
+	data.VirtUEFI = types.BoolValue(profile.Virt.UEFI)
 
 	repoList, d := types.ListValueFrom(ctx, types.StringType, profile.Repos)
 	diags.Append(d...)

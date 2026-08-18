@@ -58,7 +58,7 @@ jobs:
           - terraform
           - opentofu
         cobbler_version:
-          - 2f0ff03f17ae957cac65d9ef033a98e8d597145a # v4.0.0a4
+          - v4.0.0b1
       fail-fast: false
     steps:
       - name: Check out code into the Go module directory
@@ -87,9 +87,9 @@ jobs:
       - name: Get dependencies
         run: |
           go mod download
-      - name: Replace git version hash
+      - name: Replace Cobbler image tag
         run: |
-          sed -i "s/cobbler_commit=.*/cobbler_commit=${{ matrix.cobbler_version }}/" docker/start.sh
+          sed -i "s/cobbler_image_tag=.*/cobbler_image_tag=${{ matrix.cobbler_version }}/" docker/start.sh
       - name: Restore OS ISO
         id: cache-iso-restore
         # https://github.com/actions/cache
@@ -112,7 +112,7 @@ jobs:
             *.iso
           key: ${{ steps.cache-iso-restore.outputs.cache-primary-key }}
       - name: Upload coverage report to GH artifacts
-        if: matrix.cobbler_version == 'TODO_4_0_X_COMMIT' && matrix.tool == 'terraform'
+        if: matrix.cobbler_version == 'v4.0.0b1' && matrix.tool == 'terraform'
         # https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

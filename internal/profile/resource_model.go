@@ -19,6 +19,7 @@ type profileResourceModel struct {
 	VirtDiskDriver types.String `tfsdk:"virt_disk_driver"`
 	VirtPath       types.String `tfsdk:"virt_path"`
 	VirtType       types.String `tfsdk:"virt_type"`
+	VirtUEFI       types.Bool   `tfsdk:"virt_uefi"`
 	Repos          types.List   `tfsdk:"repos"`
 	// Inheritable:
 	AutoinstallMeta   types.Object `tfsdk:"autoinstall_meta"`

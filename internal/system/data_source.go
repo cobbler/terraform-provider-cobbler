@@ -132,6 +132,10 @@ func (d *SystemDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 				Description: "The type of virtual machine.",
 				Computed:    true,
 			},
+			"virt_uefi": dsschema.BoolAttribute{
+				Description: "Boot this virtual machine via UEFI firmware instead of legacy BIOS.",
+				Computed:    true,
+			},
 			"autoinstall_meta": dsschema.SingleNestedAttribute{
 				Description: "Automatic installation template metadata, formerly Kickstart metadata.",
 				Computed:    true,
@@ -336,6 +340,7 @@ func (d *SystemDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	data.VirtPath = types.StringValue(s.Virt.Path)
 	data.VirtPXEBoot = types.BoolValue(s.VirtPXEBoot)
 	data.VirtType = types.StringValue(s.Virt.Type)
+	data.VirtUEFI = types.BoolValue(s.Virt.UEFI)
 
 	nameServersList, diag := types.ListValueFrom(ctx, types.StringType, s.DNS.NameServers.Data)
 	resp.Diagnostics.Append(diag...)
