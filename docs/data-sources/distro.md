@@ -37,6 +37,7 @@ Use this data source to get the details of a Cobbler distro.
 - `owners` (Attributes) Owners list for authz_ownership. (see [below for nested schema](#nestedatt--owners))
 - `remote_boot_initrd` (String) URL the bootloader directly retrieves and boots from.
 - `remote_boot_kernel` (String) URL the bootloader directly retrieves and boots from.
+- `source_tree_path` (String) The original location of the distro's source tree on disk.
 - `uid` (String) Server-assigned UID for this distro. Use this as the value for `cobbler_profile.distro`.
 
 <a id="nestedatt--boot_loaders"></a>

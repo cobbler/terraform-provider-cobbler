@@ -108,6 +108,14 @@ func (r *DistroResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"source_tree_path": schema.StringAttribute{
+				Description: "The original location of the distro's source tree on disk, for use by the optional dynamic_httpd manager.",
+				Optional:    true,
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"boot_loaders": schema.SingleNestedAttribute{
 				Description: "Must be either 'grub', 'pxe', or 'ipxe'.",
 				Optional:    true,
@@ -335,6 +343,7 @@ func modelToDistro(ctx context.Context, data distroResourceModel, diags *diag.Di
 	distro.RemoteBootInitrd = data.RemoteBootInitrd.ValueString()
 	distro.RemoteBootKernel = data.RemoteBootKernel.ValueString()
 	distro.OSVersion = data.OSVersion.ValueString()
+	distro.SourceTreePath = data.SourceTreePath.ValueString()
 	distro.BootLoaders = inherit.StringListTo(ctx, data.BootLoaders, diags)
 	distro.KernelOptions = inherit.StringMapTo(ctx, data.KernelOptions, diags)
 	distro.KernelOptionsPost = inherit.StringMapTo(ctx, data.KernelOptionsPost, diags)
@@ -362,6 +371,7 @@ func distroToModel(ctx context.Context, distro cobbler.Distro, data *distroResou
 	data.RemoteBootInitrd = types.StringValue(distro.RemoteBootInitrd)
 	data.RemoteBootKernel = types.StringValue(distro.RemoteBootKernel)
 	data.OSVersion = types.StringValue(distro.OSVersion)
+	data.SourceTreePath = types.StringValue(distro.SourceTreePath)
 	data.BootLoaders = inherit.StringListFrom(ctx, distro.BootLoaders, diags)
 	data.KernelOptions = inherit.StringMapFrom(ctx, distro.KernelOptions, diags)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, distro.KernelOptionsPost, diags)

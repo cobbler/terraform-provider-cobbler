@@ -65,6 +65,7 @@ resource "cobbler_profile" "my_profile" {
 - `virt_path` (String) The virtual machine path.
 - `virt_ram` (Attributes) The amount of RAM for the virtual machine. (see [below for nested schema](#nestedatt--virt_ram))
 - `virt_type` (String) The type of virtual machine. Valid options are: xenpv, xenfv, qemu, kvm, vmware, openvz.
+- `virt_uefi` (Boolean) Boot this virtual machine via UEFI firmware instead of legacy BIOS.
 
 ### Read-Only
 

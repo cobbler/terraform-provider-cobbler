@@ -93,6 +93,10 @@ func (d *ProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest
 				Description: "The type of virtual machine.",
 				Computed:    true,
 			},
+			"virt_uefi": schema.BoolAttribute{
+				Description: "Boot this virtual machine via UEFI firmware instead of legacy BIOS.",
+				Computed:    true,
+			},
 			"repos": schema.ListAttribute{
 				Description: "Repos to auto-assign to this profile.",
 				Computed:    true,
@@ -300,6 +304,7 @@ func (d *ProfileDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	data.VirtDiskDriver = types.StringValue(p.Virt.DiskDriver)
 	data.VirtPath = types.StringValue(p.Virt.Path)
 	data.VirtType = types.StringValue(p.Virt.Type)
+	data.VirtUEFI = types.BoolValue(p.Virt.UEFI)
 
 	repoList, diag := types.ListValueFrom(ctx, types.StringType, p.Repos)
 	resp.Diagnostics.Append(diag...)

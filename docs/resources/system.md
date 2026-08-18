@@ -100,6 +100,7 @@ resource "cobbler_network_interface" "eth1" {
 - `virt_pxe_boot` (Boolean) Use PXE to build this virtual machine.
 - `virt_ram` (Attributes) The amount of RAM for the virtual machine. (see [below for nested schema](#nestedatt--virt_ram))
 - `virt_type` (String) The type of virtual machine. Valid options are: xenpv, xenfv, qemu, kvm, vmware, openvz.
+- `virt_uefi` (Boolean) Boot this virtual machine via UEFI firmware instead of legacy BIOS.
 
 ### Read-Only
 

@@ -122,6 +122,10 @@ func (d *ImageDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, 
 				Description: "Virtualization type.",
 				Computed:    true,
 			},
+			"virt_uefi": schema.BoolAttribute{
+				Description: "Boot this virtual machine via UEFI firmware instead of legacy BIOS.",
+				Computed:    true,
+			},
 			"kernel_options": schema.SingleNestedAttribute{
 				Description: "Kernel options to use with the kernel.",
 				Computed:    true,
@@ -216,6 +220,7 @@ func (d *ImageDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 	data.VirtPath = types.StringValue(image.Virt.Path)
 	data.VirtRam = inherit.IntFrom(ctx, image.Virt.Ram, &resp.Diagnostics)
 	data.VirtType = types.StringValue(image.Virt.Type)
+	data.VirtUEFI = types.BoolValue(image.Virt.UEFI)
 	data.KernelOptions = inherit.StringMapFrom(ctx, image.KernelOptions, &resp.Diagnostics)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, image.KernelOptionsPost, &resp.Diagnostics)
 	data.Owners = inherit.StringListFrom(ctx, image.Owners, &resp.Diagnostics)

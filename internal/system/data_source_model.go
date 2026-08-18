@@ -28,6 +28,7 @@ type systemDataSourceModel struct {
 	VirtPath          types.String `tfsdk:"virt_path"`
 	VirtPXEBoot       types.Bool   `tfsdk:"virt_pxe_boot"`
 	VirtType          types.String `tfsdk:"virt_type"`
+	VirtUEFI          types.Bool   `tfsdk:"virt_uefi"`
 	// Inheritable:
 	AutoinstallMeta   types.Object `tfsdk:"autoinstall_meta"`
 	BootLoaders       types.Object `tfsdk:"boot_loaders"`

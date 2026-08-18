@@ -22,6 +22,7 @@ type imageDataSourceModel struct {
 	VirtPath          types.String `tfsdk:"virt_path"`
 	VirtRam           types.Object `tfsdk:"virt_ram"`
 	VirtType          types.String `tfsdk:"virt_type"`
+	VirtUEFI          types.Bool   `tfsdk:"virt_uefi"`
 	KernelOptions     types.Object `tfsdk:"kernel_options"`
 	KernelOptionsPost types.Object `tfsdk:"kernel_options_post"`
 	Owners            types.Object `tfsdk:"owners"`

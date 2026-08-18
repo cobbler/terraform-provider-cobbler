@@ -69,6 +69,10 @@ func (d *DistroDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 				Description: "The version of the distro.",
 				Computed:    true,
 			},
+			"source_tree_path": schema.StringAttribute{
+				Description: "The original location of the distro's source tree on disk.",
+				Computed:    true,
+			},
 			"boot_loaders": schema.SingleNestedAttribute{
 				Description: "Boot loaders.",
 				Computed:    true,
@@ -168,6 +172,7 @@ func (d *DistroDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	data.RemoteBootInitrd = types.StringValue(distro.RemoteBootInitrd)
 	data.RemoteBootKernel = types.StringValue(distro.RemoteBootKernel)
 	data.OSVersion = types.StringValue(distro.OSVersion)
+	data.SourceTreePath = types.StringValue(distro.SourceTreePath)
 	data.BootLoaders = inherit.StringListFrom(ctx, distro.BootLoaders, &resp.Diagnostics)
 	data.KernelOptions = inherit.StringMapFrom(ctx, distro.KernelOptions, &resp.Diagnostics)
 	data.KernelOptionsPost = inherit.StringMapFrom(ctx, distro.KernelOptionsPost, &resp.Diagnostics)

@@ -46,6 +46,7 @@ Use this data source to get the details of a Cobbler image.
 - `virt_path` (String) Path on the virtualization host.
 - `virt_ram` (Attributes) RAM in MB for the virtual machine. (see [below for nested schema](#nestedatt--virt_ram))
 - `virt_type` (String) Virtualization type.
+- `virt_uefi` (Boolean) Boot this virtual machine via UEFI firmware instead of legacy BIOS.
 
 <a id="nestedatt--kernel_options"></a>
 ### Nested Schema for `kernel_options`
