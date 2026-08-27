@@ -22,7 +22,7 @@ description: |-
 ### Optional
 
 - `comment` (String) Free form text description.
-- `items` (List of String) Names of the distros belonging to this group.
+- `items` (List of String) UIDs of the profiles belonging to this group.
 
 ### Read-Only
 

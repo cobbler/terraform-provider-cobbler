@@ -59,7 +59,7 @@ func (r *ProfileGroupResource) Schema(_ context.Context, _ resource.SchemaReques
 				},
 			},
 			"items": schema.ListAttribute{
-				Description: "Names of the distros belonging to this group.",
+				Description: "UIDs of the profiles belonging to this group.",
 				Optional:    true,
 				Computed:    true,
 				ElementType: types.StringType,

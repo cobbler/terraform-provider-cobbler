@@ -59,7 +59,7 @@ func (r *SystemGroupResource) Schema(_ context.Context, _ resource.SchemaRequest
 				},
 			},
 			"items": schema.ListAttribute{
-				Description: "Names of the distros belonging to this group.",
+				Description: "UIDs of the systems belonging to this group.",
 				Optional:    true,
 				Computed:    true,
 				ElementType: types.StringType,

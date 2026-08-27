@@ -31,7 +31,7 @@ func (d *SystemGroupDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 			"name":    dsschema.StringAttribute{Description: "Name of the group.", Required: true},
 			"uid":     dsschema.StringAttribute{Description: "Server-assigned UID for this system group.", Computed: true},
 			"comment": dsschema.StringAttribute{Description: "Free form text description.", Computed: true},
-			"items":   dsschema.ListAttribute{Description: "Distro names in the group.", Computed: true, ElementType: types.StringType},
+			"items":   dsschema.ListAttribute{Description: "System UIDs in the group.", Computed: true, ElementType: types.StringType},
 		},
 	}
 }

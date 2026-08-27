@@ -31,7 +31,7 @@ func (d *ProfileGroupDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 			"name":    dsschema.StringAttribute{Description: "Name of the group.", Required: true},
 			"uid":     dsschema.StringAttribute{Description: "Server-assigned UID for this profile group.", Computed: true},
 			"comment": dsschema.StringAttribute{Description: "Free form text description.", Computed: true},
-			"items":   dsschema.ListAttribute{Description: "Distro names in the group.", Computed: true, ElementType: types.StringType},
+			"items":   dsschema.ListAttribute{Description: "Profile UIDs in the group.", Computed: true, ElementType: types.StringType},
 		},
 	}
 }
