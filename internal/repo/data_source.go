@@ -33,6 +33,10 @@ func (d *RepoDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Description: "The name of the repo.",
 				Required:    true,
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this repo.",
+				Computed:    true,
+			},
 			"arch": schema.StringAttribute{
 				Description: "The architecture of the repo.",
 				Computed:    true,
@@ -138,13 +142,24 @@ func (d *RepoDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		return
 	}
 
-	repo, err := d.client.GetRepo(data.Name.ValueString(), false, false)
+	matches, err := d.client.FindRepo(map[string]interface{}{"name": data.Name.ValueString()}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler Repo uid", err.Error())
+		return
+	}
+	uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "Repo", data.Name.ValueString(), matches, func(rp *cobbler.Repo) string { return rp.Uid })
+	if !ok {
+		return
+	}
+
+	repo, err := d.client.GetRepo(uid, false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler Repo", err.Error())
 		return
 	}
 
 	data.Name = types.StringValue(repo.Name)
+	data.UID = types.StringValue(repo.Uid)
 	data.Arch = types.StringValue(repo.Arch)
 	data.Breed = types.StringValue(repo.Breed)
 	data.Comment = types.StringValue(repo.Comment)

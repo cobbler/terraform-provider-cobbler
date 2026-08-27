@@ -187,7 +187,20 @@ func (r *MenuResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 		return
 	}
 
-	menu, err := r.client.GetMenu(data.Name.ValueString(), false, false)
+	if data.UID.IsNull() || data.UID.IsUnknown() || data.UID.ValueString() == "" {
+		matches, err := r.client.FindMenu(map[string]interface{}{"name": data.Name.ValueString()}, false)
+		if err != nil {
+			resp.Diagnostics.AddError("Error resolving Cobbler Menu uid", err.Error())
+			return
+		}
+		uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "Menu", data.Name.ValueString(), matches, func(m *cobbler.Menu) string { return m.Uid })
+		if !ok {
+			return
+		}
+		data.UID = types.StringValue(uid)
+	}
+
+	menu, err := r.client.GetMenu(data.UID.ValueString(), false, false)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			resp.State.RemoveResource(ctx)
@@ -224,7 +237,7 @@ func (r *MenuResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		return
 	}
 
-	updatedMenu, err := r.client.GetMenu(data.Name.ValueString(), false, false)
+	updatedMenu, err := r.client.GetMenu(data.UID.ValueString(), false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler Menu after update", err.Error())
 		return
@@ -247,7 +260,7 @@ func (r *MenuResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 
 	tflog.Debug(ctx, "Cobbler Menu: Delete", map[string]interface{}{"name": data.Name.ValueString()})
 
-	if err := r.client.DeleteMenu(data.Name.ValueString()); err != nil {
+	if err := r.client.DeleteMenu(data.UID.ValueString()); err != nil {
 		resp.Diagnostics.AddError("Error deleting Cobbler Menu", err.Error())
 	}
 }

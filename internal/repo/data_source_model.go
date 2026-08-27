@@ -4,6 +4,7 @@ import "github.com/hashicorp/terraform-plugin-framework/types"
 
 type repoDataSourceModel struct {
 	Name            types.String `tfsdk:"name"`
+	UID             types.String `tfsdk:"uid"`
 	AptComponents   types.List   `tfsdk:"apt_components"`
 	AptDists        types.List   `tfsdk:"apt_dists"`
 	Arch            types.String `tfsdk:"arch"`

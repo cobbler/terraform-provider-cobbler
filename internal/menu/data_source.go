@@ -100,7 +100,17 @@ func (d *MenuDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		return
 	}
 
-	menuPtr, err := d.client.GetMenu(data.Name.ValueString(), false, false)
+	matches, err := d.client.FindMenu(map[string]interface{}{"name": data.Name.ValueString()}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler Menu uid", err.Error())
+		return
+	}
+	uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "Menu", data.Name.ValueString(), matches, func(m *cobbler.Menu) string { return m.Uid })
+	if !ok {
+		return
+	}
+
+	menuPtr, err := d.client.GetMenu(uid, false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler Menu", err.Error())
 		return

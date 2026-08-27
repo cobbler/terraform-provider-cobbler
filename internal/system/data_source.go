@@ -310,7 +310,17 @@ func (d *SystemDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 
-	systemPtr, err := d.client.GetSystem(data.Name.ValueString(), false, false)
+	matches, err := d.client.FindSystem(map[string]interface{}{"name": data.Name.ValueString()}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler System uid", err.Error())
+		return
+	}
+	uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "System", data.Name.ValueString(), matches, func(s *cobbler.System) string { return s.Uid })
+	if !ok {
+		return
+	}
+
+	systemPtr, err := d.client.GetSystem(uid, false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler System", err.Error())
 		return

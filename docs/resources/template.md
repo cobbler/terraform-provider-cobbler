@@ -30,6 +30,7 @@ description: |-
 ### Read-Only
 
 - `built_in` (Boolean) Whether the template is built into Cobbler (read-only).
+- `uid` (String) Server-assigned UID for this template.
 
 <a id="nestedatt--uri"></a>
 ### Nested Schema for `uri`

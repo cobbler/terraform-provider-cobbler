@@ -345,7 +345,20 @@ func (r *ImageResource) Read(ctx context.Context, req resource.ReadRequest, resp
 		return
 	}
 
-	image, err := r.client.GetImage(data.Name.ValueString(), false, false)
+	if data.UID.IsNull() || data.UID.IsUnknown() || data.UID.ValueString() == "" {
+		matches, err := r.client.FindImage(map[string]interface{}{"name": data.Name.ValueString()}, false)
+		if err != nil {
+			resp.Diagnostics.AddError("Error resolving Cobbler Image uid", err.Error())
+			return
+		}
+		uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "Image", data.Name.ValueString(), matches, func(i *cobbler.Image) string { return i.Uid })
+		if !ok {
+			return
+		}
+		data.UID = types.StringValue(uid)
+	}
+
+	image, err := r.client.GetImage(data.UID.ValueString(), false, false)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			resp.State.RemoveResource(ctx)
@@ -382,7 +395,7 @@ func (r *ImageResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		return
 	}
 
-	updatedImage, err := r.client.GetImage(data.Name.ValueString(), false, false)
+	updatedImage, err := r.client.GetImage(data.UID.ValueString(), false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler Image after update", err.Error())
 		return
@@ -405,7 +418,7 @@ func (r *ImageResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 
 	tflog.Debug(ctx, "Cobbler Image: Delete", map[string]interface{}{"name": data.Name.ValueString()})
 
-	if err := r.client.DeleteImage(data.Name.ValueString()); err != nil {
+	if err := r.client.DeleteImage(data.UID.ValueString()); err != nil {
 		resp.Diagnostics.AddError("Error deleting Cobbler Image", err.Error())
 	}
 }

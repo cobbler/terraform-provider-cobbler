@@ -47,6 +47,13 @@ func (r *NetworkInterfaceResource) Schema(_ context.Context, _ resource.SchemaRe
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this network interface.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"system": schema.StringAttribute{
 				Description: "The Cobbler UID of the parent system. Use `cobbler_system.foo.uid`. Changing this forces a new resource.",
 				Required:    true,
@@ -374,7 +381,20 @@ func (r *NetworkInterfaceResource) Read(ctx context.Context, req resource.ReadRe
 		return
 	}
 
-	iface, err := r.client.GetNetworkInterface(data.Name.ValueString(), false, false)
+	if data.UID.IsNull() || data.UID.IsUnknown() || data.UID.ValueString() == "" {
+		matches, err := r.client.FindNetworkInterface(map[string]interface{}{"name": data.Name.ValueString()}, false)
+		if err != nil {
+			resp.Diagnostics.AddError("Error resolving Cobbler NetworkInterface uid", err.Error())
+			return
+		}
+		uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "NetworkInterface", data.Name.ValueString(), matches, func(n *cobbler.NetworkInterface) string { return n.Uid })
+		if !ok {
+			return
+		}
+		data.UID = types.StringValue(uid)
+	}
+
+	iface, err := r.client.GetNetworkInterface(data.UID.ValueString(), false, false)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			resp.State.RemoveResource(ctx)
@@ -416,7 +436,7 @@ func (r *NetworkInterfaceResource) Update(ctx context.Context, req resource.Upda
 		return
 	}
 
-	updated, err := r.client.GetNetworkInterface(iface.Name, false, false)
+	updated, err := r.client.GetNetworkInterface(data.UID.ValueString(), false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler NetworkInterface after update", err.Error())
 		return
@@ -444,7 +464,7 @@ func (r *NetworkInterfaceResource) Delete(ctx context.Context, req resource.Dele
 
 	tflog.Debug(ctx, "Cobbler NetworkInterface: Delete", map[string]interface{}{"name": data.Name.ValueString()})
 
-	if err := r.client.DeleteNetworkInterface(data.Name.ValueString()); err != nil {
+	if err := r.client.DeleteNetworkInterface(data.UID.ValueString()); err != nil {
 		resp.Diagnostics.AddError("Error deleting Cobbler NetworkInterface", err.Error())
 	}
 }

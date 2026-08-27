@@ -281,7 +281,17 @@ func (d *ProfileDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
-	profilePtr, err := d.client.GetProfile(data.Name.ValueString(), false, false)
+	matches, err := d.client.FindProfile(map[string]interface{}{"name": data.Name.ValueString()}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler Profile uid", err.Error())
+		return
+	}
+	uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "Profile", data.Name.ValueString(), matches, func(p *cobbler.Profile) string { return p.Uid })
+	if !ok {
+		return
+	}
+
+	profilePtr, err := d.client.GetProfile(uid, false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler Profile", err.Error())
 		return

@@ -485,7 +485,20 @@ func (r *ProfileResource) Read(ctx context.Context, req resource.ReadRequest, re
 		return
 	}
 
-	profile, err := r.client.GetProfile(data.Name.ValueString(), false, false)
+	if data.UID.IsNull() || data.UID.IsUnknown() || data.UID.ValueString() == "" {
+		matches, err := r.client.FindProfile(map[string]interface{}{"name": data.Name.ValueString()}, false)
+		if err != nil {
+			resp.Diagnostics.AddError("Error resolving Cobbler Profile uid", err.Error())
+			return
+		}
+		uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "Profile", data.Name.ValueString(), matches, func(p *cobbler.Profile) string { return p.Uid })
+		if !ok {
+			return
+		}
+		data.UID = types.StringValue(uid)
+	}
+
+	profile, err := r.client.GetProfile(data.UID.ValueString(), false, false)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			resp.State.RemoveResource(ctx)
@@ -522,7 +535,7 @@ func (r *ProfileResource) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
-	updatedProfile, err := r.client.GetProfile(data.Name.ValueString(), false, false)
+	updatedProfile, err := r.client.GetProfile(data.UID.ValueString(), false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler Profile after update", err.Error())
 		return
@@ -545,7 +558,7 @@ func (r *ProfileResource) Delete(ctx context.Context, req resource.DeleteRequest
 
 	tflog.Debug(ctx, "Cobbler Profile: Delete", map[string]interface{}{"name": data.Name.ValueString()})
 
-	if err := r.client.DeleteProfile(data.Name.ValueString()); err != nil {
+	if err := r.client.DeleteProfile(data.UID.ValueString()); err != nil {
 		resp.Diagnostics.AddError("Error deleting Cobbler Profile", err.Error())
 	}
 }

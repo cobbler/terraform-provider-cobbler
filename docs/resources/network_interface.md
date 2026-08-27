@@ -42,6 +42,7 @@ description: |-
 ### Read-Only
 
 - `system_name` (String) The name of the parent system (computed echo from the server).
+- `uid` (String) Server-assigned UID for this network interface.
 
 <a id="nestedatt--dns"></a>
 ### Nested Schema for `dns`

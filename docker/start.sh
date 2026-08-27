@@ -6,7 +6,7 @@ if [ -z "$1" ]
     echo "No cobbler server url supplied"
 fi
 
-cobbler_image_tag=v4.0.0b1
+cobbler_image_tag=v4.0.0b5
 iso_url=https://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso
 iso_os=ubuntu
 valid_iso_checksum=00a9d46306fbe9beb3581853a289490bc231c51f
@@ -59,6 +59,7 @@ python3 docker/import.py
 docker compose -f docker/compose.yml exec cobbler touch \
   /var/lib/cobbler/templates/foo-resource-template-basic.j2 \
   /var/lib/cobbler/templates/foo-resource-template-change.j2 \
-  /var/lib/cobbler/templates/foo-ds-template.j2
+  /var/lib/cobbler/templates/foo-ds-template.j2 \
+  /var/lib/cobbler/templates/foo-resource-template-import-not-found.j2
 
 docker compose -f docker/compose.yml logs

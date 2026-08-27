@@ -47,6 +47,13 @@ func (r *RepoResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this repo.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"arch": schema.StringAttribute{
 				Description: "The architecture of the repo. Valid options are: i386, x86_64, ia64, ppc, ppc64, s390, arm.",
 				Optional:    true,
@@ -243,7 +250,20 @@ func (r *RepoResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 		return
 	}
 
-	repo, err := r.client.GetRepo(data.Name.ValueString(), false, false)
+	if data.UID.IsNull() || data.UID.IsUnknown() || data.UID.ValueString() == "" {
+		matches, err := r.client.FindRepo(map[string]interface{}{"name": data.Name.ValueString()}, false)
+		if err != nil {
+			resp.Diagnostics.AddError("Error resolving Cobbler Repo uid", err.Error())
+			return
+		}
+		uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "Repo", data.Name.ValueString(), matches, func(rp *cobbler.Repo) string { return rp.Uid })
+		if !ok {
+			return
+		}
+		data.UID = types.StringValue(uid)
+	}
+
+	repo, err := r.client.GetRepo(data.UID.ValueString(), false, false)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			resp.State.RemoveResource(ctx)
@@ -280,7 +300,7 @@ func (r *RepoResource) Update(ctx context.Context, req resource.UpdateRequest, r
 		return
 	}
 
-	updatedRepo, err := r.client.GetRepo(data.Name.ValueString(), false, false)
+	updatedRepo, err := r.client.GetRepo(data.UID.ValueString(), false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler Repo after update", err.Error())
 		return
@@ -303,7 +323,7 @@ func (r *RepoResource) Delete(ctx context.Context, req resource.DeleteRequest, r
 
 	tflog.Debug(ctx, "Cobbler Repo: Delete", map[string]interface{}{"name": data.Name.ValueString()})
 
-	if err := r.client.DeleteRepo(data.Name.ValueString()); err != nil {
+	if err := r.client.DeleteRepo(data.UID.ValueString()); err != nil {
 		resp.Diagnostics.AddError("Error deleting Cobbler Repo", err.Error())
 	}
 }
@@ -358,6 +378,7 @@ func modelToRepo(ctx context.Context, data repoResourceModel, diags *diag.Diagno
 // repoToModel populates a repoResourceModel from a cobbler.Repo.
 func repoToModel(ctx context.Context, repo cobbler.Repo, data *repoResourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(repo.Name)
+	data.UID = types.StringValue(repo.Uid)
 	data.Arch = types.StringValue(repo.Arch)
 	data.Breed = types.StringValue(repo.Breed)
 	data.Comment = types.StringValue(repo.Comment)

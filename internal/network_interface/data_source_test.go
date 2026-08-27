@@ -1,6 +1,7 @@
 package network_interface_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/cobbler/terraform-provider-cobbler/internal/acctest"
@@ -26,6 +27,31 @@ func TestAccNetworkInterfaceDataSource_basic(t *testing.T) {
 		},
 	})
 }
+
+// TestAccNetworkInterfaceDataSource_notFound exercises the zero-match branch of the data
+// source's name-to-uid resolution: looking up a name that doesn't exist on the server must
+// surface a clear "not found" diagnostic instead of a raw client error.
+func TestAccNetworkInterfaceDataSource_notFound(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			acctest.PreCheck(t)
+			acctest.SkipIfCobblerVersionLessThan(t, 4, 0, 0)
+		},
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccNetworkInterfaceDataSourceNotFound,
+				ExpectError: regexp.MustCompile(`Cobbler NetworkInterface not found`),
+			},
+		},
+	})
+}
+
+const testAccNetworkInterfaceDataSourceNotFound = `
+data "cobbler_network_interface" "notfound" {
+  name = "does-not-exist-network-interface-data-source"
+}
+`
 
 const testAccNetworkInterfaceDataSourceBasic = testAccNetworkInterfaceDistroProfileSystem + `
 resource "cobbler_system" "foo" {

@@ -4,6 +4,7 @@ import "github.com/hashicorp/terraform-plugin-framework/types"
 
 type networkInterfaceResourceModel struct {
 	Name            types.String `tfsdk:"name"`
+	UID             types.String `tfsdk:"uid"`
 	System          types.String `tfsdk:"system"`
 	SystemName      types.String `tfsdk:"system_name"`
 	Comment         types.String `tfsdk:"comment"`

@@ -34,6 +34,7 @@ Use this data source to get the details of a Cobbler repo.
 - `owners` (Attributes) List of Owners for authz_ownership. (see [below for nested schema](#nestedatt--owners))
 - `proxy` (Attributes) Proxy to use for downloading the repo. (see [below for nested schema](#nestedatt--proxy))
 - `rpm_list` (List of String) List of specific RPMs to mirror.
+- `uid` (String) Server-assigned UID for this repo.
 
 <a id="nestedatt--createrepo_flags"></a>
 ### Nested Schema for `createrepo_flags`

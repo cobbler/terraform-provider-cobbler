@@ -26,6 +26,7 @@ Use this data source to look up a Cobbler template (4.0.0+).
 - `content` (String) The template body.
 - `tags` (List of String) Tags.
 - `template_type` (String) The template engine.
+- `uid` (String) Server-assigned UID for this template.
 - `uri` (Attributes) Where the template's content lives. (see [below for nested schema](#nestedatt--uri))
 
 <a id="nestedatt--uri"></a>

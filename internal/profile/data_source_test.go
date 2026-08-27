@@ -1,6 +1,7 @@
 package profile_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/cobbler/terraform-provider-cobbler/internal/acctest"
@@ -22,6 +23,28 @@ func TestAccProfileDataSource_basic(t *testing.T) {
 		},
 	})
 }
+
+// TestAccProfileDataSource_notFound exercises the zero-match branch of the data source's
+// name-to-uid resolution: looking up a name that doesn't exist on the server must surface a
+// clear "not found" diagnostic instead of a raw client error.
+func TestAccProfileDataSource_notFound(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t); acctest.SkipIfCobblerVersionLessThan(t, 3, 3, 5) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccProfileDataSourceNotFound,
+				ExpectError: regexp.MustCompile(`Cobbler Profile not found`),
+			},
+		},
+	})
+}
+
+const testAccProfileDataSourceNotFound = `
+data "cobbler_profile" "notfound" {
+  name = "does-not-exist-profile-data-source"
+}
+`
 
 const testAccProfileDataSourceBasic = `
 resource "cobbler_distro" "foo" {

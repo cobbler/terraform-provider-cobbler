@@ -195,7 +195,17 @@ func (d *ImageDataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		return
 	}
 
-	imagePtr, err := d.client.GetImage(data.Name.ValueString(), false, false)
+	matches, err := d.client.FindImage(map[string]interface{}{"name": data.Name.ValueString()}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler Image uid", err.Error())
+		return
+	}
+	uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "Image", data.Name.ValueString(), matches, func(i *cobbler.Image) string { return i.Uid })
+	if !ok {
+		return
+	}
+
+	imagePtr, err := d.client.GetImage(uid, false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler Image", err.Error())
 		return

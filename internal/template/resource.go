@@ -54,6 +54,13 @@ func (r *TemplateResource) Schema(_ context.Context, _ resource.SchemaRequest, r
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this template.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"comment": schema.StringAttribute{
 				Description: "Free form text description.",
 				Optional:    true,
@@ -210,6 +217,7 @@ func templateContent(client cobbler.Client, tpl cobbler.Template, diags *diag.Di
 
 func templateToModel(ctx context.Context, client cobbler.Client, tpl cobbler.Template, data *templateResourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(tpl.Name)
+	data.UID = types.StringValue(tpl.Uid)
 	data.Comment = types.StringValue(tpl.Comment)
 	data.TemplateType = types.StringValue(tpl.TemplateType)
 	data.URI = uriFromAPI(ctx, tpl.URI, diags)
@@ -227,6 +235,7 @@ func templateToModel(ctx context.Context, client cobbler.Client, tpl cobbler.Tem
 
 func templateToDataSourceModel(ctx context.Context, client cobbler.Client, tpl cobbler.Template, data *templateDataSourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(tpl.Name)
+	data.UID = types.StringValue(tpl.Uid)
 	data.Comment = types.StringValue(tpl.Comment)
 	data.TemplateType = types.StringValue(tpl.TemplateType)
 	data.URI = uriFromAPI(ctx, tpl.URI, diags)
@@ -277,7 +286,20 @@ func (r *TemplateResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
-	tpl, err := r.client.GetTemplate(data.Name.ValueString(), false, false)
+	if data.UID.IsNull() || data.UID.IsUnknown() || data.UID.ValueString() == "" {
+		matches, err := r.client.FindTemplate(map[string]interface{}{"name": data.Name.ValueString()}, false)
+		if err != nil {
+			resp.Diagnostics.AddError("Error resolving Cobbler Template uid", err.Error())
+			return
+		}
+		uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "Template", data.Name.ValueString(), matches, func(t *cobbler.Template) string { return t.Uid })
+		if !ok {
+			return
+		}
+		data.UID = types.StringValue(uid)
+	}
+
+	tpl, err := r.client.GetTemplate(data.UID.ValueString(), false, false)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			resp.State.RemoveResource(ctx)
@@ -314,7 +336,7 @@ func (r *TemplateResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
-	updated, err := r.client.GetTemplate(tpl.Name, false, false)
+	updated, err := r.client.GetTemplate(data.UID.ValueString(), false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler Template after update", err.Error())
 		return
@@ -337,7 +359,7 @@ func (r *TemplateResource) Delete(ctx context.Context, req resource.DeleteReques
 
 	tflog.Debug(ctx, "Cobbler Template: Delete", map[string]interface{}{"name": data.Name.ValueString()})
 
-	if err := r.client.DeleteTemplate(data.Name.ValueString()); err != nil {
+	if err := r.client.DeleteTemplate(data.UID.ValueString()); err != nil {
 		resp.Diagnostics.AddError("Error deleting Cobbler Template", err.Error())
 	}
 }

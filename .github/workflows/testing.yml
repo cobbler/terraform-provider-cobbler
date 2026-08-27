@@ -58,7 +58,7 @@ jobs:
           - terraform
           - opentofu
         cobbler_version:
-          - v4.0.0b1
+          - v4.0.0b5
       fail-fast: false
     steps:
       - name: Check out code into the Go module directory
@@ -112,7 +112,7 @@ jobs:
             *.iso
           key: ${{ steps.cache-iso-restore.outputs.cache-primary-key }}
       - name: Upload coverage report to GH artifacts
-        if: matrix.cobbler_version == 'v4.0.0b1' && matrix.tool == 'terraform'
+        if: matrix.cobbler_version == 'v4.0.0b5' && matrix.tool == 'terraform'
         # https://github.com/actions/upload-artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

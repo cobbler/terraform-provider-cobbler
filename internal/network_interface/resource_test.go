@@ -1,6 +1,7 @@
 package network_interface_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/cobbler/terraform-provider-cobbler/internal/acctest"
@@ -60,6 +61,47 @@ func TestAccNetworkInterfaceResource_change(t *testing.T) {
 		},
 	})
 }
+
+// TestAccNetworkInterfaceResource_importNotFound exercises the zero-match branch of the
+// resource's post-import name-to-uid resolution fallback: importing an ID that doesn't match
+// any NetworkInterface on the server must surface a clear "not found" diagnostic instead of a
+// raw client error.
+func TestAccNetworkInterfaceResource_importNotFound(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			acctest.PreCheck(t)
+			acctest.SkipIfCobblerVersionLessThan(t, 4, 0, 0)
+		},
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccNetworkInterfaceResourceImportNotFound,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_network_interface.notfound", "name", "eth0-foo-resource-network-interface-import-not-found"),
+				),
+			},
+			{
+				ResourceName:  "cobbler_network_interface.notfound",
+				ImportState:   true,
+				ImportStateId: "does-not-exist-network-interface-resource",
+				ExpectError:   regexp.MustCompile(`Cobbler NetworkInterface not found`),
+			},
+		},
+	})
+}
+
+const testAccNetworkInterfaceResourceImportNotFound = testAccNetworkInterfaceDistroProfileSystem + `
+resource "cobbler_system" "notfound" {
+  name    = "foo-resource-network-interface-import-not-found"
+  profile = cobbler_profile.foo.uid
+}
+
+resource "cobbler_network_interface" "notfound" {
+  name        = "eth0-${cobbler_system.notfound.name}"
+  system      = cobbler_system.notfound.uid
+  mac_address = "aa:bb:cc:dd:ee:00"
+}
+`
 
 const testAccNetworkInterfaceDistroProfileSystem = `
 resource "cobbler_distro" "foo" {

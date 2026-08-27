@@ -29,8 +29,9 @@ func (d *SystemGroupDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 		Description: "Use this data source to look up a Cobbler system group (4.0.0+).",
 		Attributes: map[string]dsschema.Attribute{
 			"name":    dsschema.StringAttribute{Description: "Name of the group.", Required: true},
+			"uid":     dsschema.StringAttribute{Description: "Server-assigned UID for this system group.", Computed: true},
 			"comment": dsschema.StringAttribute{Description: "Free form text description.", Computed: true},
-			"items":   dsschema.ListAttribute{Description: "Distro names in the group.", Computed: true, ElementType: types.StringType},
+			"items":   dsschema.ListAttribute{Description: "System UIDs in the group.", Computed: true, ElementType: types.StringType},
 		},
 	}
 }
@@ -55,7 +56,17 @@ func (d *SystemGroupDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
-	g, err := d.client.GetSystemGroup(data.Name.ValueString(), false, false)
+	matches, err := d.client.FindSystemGroup(map[string]interface{}{"name": data.Name.ValueString()}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler SystemGroup uid", err.Error())
+		return
+	}
+	uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "SystemGroup", data.Name.ValueString(), matches, func(sg *cobbler.SystemGroup) string { return sg.Uid })
+	if !ok {
+		return
+	}
+
+	g, err := d.client.GetSystemGroup(uid, false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler SystemGroup", err.Error())
 		return

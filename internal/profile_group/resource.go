@@ -43,6 +43,13 @@ func (r *ProfileGroupResource) Schema(_ context.Context, _ resource.SchemaReques
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this profile group.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"comment": schema.StringAttribute{
 				Description: "Free form text description.",
 				Optional:    true,
@@ -52,7 +59,7 @@ func (r *ProfileGroupResource) Schema(_ context.Context, _ resource.SchemaReques
 				},
 			},
 			"items": schema.ListAttribute{
-				Description: "Names of the distros belonging to this group.",
+				Description: "UIDs of the profiles belonging to this group.",
 				Optional:    true,
 				Computed:    true,
 				ElementType: types.StringType,
@@ -95,6 +102,7 @@ func modelToGroup(ctx context.Context, data profileGroupResourceModel, diags *di
 
 func groupToModel(ctx context.Context, g cobbler.ProfileGroup, data *profileGroupResourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(g.Name)
+	data.UID = types.StringValue(g.Uid)
 	data.Comment = types.StringValue(g.Comment)
 
 	items := g.Members
@@ -108,6 +116,7 @@ func groupToModel(ctx context.Context, g cobbler.ProfileGroup, data *profileGrou
 
 func groupToDataSourceModel(ctx context.Context, g cobbler.ProfileGroup, data *profileGroupDataSourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(g.Name)
+	data.UID = types.StringValue(g.Uid)
 	data.Comment = types.StringValue(g.Comment)
 
 	items := g.Members
@@ -153,7 +162,20 @@ func (r *ProfileGroupResource) Read(ctx context.Context, req resource.ReadReques
 		return
 	}
 
-	g, err := r.client.GetProfileGroup(data.Name.ValueString(), false, false)
+	if data.UID.IsNull() || data.UID.IsUnknown() || data.UID.ValueString() == "" {
+		matches, err := r.client.FindProfileGroup(map[string]interface{}{"name": data.Name.ValueString()}, false)
+		if err != nil {
+			resp.Diagnostics.AddError("Error resolving Cobbler ProfileGroup uid", err.Error())
+			return
+		}
+		uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "ProfileGroup", data.Name.ValueString(), matches, func(pg *cobbler.ProfileGroup) string { return pg.Uid })
+		if !ok {
+			return
+		}
+		data.UID = types.StringValue(uid)
+	}
+
+	g, err := r.client.GetProfileGroup(data.UID.ValueString(), false, false)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			resp.State.RemoveResource(ctx)
@@ -189,7 +211,7 @@ func (r *ProfileGroupResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	updated, err := r.client.GetProfileGroup(g.Name, false, false)
+	updated, err := r.client.GetProfileGroup(data.UID.ValueString(), false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler ProfileGroup after update", err.Error())
 		return
@@ -211,7 +233,7 @@ func (r *ProfileGroupResource) Delete(ctx context.Context, req resource.DeleteRe
 
 	tflog.Debug(ctx, "Cobbler ProfileGroup: Delete", map[string]interface{}{"name": data.Name.ValueString()})
 
-	if err := r.client.DeleteProfileGroup(data.Name.ValueString()); err != nil {
+	if err := r.client.DeleteProfileGroup(data.UID.ValueString()); err != nil {
 		resp.Diagnostics.AddError("Error deleting Cobbler ProfileGroup", err.Error())
 	}
 }

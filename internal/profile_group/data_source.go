@@ -29,8 +29,9 @@ func (d *ProfileGroupDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 		Description: "Use this data source to look up a Cobbler profile group (4.0.0+).",
 		Attributes: map[string]dsschema.Attribute{
 			"name":    dsschema.StringAttribute{Description: "Name of the group.", Required: true},
+			"uid":     dsschema.StringAttribute{Description: "Server-assigned UID for this profile group.", Computed: true},
 			"comment": dsschema.StringAttribute{Description: "Free form text description.", Computed: true},
-			"items":   dsschema.ListAttribute{Description: "Distro names in the group.", Computed: true, ElementType: types.StringType},
+			"items":   dsschema.ListAttribute{Description: "Profile UIDs in the group.", Computed: true, ElementType: types.StringType},
 		},
 	}
 }
@@ -55,7 +56,17 @@ func (d *ProfileGroupDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 
-	g, err := d.client.GetProfileGroup(data.Name.ValueString(), false, false)
+	matches, err := d.client.FindProfileGroup(map[string]interface{}{"name": data.Name.ValueString()}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler ProfileGroup uid", err.Error())
+		return
+	}
+	uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "ProfileGroup", data.Name.ValueString(), matches, func(pg *cobbler.ProfileGroup) string { return pg.Uid })
+	if !ok {
+		return
+	}
+
+	g, err := d.client.GetProfileGroup(uid, false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler ProfileGroup", err.Error())
 		return

@@ -43,6 +43,13 @@ func (r *DistroGroupResource) Schema(_ context.Context, _ resource.SchemaRequest
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"uid": schema.StringAttribute{
+				Description: "Server-assigned UID for this distro group.",
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"comment": schema.StringAttribute{
 				Description: "Free form text description.",
 				Optional:    true,
@@ -52,7 +59,7 @@ func (r *DistroGroupResource) Schema(_ context.Context, _ resource.SchemaRequest
 				},
 			},
 			"items": schema.ListAttribute{
-				Description: "Names of the distros belonging to this group.",
+				Description: "UIDs of the distros belonging to this group.",
 				Optional:    true,
 				Computed:    true,
 				ElementType: types.StringType,
@@ -95,6 +102,7 @@ func modelToGroup(ctx context.Context, data distroGroupResourceModel, diags *dia
 
 func groupToModel(ctx context.Context, g cobbler.DistroGroup, data *distroGroupResourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(g.Name)
+	data.UID = types.StringValue(g.Uid)
 	data.Comment = types.StringValue(g.Comment)
 
 	items := g.Members
@@ -108,6 +116,7 @@ func groupToModel(ctx context.Context, g cobbler.DistroGroup, data *distroGroupR
 
 func groupToDataSourceModel(ctx context.Context, g cobbler.DistroGroup, data *distroGroupDataSourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(g.Name)
+	data.UID = types.StringValue(g.Uid)
 	data.Comment = types.StringValue(g.Comment)
 
 	items := g.Members
@@ -153,7 +162,20 @@ func (r *DistroGroupResource) Read(ctx context.Context, req resource.ReadRequest
 		return
 	}
 
-	g, err := r.client.GetDistroGroup(data.Name.ValueString(), false, false)
+	if data.UID.IsNull() || data.UID.IsUnknown() || data.UID.ValueString() == "" {
+		matches, err := r.client.FindDistroGroup(map[string]interface{}{"name": data.Name.ValueString()}, false)
+		if err != nil {
+			resp.Diagnostics.AddError("Error resolving Cobbler DistroGroup uid", err.Error())
+			return
+		}
+		uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "DistroGroup", data.Name.ValueString(), matches, func(dg *cobbler.DistroGroup) string { return dg.Uid })
+		if !ok {
+			return
+		}
+		data.UID = types.StringValue(uid)
+	}
+
+	g, err := r.client.GetDistroGroup(data.UID.ValueString(), false, false)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			resp.State.RemoveResource(ctx)
@@ -189,7 +211,7 @@ func (r *DistroGroupResource) Update(ctx context.Context, req resource.UpdateReq
 		return
 	}
 
-	updated, err := r.client.GetDistroGroup(g.Name, false, false)
+	updated, err := r.client.GetDistroGroup(data.UID.ValueString(), false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler DistroGroup after update", err.Error())
 		return
@@ -211,7 +233,7 @@ func (r *DistroGroupResource) Delete(ctx context.Context, req resource.DeleteReq
 
 	tflog.Debug(ctx, "Cobbler DistroGroup: Delete", map[string]interface{}{"name": data.Name.ValueString()})
 
-	if err := r.client.DeleteDistroGroup(data.Name.ValueString()); err != nil {
+	if err := r.client.DeleteDistroGroup(data.UID.ValueString()); err != nil {
 		resp.Diagnostics.AddError("Error deleting Cobbler DistroGroup", err.Error())
 	}
 }

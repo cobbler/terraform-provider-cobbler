@@ -1,6 +1,7 @@
 package distro_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/cobbler/terraform-provider-cobbler/internal/acctest"
@@ -86,6 +87,42 @@ func TestAccDistroResource_change(t *testing.T) {
 const testAccDistroResourceBasic = `
 resource "cobbler_distro" "foo" {
   name       = "foo-resource-distro-basic"
+  breed      = "ubuntu"
+  os_version = "focal"
+  arch       = "x86_64"
+  kernel     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+  initrd     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
+}
+`
+
+// TestAccDistroResource_importNotFound exercises the zero-match branch of the resource's
+// post-import name-to-uid resolution fallback (used because ImportStatePassthroughID only
+// populates "name", leaving "uid" null): importing an ID that doesn't match any Distro on the
+// server must surface a clear "not found" diagnostic instead of a raw client error.
+func TestAccDistroResource_importNotFound(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccDistroResourceImportNotFound,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_distro.notfound", "name", "foo-resource-distro-import-not-found"),
+				),
+			},
+			{
+				ResourceName:  "cobbler_distro.notfound",
+				ImportState:   true,
+				ImportStateId: "does-not-exist-distro-resource",
+				ExpectError:   regexp.MustCompile(`Cobbler Distro not found`),
+			},
+		},
+	})
+}
+
+const testAccDistroResourceImportNotFound = `
+resource "cobbler_distro" "notfound" {
+  name       = "foo-resource-distro-import-not-found"
   breed      = "ubuntu"
   os_version = "focal"
   arch       = "x86_64"
