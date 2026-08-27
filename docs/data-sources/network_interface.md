@@ -38,6 +38,7 @@ Use this data source to look up a Cobbler network interface (Cobbler 4.0.0+).
 - `static` (Boolean) Static (true) or DHCP (false).
 - `system` (String) The UID of the parent system.
 - `system_name` (String) The name of the parent system.
+- `uid` (String) Server-assigned UID for this network interface.
 - `virt_bridge` (Attributes) The virtual bridge to attach to (inheritable). (see [below for nested schema](#nestedatt--virt_bridge))
 
 <a id="nestedatt--dns"></a>

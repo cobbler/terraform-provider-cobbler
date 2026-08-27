@@ -533,7 +533,7 @@ func (r *SystemResource) Create(ctx context.Context, req resource.CreateRequest,
 	}
 
 	// Read back the system to get computed values
-	readSystem, err := r.client.GetSystem(newSystem.Name, false, false)
+	readSystem, err := r.client.GetSystem(newSystem.Uid, false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler System after create", err.Error())
 		return
@@ -554,7 +554,20 @@ func (r *SystemResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	system, err := r.client.GetSystem(data.Name.ValueString(), false, false)
+	if data.UID.IsNull() || data.UID.IsUnknown() || data.UID.ValueString() == "" {
+		matches, err := r.client.FindSystem(map[string]interface{}{"name": data.Name.ValueString()}, false)
+		if err != nil {
+			resp.Diagnostics.AddError("Error resolving Cobbler System uid", err.Error())
+			return
+		}
+		uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "System", data.Name.ValueString(), matches, func(s *cobbler.System) string { return s.Uid })
+		if !ok {
+			return
+		}
+		data.UID = types.StringValue(uid)
+	}
+
+	system, err := r.client.GetSystem(data.UID.ValueString(), false, false)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			resp.State.RemoveResource(ctx)
@@ -598,7 +611,7 @@ func (r *SystemResource) Update(ctx context.Context, req resource.UpdateRequest,
 	}
 
 	// Read back updated system
-	readSystem, err := r.client.GetSystem(plan.Name.ValueString(), false, false)
+	readSystem, err := r.client.GetSystem(plan.UID.ValueString(), false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler System after update", err.Error())
 		return
@@ -621,7 +634,7 @@ func (r *SystemResource) Delete(ctx context.Context, req resource.DeleteRequest,
 
 	tflog.Debug(ctx, "Cobbler System: Delete", map[string]interface{}{"name": data.Name.ValueString()})
 
-	if err := r.client.DeleteSystem(data.Name.ValueString()); err != nil {
+	if err := r.client.DeleteSystem(data.UID.ValueString()); err != nil {
 		resp.Diagnostics.AddError("Error deleting Cobbler System", err.Error())
 	}
 }

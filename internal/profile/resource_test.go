@@ -1,6 +1,7 @@
 package profile_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/cobbler/terraform-provider-cobbler/internal/acctest"
@@ -57,6 +58,46 @@ func TestAccProfileResource_change(t *testing.T) {
 		},
 	})
 }
+
+// TestAccProfileResource_importNotFound exercises the zero-match branch of the resource's
+// post-import name-to-uid resolution fallback: importing an ID that doesn't match any Profile
+// on the server must surface a clear "not found" diagnostic instead of a raw client error.
+func TestAccProfileResource_importNotFound(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t); acctest.SkipIfCobblerVersionLessThan(t, 3, 3, 5) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccProfileResourceImportNotFound,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_profile.notfound", "name", "foo-resource-profile-import-not-found"),
+				),
+			},
+			{
+				ResourceName:  "cobbler_profile.notfound",
+				ImportState:   true,
+				ImportStateId: "does-not-exist-profile-resource",
+				ExpectError:   regexp.MustCompile(`Cobbler Profile not found`),
+			},
+		},
+	})
+}
+
+const testAccProfileResourceImportNotFound = `
+resource "cobbler_distro" "notfound" {
+  name       = "foo-resource-profile-import-not-found"
+  breed      = "ubuntu"
+  os_version = "focal"
+  arch       = "x86_64"
+  kernel     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+  initrd     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
+}
+
+resource "cobbler_profile" "notfound" {
+  name   = "foo-resource-profile-import-not-found"
+  distro = cobbler_distro.notfound.uid
+}
+`
 
 const testAccProfileResourceBasic = `
 resource "cobbler_distro" "foo" {

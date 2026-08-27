@@ -32,6 +32,7 @@ func (d *NetworkInterfaceDataSource) Schema(_ context.Context, _ datasource.Sche
 				Description: "The interface's name (globally unique across all systems, since network interfaces are a flat, top-level Cobbler collection).",
 				Required:    true,
 			},
+			"uid":              dsschema.StringAttribute{Description: "Server-assigned UID for this network interface.", Computed: true},
 			"system":           dsschema.StringAttribute{Description: "The UID of the parent system.", Computed: true},
 			"system_name":      dsschema.StringAttribute{Description: "The name of the parent system.", Computed: true},
 			"comment":          dsschema.StringAttribute{Description: "Free form text description.", Computed: true},
@@ -108,7 +109,17 @@ func (d *NetworkInterfaceDataSource) Read(ctx context.Context, req datasource.Re
 		return
 	}
 
-	iface, err := d.client.GetNetworkInterface(data.Name.ValueString(), false, false)
+	matches, err := d.client.FindNetworkInterface(map[string]interface{}{"name": data.Name.ValueString()}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler NetworkInterface uid", err.Error())
+		return
+	}
+	uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "NetworkInterface", data.Name.ValueString(), matches, func(n *cobbler.NetworkInterface) string { return n.Uid })
+	if !ok {
+		return
+	}
+
+	iface, err := d.client.GetNetworkInterface(uid, false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler NetworkInterface", err.Error())
 		return

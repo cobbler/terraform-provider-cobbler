@@ -1,6 +1,7 @@
 package image_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/cobbler/terraform-provider-cobbler/internal/acctest"
@@ -89,6 +90,41 @@ const testAccImageResourceBasic = `
 resource "cobbler_image" "foo" {
   name       = "foo-resource-image-basic"
   file       = "/var/www/cobbler/images/foo-basic.iso"
+  breed      = "ubuntu"
+  os_version = "focal"
+  arch       = "x86_64"
+  image_type = "iso"
+}
+`
+
+// TestAccImageResource_importNotFound exercises the zero-match branch of the resource's
+// post-import name-to-uid resolution fallback: importing an ID that doesn't match any Image on
+// the server must surface a clear "not found" diagnostic instead of a raw client error.
+func TestAccImageResource_importNotFound(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccImageResourceImportNotFound,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_image.notfound", "name", "foo-resource-image-import-not-found"),
+				),
+			},
+			{
+				ResourceName:  "cobbler_image.notfound",
+				ImportState:   true,
+				ImportStateId: "does-not-exist-image-resource",
+				ExpectError:   regexp.MustCompile(`Cobbler Image not found`),
+			},
+		},
+	})
+}
+
+const testAccImageResourceImportNotFound = `
+resource "cobbler_image" "notfound" {
+  name       = "foo-resource-image-import-not-found"
+  file       = "/var/www/cobbler/images/foo-import-not-found.iso"
   breed      = "ubuntu"
   os_version = "focal"
   arch       = "x86_64"

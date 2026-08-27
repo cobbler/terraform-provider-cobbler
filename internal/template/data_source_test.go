@@ -1,6 +1,7 @@
 package template_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/cobbler/terraform-provider-cobbler/internal/acctest"
@@ -25,6 +26,31 @@ func TestAccTemplateDataSource_basic(t *testing.T) {
 		},
 	})
 }
+
+// TestAccTemplateDataSource_notFound exercises the zero-match branch of the data source's
+// name-to-uid resolution: looking up a name that doesn't exist on the server must surface a
+// clear "not found" diagnostic instead of a raw client error.
+func TestAccTemplateDataSource_notFound(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			acctest.PreCheck(t)
+			acctest.SkipIfCobblerVersionLessThan(t, 4, 0, 0)
+		},
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccTemplateDataSourceNotFound,
+				ExpectError: regexp.MustCompile(`Cobbler Template not found`),
+			},
+		},
+	})
+}
+
+const testAccTemplateDataSourceNotFound = `
+data "cobbler_template" "notfound" {
+  name = "does-not-exist-template-data-source"
+}
+`
 
 const testAccTemplateDataSourceBasic = `
 resource "cobbler_template" "foo" {

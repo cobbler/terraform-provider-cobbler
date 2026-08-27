@@ -262,7 +262,20 @@ func (r *DistroResource) Read(ctx context.Context, req resource.ReadRequest, res
 		return
 	}
 
-	distro, err := r.client.GetDistro(data.Name.ValueString(), false, false)
+	if data.UID.IsNull() || data.UID.IsUnknown() || data.UID.ValueString() == "" {
+		matches, err := r.client.FindDistro(map[string]interface{}{"name": data.Name.ValueString()}, false)
+		if err != nil {
+			resp.Diagnostics.AddError("Error resolving Cobbler Distro uid", err.Error())
+			return
+		}
+		uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "Distro", data.Name.ValueString(), matches, func(d *cobbler.Distro) string { return d.Uid })
+		if !ok {
+			return
+		}
+		data.UID = types.StringValue(uid)
+	}
+
+	distro, err := r.client.GetDistro(data.UID.ValueString(), false, false)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			resp.State.RemoveResource(ctx)
@@ -299,7 +312,7 @@ func (r *DistroResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
-	updatedDistro, err := r.client.GetDistro(data.Name.ValueString(), false, false)
+	updatedDistro, err := r.client.GetDistro(data.UID.ValueString(), false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler Distro after update", err.Error())
 		return
@@ -322,7 +335,7 @@ func (r *DistroResource) Delete(ctx context.Context, req resource.DeleteRequest,
 
 	tflog.Debug(ctx, "Cobbler Distro: Delete", map[string]interface{}{"name": data.Name.ValueString()})
 
-	if err := r.client.DeleteDistro(data.Name.ValueString()); err != nil {
+	if err := r.client.DeleteDistro(data.UID.ValueString()); err != nil {
 		resp.Diagnostics.AddError("Error deleting Cobbler Distro", err.Error())
 	}
 }

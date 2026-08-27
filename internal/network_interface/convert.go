@@ -206,6 +206,7 @@ func modelToInterface(ctx context.Context, data networkInterfaceResourceModel, d
 // interfaceToModel populates a resource model from a NetworkInterface.
 func interfaceToModel(ctx context.Context, iface cobbler.NetworkInterface, data *networkInterfaceResourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(iface.Name)
+	data.UID = types.StringValue(iface.Uid)
 	data.System = types.StringValue(iface.SystemUid)
 	data.SystemName = types.StringValue(iface.SystemName)
 	data.Comment = types.StringValue(iface.Comment)
@@ -229,6 +230,7 @@ func interfaceToModel(ctx context.Context, iface cobbler.NetworkInterface, data 
 // interfaceToDataSourceModel populates a data source model from a NetworkInterface.
 func interfaceToDataSourceModel(ctx context.Context, iface cobbler.NetworkInterface, data *networkInterfaceDataSourceModel, diags *diag.Diagnostics) {
 	data.Name = types.StringValue(iface.Name)
+	data.UID = types.StringValue(iface.Uid)
 	data.System = types.StringValue(iface.SystemUid)
 	data.SystemName = types.StringValue(iface.SystemName)
 	data.Comment = types.StringValue(iface.Comment)

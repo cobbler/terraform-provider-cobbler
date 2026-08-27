@@ -46,6 +46,10 @@ resource "cobbler_repo" "my_repo" {
 - `proxy` (Attributes) Proxy to use for downloading the repo. (see [below for nested schema](#nestedatt--proxy))
 - `rpm_list` (List of String) List of specific RPMs to mirror.
 
+### Read-Only
+
+- `uid` (String) Server-assigned UID for this repo.
+
 <a id="nestedatt--createrepo_flags"></a>
 ### Nested Schema for `createrepo_flags`
 

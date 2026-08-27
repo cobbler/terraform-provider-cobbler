@@ -1,6 +1,7 @@
 package repo_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/cobbler/terraform-provider-cobbler/internal/acctest"
@@ -59,6 +60,41 @@ func TestAccRepoResource_change(t *testing.T) {
 		},
 	})
 }
+
+// TestAccRepoResource_importNotFound exercises the zero-match branch of the resource's
+// post-import name-to-uid resolution fallback: importing an ID that doesn't match any Repo on
+// the server must surface a clear "not found" diagnostic instead of a raw client error.
+func TestAccRepoResource_importNotFound(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccRepoResourceImportNotFound,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_repo.notfound", "name", "foo-resource-repo-import-not-found"),
+				),
+			},
+			{
+				ResourceName:  "cobbler_repo.notfound",
+				ImportState:   true,
+				ImportStateId: "does-not-exist-repo-resource",
+				ExpectError:   regexp.MustCompile(`Cobbler Repo not found`),
+			},
+		},
+	})
+}
+
+const testAccRepoResourceImportNotFound = `
+resource "cobbler_repo" "notfound" {
+  name           = "foo-resource-repo-import-not-found"
+  breed          = "apt"
+  arch           = "x86_64"
+  apt_components = ["main"]
+  apt_dists      = ["focal"]
+  mirror         = "http://us.archive.ubuntu.com/ubuntu/"
+}
+`
 
 const testAccRepoResourceBasic = `
 resource "cobbler_repo" "foo" {

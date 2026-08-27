@@ -1,6 +1,7 @@
 package template_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/cobbler/terraform-provider-cobbler/internal/acctest"
@@ -65,6 +66,44 @@ func TestAccTemplateResource_change(t *testing.T) {
 		},
 	})
 }
+
+// TestAccTemplateResource_importNotFound exercises the zero-match branch of the resource's
+// post-import name-to-uid resolution fallback: importing an ID that doesn't match any Template
+// on the server must surface a clear "not found" diagnostic instead of a raw client error.
+func TestAccTemplateResource_importNotFound(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			acctest.PreCheck(t)
+			acctest.SkipIfCobblerVersionLessThan(t, 4, 0, 0)
+		},
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccTemplateResourceImportNotFound,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_template.notfound", "name", "foo-resource-template-import-not-found"),
+				),
+			},
+			{
+				ResourceName:  "cobbler_template.notfound",
+				ImportState:   true,
+				ImportStateId: "does-not-exist-template-resource",
+				ExpectError:   regexp.MustCompile(`Cobbler Template not found`),
+			},
+		},
+	})
+}
+
+const testAccTemplateResourceImportNotFound = `
+resource "cobbler_template" "notfound" {
+  name    = "foo-resource-template-import-not-found"
+  uri = {
+    schema = "file"
+    path   = "foo-resource-template-import-not-found.j2"
+  }
+  content = "# import not found test content\n"
+}
+`
 
 const testAccTemplateResourceBasic = `
 resource "cobbler_template" "foo" {

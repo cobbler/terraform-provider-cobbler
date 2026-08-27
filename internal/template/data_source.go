@@ -29,6 +29,7 @@ func (d *TemplateDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 		Description: "Use this data source to look up a Cobbler template (4.0.0+).",
 		Attributes: map[string]dsschema.Attribute{
 			"name":          dsschema.StringAttribute{Description: "The name of the template.", Required: true},
+			"uid":           dsschema.StringAttribute{Description: "Server-assigned UID for this template.", Computed: true},
 			"comment":       dsschema.StringAttribute{Description: "Free form text description.", Computed: true},
 			"template_type": dsschema.StringAttribute{Description: "The template engine.", Computed: true},
 			"uri": dsschema.SingleNestedAttribute{
@@ -66,7 +67,17 @@ func (d *TemplateDataSource) Read(ctx context.Context, req datasource.ReadReques
 		return
 	}
 
-	tpl, err := d.client.GetTemplate(data.Name.ValueString(), false, false)
+	matches, err := d.client.FindTemplate(map[string]interface{}{"name": data.Name.ValueString()}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler Template uid", err.Error())
+		return
+	}
+	uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "Template", data.Name.ValueString(), matches, func(t *cobbler.Template) string { return t.Uid })
+	if !ok {
+		return
+	}
+
+	tpl, err := d.client.GetTemplate(uid, false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler Template", err.Error())
 		return

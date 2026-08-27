@@ -155,7 +155,17 @@ func (d *DistroDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 
-	distroPtr, err := d.client.GetDistro(data.Name.ValueString(), false, false)
+	matches, err := d.client.FindDistro(map[string]interface{}{"name": data.Name.ValueString()}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler Distro uid", err.Error())
+		return
+	}
+	uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "Distro", data.Name.ValueString(), matches, func(d *cobbler.Distro) string { return d.Uid })
+	if !ok {
+		return
+	}
+
+	distroPtr, err := d.client.GetDistro(uid, false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler Distro", err.Error())
 		return

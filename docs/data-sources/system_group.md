@@ -23,3 +23,4 @@ Use this data source to look up a Cobbler system group (4.0.0+).
 
 - `comment` (String) Free form text description.
 - `items` (List of String) Distro names in the group.
+- `uid` (String) Server-assigned UID for this system group.

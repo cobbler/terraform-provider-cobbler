@@ -29,6 +29,7 @@ func (d *DistroGroupDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 		Description: "Use this data source to look up a Cobbler distro group (4.0.0+).",
 		Attributes: map[string]dsschema.Attribute{
 			"name":    dsschema.StringAttribute{Description: "Name of the group.", Required: true},
+			"uid":     dsschema.StringAttribute{Description: "Server-assigned UID for this distro group.", Computed: true},
 			"comment": dsschema.StringAttribute{Description: "Free form text description.", Computed: true},
 			"items":   dsschema.ListAttribute{Description: "Distro names in the group.", Computed: true, ElementType: types.StringType},
 		},
@@ -55,7 +56,17 @@ func (d *DistroGroupDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 
-	g, err := d.client.GetDistroGroup(data.Name.ValueString(), false, false)
+	matches, err := d.client.FindDistroGroup(map[string]interface{}{"name": data.Name.ValueString()}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler DistroGroup uid", err.Error())
+		return
+	}
+	uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "DistroGroup", data.Name.ValueString(), matches, func(dg *cobbler.DistroGroup) string { return dg.Uid })
+	if !ok {
+		return
+	}
+
+	g, err := d.client.GetDistroGroup(uid, false, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Error reading Cobbler DistroGroup", err.Error())
 		return
