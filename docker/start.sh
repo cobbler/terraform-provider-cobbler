@@ -6,7 +6,7 @@ if [ -z "$1" ]
     echo "No cobbler server url supplied"
 fi
 
-cobbler_image_tag=v4.0.0b5
+cobbler_image_tag=v4.0.0b6
 iso_url=https://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso
 iso_os=ubuntu
 valid_iso_checksum=00a9d46306fbe9beb3581853a289490bc231c51f
