@@ -3,7 +3,7 @@ services:
     image: ghcr.io/cobbler/cobblerd:${COBBLER_IMAGE_TAG:-latest}
     container_name: cobbler-dev
     environment:
-      - COBBLER_XMLRPC_BIND_ADDRESS=0.0.0.0
+      - COBBLER_XMLRPC_BIND_ADDRESS_V4=0.0.0.0
     volumes:
       - ../extracted_iso_image:/extracted_iso_image:ro,z
     ports:
