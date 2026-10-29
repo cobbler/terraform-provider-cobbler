@@ -675,7 +675,7 @@ func modelToSystem(ctx context.Context, data systemResourceModel, diags *diag.Di
 	system.Status = data.Status.ValueString()
 	system.Virt.DiskDriver = systemStringOrInherit(data.VirtDiskDriver)
 	system.Virt.Path = data.VirtPath.ValueString()
-	system.VirtPXEBoot = data.VirtPXEBoot.ValueBool()
+	system.Virt.PxeBoot = data.VirtPXEBoot.ValueBool()
 	system.Virt.Type = systemStringOrInherit(data.VirtType)
 	system.Virt.UEFI = data.VirtUEFI.ValueBool()
 
@@ -734,7 +734,7 @@ func systemToModel(ctx context.Context, system cobbler.System, data *systemResou
 	data.Status = types.StringValue(system.Status)
 	data.VirtDiskDriver = types.StringValue(system.Virt.DiskDriver)
 	data.VirtPath = types.StringValue(system.Virt.Path)
-	data.VirtPXEBoot = types.BoolValue(system.VirtPXEBoot)
+	data.VirtPXEBoot = types.BoolValue(system.Virt.PxeBoot)
 	data.VirtType = types.StringValue(system.Virt.Type)
 	data.VirtUEFI = types.BoolValue(system.Virt.UEFI)
 
