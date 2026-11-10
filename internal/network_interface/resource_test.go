@@ -62,6 +62,30 @@ func TestAccNetworkInterfaceResource_change(t *testing.T) {
 	})
 }
 
+// TestAccNetworkInterfaceResource_gateway exercises the per-address-family default gateway,
+// which Cobbler 4.0.0 models as IPv4Option.DefaultGateway / IPv6Option.DefaultGateway (see
+// cobbler/items/options/ip.py) rather than as a standalone NetworkInterface field.
+func TestAccNetworkInterfaceResource_gateway(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			acctest.PreCheck(t)
+			acctest.SkipIfCobblerVersionLessThan(t, 4, 0, 0)
+		},
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccNetworkInterfaceResourceGateway,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_network_interface.eth0", "ipv4.address", "1.2.3.4"),
+					resource.TestCheckResourceAttr("cobbler_network_interface.eth0", "ipv4.gateway", "1.2.3.1"),
+					resource.TestCheckResourceAttr("cobbler_network_interface.eth0", "ipv6.address", "2001:db8::4"),
+					resource.TestCheckResourceAttr("cobbler_network_interface.eth0", "ipv6.default_gateway", "2001:db8::1"),
+				),
+			},
+		},
+	})
+}
+
 // TestAccNetworkInterfaceResource_importNotFound exercises the zero-match branch of the
 // resource's post-import name-to-uid resolution fallback: importing an ID that doesn't match
 // any NetworkInterface on the server must surface a clear "not found" diagnostic instead of a
@@ -89,6 +113,64 @@ func TestAccNetworkInterfaceResource_importNotFound(t *testing.T) {
 		},
 	})
 }
+
+// TestAccNetworkInterfaceResource_importComposite exercises importing a NetworkInterface
+// whose name ("eth0") collides with another system's interface of the same name — the
+// overwhelmingly common real-world case, since most systems name their primary interface
+// eth0. A bare-name import can't disambiguate between the two and fails with "Ambiguous
+// Cobbler NetworkInterface name"; a composite "<system_name>/<interface_name>" import ID
+// must resolve the system name to a uid first and scope the NetworkInterface lookup to
+// that system, importing the correct interface (verified via its distinguishing
+// mac_address, not just "something" got imported).
+func TestAccNetworkInterfaceResource_importComposite(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			acctest.PreCheck(t)
+			acctest.SkipIfCobblerVersionLessThan(t, 4, 0, 0)
+		},
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccNetworkInterfaceResourceImportComposite,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_network_interface.eth0_a", "mac_address", "aa:bb:cc:dd:ee:a1"),
+					resource.TestCheckResourceAttr("cobbler_network_interface.eth0_b", "mac_address", "aa:bb:cc:dd:ee:b1"),
+				),
+			},
+			{
+				ResourceName:                         "cobbler_network_interface.eth0_b",
+				ImportState:                          true,
+				ImportStateVerify:                    true,
+				ImportStateId:                        "foo-resource-network-interface-import-composite-b/eth0",
+				ImportStateVerifyIdentifierAttribute: "mac_address",
+			},
+		},
+	})
+}
+
+const testAccNetworkInterfaceResourceImportComposite = testAccNetworkInterfaceDistroProfileSystem + `
+resource "cobbler_system" "composite_a" {
+  name    = "foo-resource-network-interface-import-composite-a"
+  profile = cobbler_profile.foo.uid
+}
+
+resource "cobbler_system" "composite_b" {
+  name    = "foo-resource-network-interface-import-composite-b"
+  profile = cobbler_profile.foo.uid
+}
+
+resource "cobbler_network_interface" "eth0_a" {
+  name        = "eth0"
+  system      = cobbler_system.composite_a.uid
+  mac_address = "aa:bb:cc:dd:ee:a1"
+}
+
+resource "cobbler_network_interface" "eth0_b" {
+  name        = "eth0"
+  system      = cobbler_system.composite_b.uid
+  mac_address = "aa:bb:cc:dd:ee:b1"
+}
+`
 
 const testAccNetworkInterfaceResourceImportNotFound = testAccNetworkInterfaceDistroProfileSystem + `
 resource "cobbler_system" "notfound" {
@@ -151,6 +233,30 @@ resource "cobbler_network_interface" "eth0" {
   ipv4 = {
     address = "1.2.3.4"
     netmask = "255.255.255.0"
+  }
+}
+`
+
+const testAccNetworkInterfaceResourceGateway = testAccNetworkInterfaceDistroProfileSystem + `
+resource "cobbler_system" "foo" {
+  name    = "foo-resource-network-interface-gateway"
+  profile = cobbler_profile.foo.uid
+}
+
+resource "cobbler_network_interface" "eth0" {
+  name        = "eth0-${cobbler_system.foo.name}"
+  system      = cobbler_system.foo.uid
+  mac_address = "aa:bb:cc:dd:ee:fe"
+  static      = true
+  ipv4 = {
+    address = "1.2.3.4"
+    netmask = "255.255.255.0"
+    gateway = "1.2.3.1"
+  }
+  ipv6 = {
+    address         = "2001:db8::4"
+    prefix          = "64"
+    default_gateway = "2001:db8::1"
   }
 }
 `

@@ -72,25 +72,23 @@ func listToStringSlice(ctx context.Context, l types.List, diags *diag.Diagnostic
 	return ss
 }
 
-// ipv4FromAPI renders the nested "ipv4" object. There is no Gateway field on
-// IPv4Option itself (see NetworkInterface.IfGateway) so the gateway value is
-// passed in separately by the caller.
-func ipv4FromAPI(ctx context.Context, o cobbler.IPv4Option, ifGateway string, diags *diag.Diagnostics) types.Object {
+// ipv4FromAPI renders the nested "ipv4" object.
+func ipv4FromAPI(ctx context.Context, o cobbler.IPv4Option, diags *diag.Diagnostics) types.Object {
 	obj, d := types.ObjectValue(ipv4AttrTypes, map[string]attr.Value{
 		"address":       types.StringValue(o.Address),
 		"netmask":       types.StringValue(o.Netmask),
-		"gateway":       types.StringValue(ifGateway),
+		"gateway":       types.StringValue(o.DefaultGateway),
 		"static_routes": stringSliceToList(ctx, o.StaticRoutes, diags),
 	})
 	diags.Append(d...)
 	return obj
 }
 
-// ipv4ToAPI extracts the IPv4Option fields plus the "gateway" value, which the
-// caller is responsible for assigning to NetworkInterface.IfGateway.
-func ipv4ToAPI(ctx context.Context, obj types.Object, diags *diag.Diagnostics) (cobbler.IPv4Option, string) {
+// ipv4ToAPI extracts the IPv4Option fields, including "gateway" as
+// IPv4Option.DefaultGateway.
+func ipv4ToAPI(ctx context.Context, obj types.Object, diags *diag.Diagnostics) cobbler.IPv4Option {
 	if obj.IsNull() || obj.IsUnknown() {
-		return cobbler.IPv4Option{StaticRoutes: []string{}}, ""
+		return cobbler.IPv4Option{StaticRoutes: []string{}}
 	}
 	attrs := obj.Attributes()
 	address, _ := attrs["address"].(types.String)
@@ -98,21 +96,20 @@ func ipv4ToAPI(ctx context.Context, obj types.Object, diags *diag.Diagnostics) (
 	gateway, _ := attrs["gateway"].(types.String)
 	routes, _ := attrs["static_routes"].(types.List)
 	return cobbler.IPv4Option{
-		Address:      address.ValueString(),
-		Netmask:      netmask.ValueString(),
-		StaticRoutes: listToStringSlice(ctx, routes, diags),
-	}, gateway.ValueString()
+		Address:        address.ValueString(),
+		Netmask:        netmask.ValueString(),
+		DefaultGateway: gateway.ValueString(),
+		StaticRoutes:   listToStringSlice(ctx, routes, diags),
+	}
 }
 
-// ipv6FromAPI renders the nested "ipv6" object. There is no DefaultGateway
-// field on IPv6Option itself (see NetworkInterface.Ipv6DefaultGateway) so the
-// gateway value is passed in separately by the caller.
-func ipv6FromAPI(ctx context.Context, o cobbler.IPv6Option, defaultGateway string, diags *diag.Diagnostics) types.Object {
+// ipv6FromAPI renders the nested "ipv6" object.
+func ipv6FromAPI(ctx context.Context, o cobbler.IPv6Option, diags *diag.Diagnostics) types.Object {
 	obj, d := types.ObjectValue(ipv6AttrTypes, map[string]attr.Value{
 		"address":         types.StringValue(o.Address),
 		"prefix":          types.StringValue(o.Prefix),
 		"mtu":             types.StringValue(o.MTU),
-		"default_gateway": types.StringValue(defaultGateway),
+		"default_gateway": types.StringValue(o.DefaultGateway),
 		"secondaries":     stringSliceToList(ctx, o.Secondaries, diags),
 		"static_routes":   stringSliceToList(ctx, o.StaticRoutes, diags),
 	})
@@ -120,12 +117,11 @@ func ipv6FromAPI(ctx context.Context, o cobbler.IPv6Option, defaultGateway strin
 	return obj
 }
 
-// ipv6ToAPI extracts the IPv6Option fields plus the "default_gateway" value,
-// which the caller is responsible for assigning to
-// NetworkInterface.Ipv6DefaultGateway.
-func ipv6ToAPI(ctx context.Context, obj types.Object, diags *diag.Diagnostics) (cobbler.IPv6Option, string) {
+// ipv6ToAPI extracts the IPv6Option fields, including "default_gateway" as
+// IPv6Option.DefaultGateway.
+func ipv6ToAPI(ctx context.Context, obj types.Object, diags *diag.Diagnostics) cobbler.IPv6Option {
 	if obj.IsNull() || obj.IsUnknown() {
-		return cobbler.IPv6Option{Secondaries: []string{}, StaticRoutes: []string{}}, ""
+		return cobbler.IPv6Option{Secondaries: []string{}, StaticRoutes: []string{}}
 	}
 	attrs := obj.Attributes()
 	address, _ := attrs["address"].(types.String)
@@ -135,12 +131,13 @@ func ipv6ToAPI(ctx context.Context, obj types.Object, diags *diag.Diagnostics) (
 	secondaries, _ := attrs["secondaries"].(types.List)
 	routes, _ := attrs["static_routes"].(types.List)
 	return cobbler.IPv6Option{
-		Address:      address.ValueString(),
-		Prefix:       prefix.ValueString(),
-		MTU:          mtu.ValueString(),
-		Secondaries:  listToStringSlice(ctx, secondaries, diags),
-		StaticRoutes: listToStringSlice(ctx, routes, diags),
-	}, gw.ValueString()
+		Address:        address.ValueString(),
+		Prefix:         prefix.ValueString(),
+		MTU:            mtu.ValueString(),
+		DefaultGateway: gw.ValueString(),
+		Secondaries:    listToStringSlice(ctx, secondaries, diags),
+		StaticRoutes:   listToStringSlice(ctx, routes, diags),
+	}
 }
 
 func dnsFromAPI(ctx context.Context, o cobbler.DNSInterfaceOption, diags *diag.Diagnostics) types.Object {
@@ -188,16 +185,13 @@ func modelToInterface(ctx context.Context, data networkInterfaceResourceModel, d
 	iface.MTU = data.MTU.ValueString()
 	iface.VirtBridge = inherit.StringTo(ctx, data.VirtBridge, diags)
 
-	ipv4Opt, ipv4Gateway := ipv4ToAPI(ctx, data.IPv4, diags)
-	iface.IPv4 = ipv4Opt
-	iface.IfGateway = data.IfGateway.ValueString()
-	if iface.IfGateway == "" {
-		iface.IfGateway = ipv4Gateway
+	ipv4Opt := ipv4ToAPI(ctx, data.IPv4, diags)
+	if ifGateway := data.IfGateway.ValueString(); ifGateway != "" {
+		ipv4Opt.DefaultGateway = ifGateway
 	}
+	iface.IPv4 = ipv4Opt
 
-	ipv6Opt, ipv6DefaultGateway := ipv6ToAPI(ctx, data.IPv6, diags)
-	iface.IPv6 = ipv6Opt
-	iface.Ipv6DefaultGateway = ipv6DefaultGateway
+	iface.IPv6 = ipv6ToAPI(ctx, data.IPv6, diags)
 
 	iface.DNS = dnsToAPI(ctx, data.DNS, diags)
 	return iface
@@ -219,11 +213,11 @@ func interfaceToModel(ctx context.Context, iface cobbler.NetworkInterface, data 
 	data.Management = types.BoolValue(iface.Management)
 	data.Static = types.BoolValue(iface.Static)
 	data.DHCPTag = types.StringValue(iface.DHCPTag)
-	data.IfGateway = types.StringValue(iface.IfGateway)
+	data.IfGateway = types.StringValue(iface.IPv4.DefaultGateway)
 	data.MTU = types.StringValue(iface.MTU)
 	data.VirtBridge = inherit.StringFrom(ctx, iface.VirtBridge, diags)
-	data.IPv4 = ipv4FromAPI(ctx, iface.IPv4, iface.IfGateway, diags)
-	data.IPv6 = ipv6FromAPI(ctx, iface.IPv6, iface.Ipv6DefaultGateway, diags)
+	data.IPv4 = ipv4FromAPI(ctx, iface.IPv4, diags)
+	data.IPv6 = ipv6FromAPI(ctx, iface.IPv6, diags)
 	data.DNS = dnsFromAPI(ctx, iface.DNS, diags)
 }
 
@@ -243,10 +237,10 @@ func interfaceToDataSourceModel(ctx context.Context, iface cobbler.NetworkInterf
 	data.Management = types.BoolValue(iface.Management)
 	data.Static = types.BoolValue(iface.Static)
 	data.DHCPTag = types.StringValue(iface.DHCPTag)
-	data.IfGateway = types.StringValue(iface.IfGateway)
+	data.IfGateway = types.StringValue(iface.IPv4.DefaultGateway)
 	data.MTU = types.StringValue(iface.MTU)
 	data.VirtBridge = inherit.StringFrom(ctx, iface.VirtBridge, diags)
-	data.IPv4 = ipv4FromAPI(ctx, iface.IPv4, iface.IfGateway, diags)
-	data.IPv6 = ipv6FromAPI(ctx, iface.IPv6, iface.Ipv6DefaultGateway, diags)
+	data.IPv4 = ipv4FromAPI(ctx, iface.IPv4, diags)
+	data.IPv6 = ipv6FromAPI(ctx, iface.IPv6, diags)
 	data.DNS = dnsFromAPI(ctx, iface.DNS, diags)
 }
