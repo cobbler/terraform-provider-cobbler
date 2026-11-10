@@ -348,7 +348,7 @@ func (d *SystemDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	data.Status = types.StringValue(s.Status)
 	data.VirtDiskDriver = types.StringValue(s.Virt.DiskDriver)
 	data.VirtPath = types.StringValue(s.Virt.Path)
-	data.VirtPXEBoot = types.BoolValue(s.VirtPXEBoot)
+	data.VirtPXEBoot = types.BoolValue(s.Virt.PxeBoot)
 	data.VirtType = types.StringValue(s.Virt.Type)
 	data.VirtUEFI = types.BoolValue(s.Virt.UEFI)
 

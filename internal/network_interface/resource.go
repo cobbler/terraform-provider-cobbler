@@ -469,6 +469,43 @@ func (r *NetworkInterfaceResource) Delete(ctx context.Context, req resource.Dele
 	}
 }
 
+// ImportState supports two import ID forms:
+//
+//   - "<interface_name>" — the bare-name form, passed straight through to the
+//     "name" attribute and resolved to a uid during the subsequent Read, same as
+//     resource.ImportStatePassthroughID. Only works when the interface name is
+//     unique across the whole server.
+//   - "<system_name>/<interface_name>" — a composite form that disambiguates by
+//     scoping the lookup to a single system, for the common case of multiple
+//     systems sharing an interface name (e.g. every system's primary interface
+//     named "eth0"). The system name is resolved to a uid first, then
+//     NetworkInterface is looked up by both name and system_uid.
 func (r *NetworkInterfaceResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughID(ctx, path.Root("name"), req, resp)
+	systemName, ifaceName, isComposite := strings.Cut(req.ID, "/")
+	if !isComposite {
+		resource.ImportStatePassthroughID(ctx, path.Root("name"), req, resp)
+		return
+	}
+
+	systemMatches, err := r.client.FindSystem(map[string]interface{}{"name": systemName}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler System uid", err.Error())
+		return
+	}
+	systemUid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "System", systemName, systemMatches, func(s *cobbler.System) string { return s.Uid })
+	if !ok {
+		return
+	}
+
+	ifaceMatches, err := r.client.FindNetworkInterface(map[string]interface{}{"name": ifaceName, "system_uid": systemUid}, false)
+	if err != nil {
+		resp.Diagnostics.AddError("Error resolving Cobbler NetworkInterface uid", err.Error())
+		return
+	}
+	uid, ok := clientpkg.ResolveUnique(&resp.Diagnostics, "NetworkInterface", ifaceName, ifaceMatches, func(n *cobbler.NetworkInterface) string { return n.Uid })
+	if !ok {
+		return
+	}
+
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("uid"), uid)...)
 }
