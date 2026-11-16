@@ -258,6 +258,17 @@ func (r *TemplateResource) Create(ctx context.Context, req resource.CreateReques
 		return
 	}
 
+	if attrs := data.URI.Attributes(); attrs != nil {
+		if s, ok := attrs["schema"].(types.String); ok && strings.EqualFold(s.ValueString(), "importlib") {
+			resp.Diagnostics.AddError(
+				"Cannot create a built-in Cobbler Template",
+				"uri.schema = \"importlib\" is reserved for Cobbler's own built-in templates, sourced "+
+					"from the server's package resources, not something Terraform can create.",
+			)
+			return
+		}
+	}
+
 	tpl := modelToTemplate(ctx, data, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
@@ -309,6 +320,18 @@ func (r *TemplateResource) Read(ctx context.Context, req resource.ReadRequest, r
 		return
 	}
 
+	if tpl.BuiltIn {
+		resp.Diagnostics.AddError(
+			"Cobbler Template is built-in",
+			"Template \""+tpl.Name+"\" is one of Cobbler's built-in templates (sourced from the "+
+				"server's own package resources, not a real file) and is not something Terraform "+
+				"can manage: it already exists identically on every Cobbler install of the same "+
+				"version, has no independent content to track, and is never user-modifiable. "+
+				"Remove it from your configuration and state instead of importing or managing it.",
+		)
+		return
+	}
+
 	templateToModel(ctx, r.client, *tpl, &data, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
@@ -321,6 +344,14 @@ func (r *TemplateResource) Update(ctx context.Context, req resource.UpdateReques
 	var data templateResourceModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if data.BuiltIn.ValueBool() {
+		resp.Diagnostics.AddError(
+			"Cobbler Template is built-in",
+			"Template \""+data.Name.ValueString()+"\" is a built-in Cobbler template and cannot be modified.",
+		)
 		return
 	}
 
@@ -354,6 +385,14 @@ func (r *TemplateResource) Delete(ctx context.Context, req resource.DeleteReques
 	var data templateResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if data.BuiltIn.ValueBool() {
+		resp.Diagnostics.AddError(
+			"Cobbler Template is built-in",
+			"Template \""+data.Name.ValueString()+"\" is a built-in Cobbler template and cannot be deleted.",
+		)
 		return
 	}
 
