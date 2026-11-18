@@ -23,4 +23,5 @@ Use this data source to look up a Cobbler profile group (4.0.0+).
 
 - `comment` (String) Free form text description.
 - `items` (List of String) Profile UIDs in the group.
+- `parent` (String) UID of the parent profile group.
 - `uid` (String) Server-assigned UID for this profile group.

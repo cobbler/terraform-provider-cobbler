@@ -23,6 +23,7 @@ description: |-
 
 - `comment` (String) Free form text description.
 - `items` (List of String) UIDs of the distros belonging to this group.
+- `parent` (String) UID of the parent distro group. Used for hierarchical (nested) groups.
 
 ### Read-Only
 

@@ -32,6 +32,7 @@ Use this data source to get the details of a Cobbler repo.
 - `mirror` (String) Address of the repo to mirror.
 - `mirror_locally` (Boolean) Whether to copy the files locally or just references to the external files.
 - `owners` (Attributes) List of Owners for authz_ownership. (see [below for nested schema](#nestedatt--owners))
+- `parent` (String) The UID of the parent repo.
 - `proxy` (Attributes) Proxy to use for downloading the repo. (see [below for nested schema](#nestedatt--proxy))
 - `rpm_list` (List of String) List of specific RPMs to mirror.
 - `uid` (String) Server-assigned UID for this repo.

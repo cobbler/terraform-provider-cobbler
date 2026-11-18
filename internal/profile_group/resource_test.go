@@ -131,3 +131,43 @@ resource "cobbler_profile_group" "foo" {
   items   = [cobbler_profile.b.uid]
 }
 `
+
+// TestAccProfileGroupResource_parent verifies that a ProfileGroup's parent (another
+// ProfileGroup — group nesting, distinct from the "items" list of member Profile uids)
+// round-trips correctly.
+func TestAccProfileGroupResource_parent(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			acctest.PreCheck(t)
+			acctest.SkipIfCobblerVersionLessThan(t, 4, 0, 0)
+		},
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccProfileGroupResourceParent,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_profile_group.child", "name", "foo-resource-profile-group-parent-child"),
+					resource.TestCheckResourceAttrPair("cobbler_profile_group.child", "parent", "cobbler_profile_group.parent", "uid"),
+				),
+			},
+			{
+				ResourceName:                         "cobbler_profile_group.child",
+				ImportState:                          true,
+				ImportStateVerify:                    true,
+				ImportStateId:                        "foo-resource-profile-group-parent-child",
+				ImportStateVerifyIdentifierAttribute: "name",
+			},
+		},
+	})
+}
+
+const testAccProfileGroupResourceParent = `
+resource "cobbler_profile_group" "parent" {
+  name = "foo-resource-profile-group-parent-parent"
+}
+
+resource "cobbler_profile_group" "child" {
+  name   = "foo-resource-profile-group-parent-child"
+  parent = cobbler_profile_group.parent.uid
+}
+`

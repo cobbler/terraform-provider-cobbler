@@ -61,6 +61,48 @@ func TestAccRepoResource_change(t *testing.T) {
 	})
 }
 
+// TestAccRepoResource_parent verifies that Repo's parent attribute round-trips correctly;
+// Repo has a real parent property server-side, same as Menu.
+func TestAccRepoResource_parent(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccRepoResourceParent,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_repo.child", "name", "foo-resource-repo-parent-child"),
+					resource.TestCheckResourceAttrPair("cobbler_repo.child", "parent", "cobbler_repo.parent", "uid"),
+				),
+			},
+			{
+				ResourceName:                         "cobbler_repo.child",
+				ImportState:                          true,
+				ImportStateVerify:                    true,
+				ImportStateId:                        "foo-resource-repo-parent-child",
+				ImportStateVerifyIdentifierAttribute: "name",
+			},
+		},
+	})
+}
+
+const testAccRepoResourceParent = `
+resource "cobbler_repo" "parent" {
+  name   = "foo-resource-repo-parent-parent"
+  breed  = "apt"
+  arch   = "x86_64"
+  mirror = "http://us.archive.ubuntu.com/ubuntu/"
+}
+
+resource "cobbler_repo" "child" {
+  name   = "foo-resource-repo-parent-child"
+  breed  = "apt"
+  arch   = "x86_64"
+  mirror = "http://us.archive.ubuntu.com/ubuntu/"
+  parent = cobbler_repo.parent.uid
+}
+`
+
 // TestAccRepoResource_importNotFound exercises the zero-match branch of the resource's
 // post-import name-to-uid resolution fallback: importing an ID that doesn't match any Repo on
 // the server must surface a clear "not found" diagnostic instead of a raw client error.

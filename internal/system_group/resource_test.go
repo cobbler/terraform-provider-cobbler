@@ -136,3 +136,43 @@ resource "cobbler_system_group" "foo" {
   items   = [cobbler_system.b.uid]
 }
 `
+
+// TestAccSystemGroupResource_parent verifies that a SystemGroup's parent (another
+// SystemGroup — group nesting, distinct from the "items" list of member System uids)
+// round-trips correctly.
+func TestAccSystemGroupResource_parent(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			acctest.PreCheck(t)
+			acctest.SkipIfCobblerVersionLessThan(t, 4, 0, 0)
+		},
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccSystemGroupResourceParent,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_system_group.child", "name", "foo-resource-system-group-parent-child"),
+					resource.TestCheckResourceAttrPair("cobbler_system_group.child", "parent", "cobbler_system_group.parent", "uid"),
+				),
+			},
+			{
+				ResourceName:                         "cobbler_system_group.child",
+				ImportState:                          true,
+				ImportStateVerify:                    true,
+				ImportStateId:                        "foo-resource-system-group-parent-child",
+				ImportStateVerifyIdentifierAttribute: "name",
+			},
+		},
+	})
+}
+
+const testAccSystemGroupResourceParent = `
+resource "cobbler_system_group" "parent" {
+  name = "foo-resource-system-group-parent-parent"
+}
+
+resource "cobbler_system_group" "child" {
+  name   = "foo-resource-system-group-parent-child"
+  parent = cobbler_system_group.parent.uid
+}
+`

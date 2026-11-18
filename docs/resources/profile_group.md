@@ -23,6 +23,7 @@ description: |-
 
 - `comment` (String) Free form text description.
 - `items` (List of String) UIDs of the profiles belonging to this group.
+- `parent` (String) UID of the parent profile group. Used for hierarchical (nested) groups.
 
 ### Read-Only
 

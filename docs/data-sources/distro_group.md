@@ -23,4 +23,5 @@ Use this data source to look up a Cobbler distro group (4.0.0+).
 
 - `comment` (String) Free form text description.
 - `items` (List of String) Distro UIDs in the group.
+- `parent` (String) UID of the parent distro group.
 - `uid` (String) Server-assigned UID for this distro group.
