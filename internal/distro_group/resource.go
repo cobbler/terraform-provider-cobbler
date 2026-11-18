@@ -58,6 +58,14 @@ func (r *DistroGroupResource) Schema(_ context.Context, _ resource.SchemaRequest
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"parent": schema.StringAttribute{
+				Description: "UID of the parent distro group. Used for hierarchical (nested) groups.",
+				Optional:    true,
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"items": schema.ListAttribute{
 				Description: "UIDs of the distros belonging to this group.",
 				Optional:    true,
@@ -88,6 +96,7 @@ func modelToGroup(ctx context.Context, data distroGroupResourceModel, diags *dia
 	g := cobbler.NewDistroGroup()
 	g.Name = data.Name.ValueString()
 	g.Comment = data.Comment.ValueString()
+	g.Parent = data.Parent.ValueString()
 
 	var items []string
 	if !data.Items.IsNull() && !data.Items.IsUnknown() {
@@ -104,6 +113,7 @@ func groupToModel(ctx context.Context, g cobbler.DistroGroup, data *distroGroupR
 	data.Name = types.StringValue(g.Name)
 	data.UID = types.StringValue(g.Uid)
 	data.Comment = types.StringValue(g.Comment)
+	data.Parent = types.StringValue(g.Parent)
 
 	items := g.Members
 	if items == nil {
@@ -118,6 +128,7 @@ func groupToDataSourceModel(ctx context.Context, g cobbler.DistroGroup, data *di
 	data.Name = types.StringValue(g.Name)
 	data.UID = types.StringValue(g.Uid)
 	data.Comment = types.StringValue(g.Comment)
+	data.Parent = types.StringValue(g.Parent)
 
 	items := g.Members
 	if items == nil {

@@ -130,3 +130,43 @@ resource "cobbler_distro_group" "foo" {
   items   = [cobbler_distro.b.uid]
 }
 `
+
+// TestAccDistroGroupResource_parent verifies that a DistroGroup's parent (another
+// DistroGroup — group nesting, distinct from the "items" list of member Distro uids)
+// round-trips correctly.
+func TestAccDistroGroupResource_parent(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			acctest.PreCheck(t)
+			acctest.SkipIfCobblerVersionLessThan(t, 4, 0, 0)
+		},
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccDistroGroupResourceParent,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_distro_group.child", "name", "foo-resource-distro-group-parent-child"),
+					resource.TestCheckResourceAttrPair("cobbler_distro_group.child", "parent", "cobbler_distro_group.parent", "uid"),
+				),
+			},
+			{
+				ResourceName:                         "cobbler_distro_group.child",
+				ImportState:                          true,
+				ImportStateVerify:                    true,
+				ImportStateId:                        "foo-resource-distro-group-parent-child",
+				ImportStateVerifyIdentifierAttribute: "name",
+			},
+		},
+	})
+}
+
+const testAccDistroGroupResourceParent = `
+resource "cobbler_distro_group" "parent" {
+  name = "foo-resource-distro-group-parent-parent"
+}
+
+resource "cobbler_distro_group" "child" {
+  name   = "foo-resource-distro-group-parent-child"
+  parent = cobbler_distro_group.parent.uid
+}
+`

@@ -49,6 +49,10 @@ func (d *RepoDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 				Description: "Free form text description.",
 				Computed:    true,
 			},
+			"parent": schema.StringAttribute{
+				Description: "The UID of the parent repo.",
+				Computed:    true,
+			},
 			"environment": schema.MapAttribute{
 				Description: "Environment variables to use during repo command execution.",
 				ElementType: types.StringType,
@@ -163,6 +167,7 @@ func (d *RepoDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	data.Arch = types.StringValue(repo.Arch)
 	data.Breed = types.StringValue(repo.Breed)
 	data.Comment = types.StringValue(repo.Comment)
+	data.Parent = types.StringValue(repo.Parent)
 	data.KeepUpdated = types.BoolValue(repo.KeepUpdated)
 	data.Mirror = types.StringValue(repo.Mirror)
 	data.MirrorLocally = types.BoolValue(repo.MirrorLocally)

@@ -10,6 +10,7 @@ type repoDataSourceModel struct {
 	Arch            types.String `tfsdk:"arch"`
 	Breed           types.String `tfsdk:"breed"`
 	Comment         types.String `tfsdk:"comment"`
+	Parent          types.String `tfsdk:"parent"`
 	Environment     types.Map    `tfsdk:"environment"`
 	KeepUpdated     types.Bool   `tfsdk:"keep_updated"`
 	Mirror          types.String `tfsdk:"mirror"`

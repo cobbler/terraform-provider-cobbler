@@ -83,6 +83,43 @@ func TestAccMenuResource_inherit(t *testing.T) {
 	})
 }
 
+// TestAccMenuResource_parent verifies that a menu's parent attribute is actually persisted
+// server-side; cobblerclient previously dropped the Parent field for every item type but
+// Profile.
+func TestAccMenuResource_parent(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccMenuResourceParent,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_menu.child", "name", "foo-resource-menu-parent-child"),
+					resource.TestCheckResourceAttrPair("cobbler_menu.child", "parent", "cobbler_menu.parent", "uid"),
+				),
+			},
+			{
+				ResourceName:                         "cobbler_menu.child",
+				ImportState:                          true,
+				ImportStateVerify:                    true,
+				ImportStateId:                        "foo-resource-menu-parent-child",
+				ImportStateVerifyIdentifierAttribute: "name",
+			},
+		},
+	})
+}
+
+const testAccMenuResourceParent = `
+resource "cobbler_menu" "parent" {
+  name = "foo-resource-menu-parent-parent"
+}
+
+resource "cobbler_menu" "child" {
+  name   = "foo-resource-menu-parent-child"
+  parent = cobbler_menu.parent.uid
+}
+`
+
 // TestAccMenuResource_importNotFound exercises the zero-match branch of the resource's
 // post-import name-to-uid resolution fallback: importing an ID that doesn't match any Menu on
 // the server must surface a clear "not found" diagnostic instead of a raw client error.

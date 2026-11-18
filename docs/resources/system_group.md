@@ -23,6 +23,7 @@ description: |-
 
 - `comment` (String) Free form text description.
 - `items` (List of String) UIDs of the systems belonging to this group.
+- `parent` (String) UID of the parent system group. Used for hierarchical (nested) groups.
 
 ### Read-Only
 

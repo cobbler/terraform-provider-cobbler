@@ -78,6 +78,14 @@ func (r *RepoResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"parent": schema.StringAttribute{
+				Description: "The UID of the parent repo. Used for hierarchical repos.",
+				Optional:    true,
+				Computed:    true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
+			},
 			"environment": schema.MapAttribute{
 				Description: "Environment variables to use during repo command execution.",
 				ElementType: types.StringType,
@@ -339,6 +347,7 @@ func modelToRepo(ctx context.Context, data repoResourceModel, diags *diag.Diagno
 	repo.Arch = data.Arch.ValueString()
 	repo.Breed = data.Breed.ValueString()
 	repo.Comment = data.Comment.ValueString()
+	repo.Parent = data.Parent.ValueString()
 	repo.KeepUpdated = data.KeepUpdated.ValueBool()
 	repo.Mirror = data.Mirror.ValueString()
 	repo.MirrorLocally = data.MirrorLocally.ValueBool()
@@ -382,6 +391,7 @@ func repoToModel(ctx context.Context, repo cobbler.Repo, data *repoResourceModel
 	data.Arch = types.StringValue(repo.Arch)
 	data.Breed = types.StringValue(repo.Breed)
 	data.Comment = types.StringValue(repo.Comment)
+	data.Parent = types.StringValue(repo.Parent)
 	data.KeepUpdated = types.BoolValue(repo.KeepUpdated)
 	data.Mirror = types.StringValue(repo.Mirror)
 	data.MirrorLocally = types.BoolValue(repo.MirrorLocally)

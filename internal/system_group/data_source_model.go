@@ -6,5 +6,6 @@ type systemGroupDataSourceModel struct {
 	Name    types.String `tfsdk:"name"`
 	UID     types.String `tfsdk:"uid"`
 	Comment types.String `tfsdk:"comment"`
+	Parent  types.String `tfsdk:"parent"`
 	Items   types.List   `tfsdk:"items"`
 }
