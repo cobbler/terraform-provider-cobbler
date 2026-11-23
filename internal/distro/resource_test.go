@@ -84,6 +84,47 @@ func TestAccDistroResource_change(t *testing.T) {
 	})
 }
 
+// TestAccDistroResource_sourceRepos is a regression test: a distro with a non-empty
+// source_repos used to crash the provider's Read entirely (cobblerclient decoded the
+// field's nested array-of-2-element-arrays wire shape into a flat []string).
+// source_repos isn't in this resource's schema (it's populated by `cobbler import`'s
+// split-tree-repo detection, not Terraform config), so it's forced here via a raw RPC
+// call between steps, and the second step's implicit refresh-before-plan is what
+// exercises the provider's Read path.
+func TestAccDistroResource_sourceRepos(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccDistroResourceSourceRepos,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_distro.foo", "name", "foo-resource-distro-source-repos"),
+				),
+			},
+			{
+				PreConfig: func() {
+					handle, err := acctest.CobblerApiClient.GetDistroHandle("foo-resource-distro-source-repos")
+					if err != nil {
+						t.Fatalf("failed to resolve distro handle: %v", err)
+					}
+					_, err = acctest.CobblerApiClient.Call("modify_distro", handle, []string{"source_repos"},
+						[][]string{{"http://example.com/repo1.repo", "http://example.com/repo1"}}, acctest.CobblerApiClient.Token)
+					if err != nil {
+						t.Fatalf("failed to set source_repos: %v", err)
+					}
+					if err := acctest.CobblerApiClient.SaveDistro(handle, true, true, "bypass"); err != nil {
+						t.Fatalf("failed to save distro: %v", err)
+					}
+				},
+				Config:             testAccDistroResourceSourceRepos,
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: false,
+			},
+		},
+	})
+}
+
 const testAccDistroResourceBasic = `
 resource "cobbler_distro" "foo" {
   name       = "foo-resource-distro-basic"
@@ -230,6 +271,17 @@ const testAccDistroResourceChange2 = `
 resource "cobbler_distro" "foo" {
   name       = "foo-resource-distro-change"
   comment    = "I am a distro again"
+  breed      = "ubuntu"
+  os_version = "focal"
+  arch       = "x86_64"
+  kernel     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/vmlinuz"
+  initrd     = "/srv/www/cobbler/distro_mirror/Ubuntu-20.04/install/initrd.gz"
+}
+`
+
+const testAccDistroResourceSourceRepos = `
+resource "cobbler_distro" "foo" {
+  name       = "foo-resource-distro-source-repos"
   breed      = "ubuntu"
   os_version = "focal"
   arch       = "x86_64"
