@@ -424,6 +424,10 @@ func (r *NetworkInterfaceResource) Update(ctx context.Context, req resource.Upda
 	if resp.Diagnostics.HasError() {
 		return
 	}
+	// modelToInterface doesn't carry the resource's known uid onto the fresh struct;
+	// without it, UpdateNetworkInterface falls back to a name-based lookup that's
+	// ambiguous whenever the interface name isn't unique across the server.
+	iface.Uid = data.UID.ValueString()
 
 	mu := lockForSystem(systemUid)
 	mu.Lock()

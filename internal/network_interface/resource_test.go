@@ -148,6 +148,84 @@ func TestAccNetworkInterfaceResource_importComposite(t *testing.T) {
 	})
 }
 
+// TestAccNetworkInterfaceResource_updateAmbiguousNameAcrossSystems covers updating a
+// cobbler_network_interface whose name collides with another system's (e.g. both "eth0").
+// The second step changes only one of the two same-named interfaces and must land on it
+// without disturbing the other.
+func TestAccNetworkInterfaceResource_updateAmbiguousNameAcrossSystems(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			acctest.PreCheck(t)
+			acctest.SkipIfCobblerVersionLessThan(t, 4, 0, 0)
+		},
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccNetworkInterfaceResourceUpdateAmbiguous1,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_network_interface.eth0_a", "mac_address", "aa:bb:cc:dd:ee:c1"),
+					resource.TestCheckResourceAttr("cobbler_network_interface.eth0_b", "mac_address", "aa:bb:cc:dd:ee:c2"),
+				),
+			},
+			{
+				Config: testAccNetworkInterfaceResourceUpdateAmbiguous2,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr("cobbler_network_interface.eth0_a", "mac_address", "aa:bb:cc:dd:ee:c1"),
+					resource.TestCheckResourceAttr("cobbler_network_interface.eth0_b", "mac_address", "aa:bb:cc:dd:ee:c3"),
+				),
+			},
+		},
+	})
+}
+
+const testAccNetworkInterfaceResourceUpdateAmbiguous1 = testAccNetworkInterfaceDistroProfileSystem + `
+resource "cobbler_system" "update_ambig_a" {
+  name    = "foo-resource-network-interface-update-ambig-a"
+  profile = cobbler_profile.foo.uid
+}
+
+resource "cobbler_system" "update_ambig_b" {
+  name    = "foo-resource-network-interface-update-ambig-b"
+  profile = cobbler_profile.foo.uid
+}
+
+resource "cobbler_network_interface" "eth0_a" {
+  name        = "eth0"
+  system      = cobbler_system.update_ambig_a.uid
+  mac_address = "aa:bb:cc:dd:ee:c1"
+}
+
+resource "cobbler_network_interface" "eth0_b" {
+  name        = "eth0"
+  system      = cobbler_system.update_ambig_b.uid
+  mac_address = "aa:bb:cc:dd:ee:c2"
+}
+`
+
+const testAccNetworkInterfaceResourceUpdateAmbiguous2 = testAccNetworkInterfaceDistroProfileSystem + `
+resource "cobbler_system" "update_ambig_a" {
+  name    = "foo-resource-network-interface-update-ambig-a"
+  profile = cobbler_profile.foo.uid
+}
+
+resource "cobbler_system" "update_ambig_b" {
+  name    = "foo-resource-network-interface-update-ambig-b"
+  profile = cobbler_profile.foo.uid
+}
+
+resource "cobbler_network_interface" "eth0_a" {
+  name        = "eth0"
+  system      = cobbler_system.update_ambig_a.uid
+  mac_address = "aa:bb:cc:dd:ee:c1"
+}
+
+resource "cobbler_network_interface" "eth0_b" {
+  name        = "eth0"
+  system      = cobbler_system.update_ambig_b.uid
+  mac_address = "aa:bb:cc:dd:ee:c3"
+}
+`
+
 const testAccNetworkInterfaceResourceImportComposite = testAccNetworkInterfaceDistroProfileSystem + `
 resource "cobbler_system" "composite_a" {
   name    = "foo-resource-network-interface-import-composite-a"
